@@ -1,0 +1,224 @@
+<?xml version="1.0"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.riftsaw</groupId>
+	<artifactId>riftsaw-parent</artifactId>
+	<version>3.0.0-SNAPSHOT</version>
+	<packaging>pom</packaging>
+	<name>RiftSaw</name>
+	<url>http://www.jboss.org/riftsaw</url>
+	<description>
+		RiftSaw - the JBoss BPEL engine.
+	</description>
+
+	<scm>
+		<connection>scm:svn:http://anonsvn.jboss.org/repos/riftsaw/trunk</connection>
+		<developerConnection>scm:svn:https://svn.jboss.org/repos/riftsaw/trunk</developerConnection>
+		<url>http://fisheye.jboss.org/browse/Riftsaw</url>
+	</scm>
+
+	<developers>
+		<developer>
+			<name>Kurt Stam</name>
+			<id>kstam</id>
+			<email>kstam@redhat.com</email>
+			<organization>Red Hat</organization>
+			<roles>
+				<role>Developer</role>
+			</roles>
+			<timezone>+8</timezone>
+		</developer>
+		<developer>
+			<name>Gary Brown</name>
+			<id>objectiser</id>
+			<email>gbrown@redhat.com</email>
+			<organization>Red Hat</organization>
+			<roles>
+				<role>Developer</role>
+			</roles>
+			<timezone>+1</timezone>
+		</developer>
+		<developer>
+			<name>Heiko Braun</name>
+			<id>hbraun</id>
+			<email>hbraun@redhat.com</email>
+			<organization>Red Hat</organization>
+			<roles>
+				<role>Developer</role>
+			</roles>
+			<timezone>+1</timezone>
+		</developer>
+		<developer>
+			<name>Jeff Yu</name>
+			<id>jeff.yuchang</id>
+			<email>cyu@redhat.com</email>
+			<organization>Red Hat</organization>
+			<roles>
+				<role>Developer</role>
+			</roles>
+			<timezone>+10</timezone>
+		</developer>
+	</developers>
+
+	<modules>
+		<module>engine</module>
+	</modules>
+  
+	<properties>
+		<riftsaw.ode.version>2.3.0-SNAPSHOT</riftsaw.ode.version>
+		<riftsaw.engine.version>2.3.0-SNAPSHOT</riftsaw.engine.version>
+		<bpel.console.version>2.2.5-SNAPSHOT</bpel.console.version>
+		<activity.monitor.model.version>1.0.0.Final</activity.monitor.model.version>
+		<dsp.version>1.0.0.Final</dsp.version>
+		<commons.logging.version>1.1.1</commons.logging.version>
+		<commons.lang.version>2.4</commons.lang.version>
+		<junit.version>4.8.1</junit.version>
+		<jboss.version>5.1.0.GA</jboss.version>
+		<log4j.version>1.2.14</log4j.version>
+		<jbossesb.version>4.9</jbossesb.version>
+		<jbossts.version>4.6.1.GA</jbossts.version>
+		<wsdl4j.version>1.6.2</wsdl4j.version>
+		<h2.version>1.2.124</h2.version>
+		<javassist.version>3.11.0.GA</javassist.version>
+		<jaxws.version>2.1</jaxws.version>
+		<xmlbeans.version>2.2.0</xmlbeans.version>
+		<commons.codec.version>1.3</commons.codec.version>
+		<xerces.version>2.9.0</xerces.version>
+		<commons.httpclient.version>3.1</commons.httpclient.version>
+		<cxf.version>2.2.6</cxf.version>
+		<saxon.version>9.2.1.5</saxon.version>
+		<spring.version>3.0.3.RELEASE</spring.version> <!-- This version must match the version used by the ESB -->
+		<batik.version>1.7</batik.version>
+		<axiom.version>1.2.8</axiom.version>
+		<commons.codec.version>1.4</commons.codec.version>
+		<picketlink.version>1.0.3.final</picketlink.version>
+		<juddi.version>3.1.0-SNAPSHOT</juddi.version>
+		<scout.version>1.2.3-SNAPSHOT</scout.version>
+	</properties>
+
+	<dependencyManagement>
+		<dependencies> 
+		</dependencies>
+	</dependencyManagement>
+
+	<distributionManagement>
+		<repository>
+			<id>jboss-releases-repository</id>
+			<name>JBoss Releases Repository</name>
+			<url>https://repository.jboss.org/nexus/service/local/staging/deploy/maven2/</url>
+		</repository>
+		<snapshotRepository>
+			<id>jboss-snapshots-repository</id>
+			<name>JBoss Snapshots Repository</name>
+			<url>https://repository.jboss.org/nexus/content/repositories/snapshots/</url>
+		</snapshotRepository>
+	</distributionManagement>
+
+  <build>
+    <!-- This section defines the default plugin settings inherited by child projects. -->
+    <pluginManagement>
+    <plugins>
+        <!-- Fixes how test resources of a project can be used in projects dependent on it  -->
+    <plugin>
+      <groupId>org.apache.maven.plugins</groupId>
+      <artifactId>maven-jar-plugin</artifactId>
+      <version>2.2</version>
+    </plugin>
+    <plugin>
+      <groupId>org.apache.maven.plugins</groupId>
+      <artifactId>maven-javadoc-plugin</artifactId>
+      <version>2.2</version>
+      <configuration>
+        <aggregate>true</aggregate>
+      </configuration>
+    </plugin>
+      <!-- Specify the compiler options and settings -->
+    <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>2.3.2</version>
+        <configuration>
+          <source>1.5</source>
+          <target>1.5</target>
+          <showDeprecation>false</showDeprecation>
+          <showWarnings>false</showWarnings>
+          <optimize>true</optimize>
+          <compilerArgument>-verbose</compilerArgument>
+        </configuration>
+    </plugin>
+    <!-- Produce source jars during the 'verify' phase -->
+    <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+        <version>2.1.2</version>
+        <executions>
+          <execution>
+            <id>attach-sources</id>
+            <phase>verify</phase>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+          </execution>
+        </executions>
+     </plugin>
+     <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>2.7.2</version>
+        <configuration>
+          <includes>
+            <include>**/*TestCase.java</include>
+            <include>**/*Test.java</include>
+          </includes>
+        </configuration>
+     </plugin>
+     <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <version>2.2-beta-5</version>
+     </plugin>
+   </plugins>
+   </pluginManagement>
+  </build>
+
+  <reporting>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-report-plugin</artifactId>
+        <version>2.7.2</version>
+      </plugin>
+	  <!--plugin>
+	    <groupId>org.codehaus.mojo</groupId>
+	    <artifactId>findbugs-maven-plugin</artifactId>
+	    <version>2.3</version>
+		<configuration>
+		  <xmlOutput>true</xmlOutput>
+		  <xmlOutputDirectory>target/site</xmlOutputDirectory>
+		  <onlyAnalyze>org.jboss.soa.bpel.*</onlyAnalyze>
+		</configuration>
+	  </plugin-->
+    </plugins>
+  </reporting>
+
+  <repositories>
+
+    <repository>
+        <id>jboss-public-repository-group</id>
+        <name>JBoss Public Repository Group</name>
+		<url>http://repository.jboss.org/nexus/content/groups/public</url>
+		<releases>
+		  <enabled>true</enabled>
+		  <updatePolicy>never</updatePolicy>
+		</releases>
+		<snapshots>
+		  <enabled>true</enabled>
+		  <updatePolicy>never</updatePolicy>
+		</snapshots>
+    </repository>
+
+  </repositories>
+
+</project>

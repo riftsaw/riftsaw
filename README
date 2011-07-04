@@ -1,0 +1,66 @@
+This is an experiment in providing the best way to embed the ODE BPEL engine for use
+in other environments, e.g. SCA and more specifically the JBoss Switchyard project.
+
+
+To run the current test application:
+
+1) run "mvn eclipse:eclipse" from the top level folder
+2) import project 'embedded' into Eclipse
+3) select the "Run As->Java Application" menu item associated with the Java class 'org.riftsaw.RiftsawEngine' 
+
+
+
+NOTES
+=====
+
+The following is the list of jars used in the original embedded test, and may provide
+an indication of the minimum set of dependencies required. The maven project does not
+restrict the extended list of dependencies pulled in currently.
+
+	<classpathentry kind="lib" path="lib/commons-lang-2.4.jar"/>
+	<classpathentry kind="lib" path="lib/geronimo-connector-2.0.1.jar"/>
+	<classpathentry kind="lib" path="lib/riftsaw-agents-2.3.0-20110608.015915-15.jar"/>
+	<classpathentry kind="lib" path="lib/riftsaw-bpel-api-2.3.0-20110608.020103-15.jar"/>
+	<classpathentry kind="lib" path="lib/riftsaw-bpel-compiler-2.3.0-20110608.020244-14.jar"/>
+	<classpathentry kind="lib" path="lib/riftsaw-bpel-dao-2.3.0-20110608.020130-14.jar"/>
+	<classpathentry kind="lib" path="lib/riftsaw-bpel-epr-2.3.0-20110608.020222-14.jar"/>
+	<classpathentry kind="lib" path="lib/riftsaw-bpel-obj-2.3.0-20110608.020042-15.jar"/>
+	<classpathentry kind="lib" path="lib/riftsaw-bpel-ql-2.3.0-20110608.020303-14.jar"/>
+	<classpathentry kind="lib" path="lib/riftsaw-bpel-runtime-2.3.0-20110608.020531-14.jar"/>
+	<classpathentry kind="lib" path="lib/riftsaw-bpel-schemas-2.3.0-20110608.020009-15.jar"/>
+	<classpathentry kind="lib" path="lib/riftsaw-bpel-store-2.3.0-20110608.020408-14.jar"/>
+	<classpathentry kind="lib" path="lib/riftsaw-dao-jpa-2.3.0-20110608.020145-14.jar"/>
+	<classpathentry kind="lib" path="lib/riftsaw-dao-jpa-hibernate-2.3.0-20110608.020323-14.jar"/>
+	<classpathentry kind="lib" path="lib/riftsaw-jacob-2.3.0-20110608.015948-15.jar"/>
+	<classpathentry kind="lib" path="lib/riftsaw-scheduler-simple-2.3.0-20110608.020513-14.jar" sourcepath="/riftsaw-scheduler-simple"/>
+	<classpathentry kind="lib" path="lib/riftsaw-utils-2.3.0-20110608.015934-15.jar"/>
+	<classpathentry kind="lib" path="lib/saxonhe-9.2.1.5.jar"/>
+	<classpathentry kind="lib" path="lib/spring-core-3.0.3.RELEASE.jar"/>
+	<classpathentry kind="lib" path="lib/xmlbeans-2.2.0.jar"/>
+	<classpathentry kind="lib" path="lib/jboss-javaee.jar"/>
+	<classpathentry kind="lib" path="lib/commons-logging.jar"/>
+	<classpathentry kind="lib" path="lib/riftsaw-engine-2.3.0-SNAPSHOT.jar"/>
+	<classpathentry kind="lib" path="lib/h2-1.2.124.jar"/>
+	<classpathentry kind="lib" path="lib/hibernate-core.jar"/>
+	<classpathentry kind="lib" path="lib/ejb3-persistence.jar"/>
+	<classpathentry kind="lib" path="lib/hibernate-entitymanager.jar"/>
+	<classpathentry kind="lib" path="lib/dom4j.jar"/>
+	<classpathentry kind="lib" path="lib/hibernate-annotations.jar"/>
+	<classpathentry kind="lib" path="lib/hibernate-commons-annotations.jar"/>
+	<classpathentry kind="lib" path="lib/slf4j-api-1.6.1.jar"/>
+	<classpathentry kind="lib" path="lib/slf4j-jcl-1.6.1.jar"/>
+	<classpathentry kind="lib" path="lib/javassist.jar"/>
+	<classpathentry kind="lib" path="lib/activity-monitor-model.jar"/>
+	<classpathentry kind="lib" path="lib/commons-collections.jar"/>
+	<classpathentry kind="lib" path="lib/geronimo-transaction-2.1.4.jar"/>
+	<classpathentry kind="lib" path="lib/antlr.jar"/>
+	<classpathentry kind="lib" path="lib/wsdl4j.jar"/>
+	<classpathentry kind="lib" path="lib/org.springframework.context-3.0.3.RELEASE.jar"/>
+	<classpathentry kind="lib" path="lib/org.springframework.beans-3.0.3.RELEASE.jar"/>
+	<classpathentry kind="lib" path="lib/org.springframework.asm-3.0.3.RELEASE.jar"/>
+	<classpathentry kind="lib" path="lib/xercesImpl.jar"/>
+	<classpathentry kind="lib" path="lib/xalan.jar"/>
+	<classpathentry kind="lib" path="lib/jaxen.jar"/>
+	<classpathentry kind="lib" path="lib/tranql-connector-1.1.jar"/>
+	<classpathentry kind="lib" path="lib/jboss-common-core.jar"/>
+
