@@ -45,15 +45,6 @@ public class MessageExchangeContextImpl implements MessageExchangeContext {
         if (__log.isDebugEnabled())
             __log.debug("Invoking a partner operation: " + partnerRoleMessageExchange.getOperationName());
 
-        /* TODO: TEAM_ODE: This needs to retrieve the relevant 'transport layer' construct that is used to manage communications
-         * with the external service.
-         * 
-        ExternalService service = (ExternalService)partnerRoleMessageExchange.getPartnerRoleChannel();
-        if (__log.isDebugEnabled())
-            __log.debug("The service to invoke is the external service " + service.getServiceName()+":"+service.getPortName());
-        service.invoke(partnerRoleMessageExchange);
-        */
-        
         PartnerRoleChannelImpl channel=(PartnerRoleChannelImpl)
             partnerRoleMessageExchange.getChannel();
         

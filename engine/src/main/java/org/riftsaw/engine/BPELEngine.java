@@ -21,17 +21,46 @@ import javax.xml.namespace.QName;
 
 import org.w3c.dom.Element;
 
-
+/**
+ * This interface represents the BPEL engine, used to deploy
+ * process definitions and invoke BPEL process instances.
+ *
+ */
 public interface BPELEngine {
 	
+	/**
+	 * This method initializes the BPEL engine.
+	 * 
+	 * @throws Exception Failed to initialize
+	 */
 	public void init() throws Exception;
 	
-	public void deploy(BPELDeploymentUnit bdu);
+	/**
+	 * This method deploys a BPEL process definition.
+	 * 
+	 * @param bdu The BPEL process definition
+	 */
+	public void deploy(DeploymentUnit bdu);
 
+	/**
+	 * This method invokes a BPEL process instance. If a process
+	 * does not exist, one will be created. If the message is
+	 * for an existing process, it will be routed to the appropriate
+	 * instance based on correlaton information within the
+	 * message contents or header values.
+	 * 
+	 * @param serviceName The service name
+	 * @param portName The port name
+	 * @param operationName The operation name
+	 * @param mesg The multipart message
+	 * @param headers The optional header values
+	 * @return The response, or null if a one-way request
+	 * @throws Exception Failed to invoke operation
+	 */
 	public Element invoke(QName serviceName, String portName, String operationName, Element mesg,
 						java.util.Map<String, Object> headers) throws Exception;
 	
-	public void undeploy(BPELDeploymentUnit bdu);
+	public void undeploy(DeploymentUnit bdu);
 	
 	public void close() throws Exception;
 	

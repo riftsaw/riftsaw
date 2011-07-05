@@ -1,3 +1,20 @@
+/*
+ * JBoss, Home of Professional Open Source
+ * Copyright 2009-11, Red Hat Middleware LLC, and others contributors as indicated
+ * by the @authors tag. All rights reserved.
+ * See the copyright.txt in the distribution for a
+ * full listing of individual contributors.
+ * This copyrighted material is made available to anyone wishing to use,
+ * modify, copy, or redistribute it subject to the terms and conditions
+ * of the GNU Lesser General Public License, v. 2.1.
+ * This program is distributed in the hope that it will be useful, but WITHOUT A
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+ * PARTICULAR PURPOSE.  See the GNU Lesser General Public License for more details.
+ * You should have received a copy of the GNU Lesser General Public License,
+ * v.2.1 along with this distribution; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+ * MA  02110-1301, USA.
+ */
 package org.riftsaw.engine.internal;
 
 import java.util.StringTokenizer;
@@ -6,12 +23,12 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.transaction.TransactionManager;
 import javax.xml.namespace.QName;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.ode.bpel.common.evt.DebugBpelEventListener;
 import org.apache.ode.bpel.engine.BpelServerImpl;
 import org.apache.ode.bpel.engine.CountLRUDehydrationPolicy;
@@ -39,79 +56,17 @@ import org.apache.ode.store.RiftSawProcessStore;
 import org.apache.ode.utils.DOMUtils;
 import org.apache.ode.utils.GUID;
 import org.apache.ode.utils.Properties;
-import org.riftsaw.engine.BPELDeploymentUnit;
+import org.riftsaw.engine.BPELEngine;
+import org.riftsaw.engine.DeploymentUnit;
 import org.w3c.dom.Element;
 
-public class BPELEngineImpl {
+/**
+ * This class provides an ODE based implementation of the BPEL engine interface.
+ *
+ */
+public class BPELEngineImpl implements BPELEngine {
 	
-	public static void main(String[] args) {
-		
-		java.net.URL url=BPELEngineImpl.class.getResource("/hello_world/deploy.xml");
-		
-		java.io.File deployFile=new java.io.File(url.getFile());
-		
-		BPELDeploymentUnit bdu=new BPELDeploymentUnit("hello_world", deployFile.lastModified());
-		bdu.setDeploymentDescriptor(deployFile);
-
-		// Create the engine
-		BPELEngineImpl engine=new BPELEngineImpl();
-		
-		try {
-			engine.init();
-			
-			Thread.sleep(2000);
-			
-			logger.info("GPB: DEPLOY");
-			
-			// Deploy the process
-			engine.deploy(bdu);
-			
-			Thread.sleep(5000);
-			
-			org.w3c.dom.Element mesgElem=DOMUtils.stringToDOM("<message><TestPart>Hello</TestPart></message>");
-	
-			// Invoke the service
-			String serviceName="{http://www.jboss.org/bpel/examples/wsdl}HelloService";
-			String portName="HelloPort";
-			String operation="hello";
-			
-			javax.xml.namespace.QName qname=javax.xml.namespace.QName.valueOf(serviceName);
-			
-			// Create invocationContext
-			//EmbeddedInvocationAdapter invocationContext =
-			//	new EmbeddedInvocationAdapter(operation, qname, portName);
-			//invocationContext.setRequestXML(mesgElem);
-			
-			// invoke ODE
-			Element resp=null;
-			
-			try {
-				resp  = engine.invoke(qname, portName, operation, mesgElem, null);
-			} catch(Throwable t) {
-				// RIFTSAW-177 - prevent ODE specific exceptions being returned to ESB client where
-				// a ClassNotFoundException would be thrown
-				throw new Exception("BPEL invoke failed: "+t);
-			}
-			
-			logger.info("RESPONSE="+DOMUtils.domToString(resp));
-			
-			logger.info("GPB: UNDEPLOY");
-			
-			// Undeploy the process
-			engine.undeploy(bdu);
-			
-			Thread.sleep(2000);
-
-			System.out.println("GPB: CLOSE");
-			
-			engine.close();
-			
-		} catch(Exception e) {
-			e.printStackTrace();
-		}
-	}
-
-	private static final Logger logger=Logger.getLogger(BPELEngineImpl.class.getName());
+	private static final Log _log=LogFactory.getLog(BPELEngineImpl.class);
 
 	protected BpelServerImpl _bpelServer;
 	protected RiftSawProcessStore _store;
@@ -136,33 +91,33 @@ public class BPELEngineImpl {
 	
 			props.load(is);
 		} catch(Exception e) {
-			logger.log(Level.SEVERE, "Failed to load properties", e);
+			_log.error("Failed to load properties", e);
 		}
 
-		logger.info("ODE PROPS="+props);
+		_log.info("ODE PROPS="+props);
 
 		_odeConfig = new OdeConfigProperties(props, "bpel.");
 
-		logger.info("Initializing transaction manager");
+		_log.info("Initializing transaction manager");
 		initTxMgr();
 		
-		logger.info("Creating data source.");
+		_log.info("Creating data source.");
 		initDataSource();
 		
-		logger.info("Starting DAO.");
+		_log.info("Starting DAO.");
 		initDAO();
 		
 		EndpointReferenceContextImpl eprContext = new EndpointReferenceContextImpl(this);
 		
 		initCacheProvider();
 		
-		logger.info("Initializing BPEL process store.");
+		_log.info("Initializing BPEL process store.");
 		initProcessStore(eprContext);
 		
-		logger.info("Initializing UDDI registration");
+		_log.info("Initializing UDDI registration");
 		//initUDDIRegistration();
 		
-		logger.info("Initializing BPEL server.");
+		_log.info("Initializing BPEL server.");
 		initBpelServer(eprContext);
 
 		_store.loadAll();
@@ -179,10 +134,10 @@ public class BPELEngineImpl {
 			_bpelServer.start();
 		} catch (Exception ex) {
 			String errmsg = "SERVER START FAILED";
-			logger.log(Level.SEVERE, errmsg, ex);
+			_log.error(errmsg, ex);
 		}
 
-		logger.info("Starting scheduler");
+		_log.info("Starting scheduler");
 		_scheduler.start();
 	}
 	
@@ -203,7 +158,7 @@ public class BPELEngineImpl {
 		try {
 			_cacheProvider.start();
 		} catch (Exception e) {
-			logger.log(Level.SEVERE, "Error in starting cache provider", e);
+			_log.error("Error in starting cache provider", e);
 			throw new RuntimeException("Error in initCacheProvider.", e);
 		}
 	}
@@ -218,7 +173,7 @@ public class BPELEngineImpl {
 			_db.start();
 		} catch (Exception ex) {
 			String errmsg = "FAILED TO INITIALISE DATA SOURCE";
-			logger.log(Level.SEVERE, errmsg, ex);
+			_log.error(errmsg, ex);
 			throw new Exception(errmsg, ex);
 		}
 	}
@@ -237,7 +192,7 @@ public class BPELEngineImpl {
 			//	_txMgr = new DebugTxMgr(_txMgr);
 			//_axisConfig.addParameter("ode.transaction.manager", _txMgr);
 		} catch (Exception e) {
-			logger.log(Level.SEVERE, "Couldn't initialize a transaction manager with factory: " + txFactoryName, e);
+			logger.error("Couldn't initialize a transaction manager with factory: " + txFactoryName, e);
 			throw new Exception("Couldn't initialize a transaction manager with factory: " + txFactoryName, e);
 		}
 		*/
@@ -245,7 +200,7 @@ public class BPELEngineImpl {
 	}
 
 	protected void initDAO() throws Exception {
-		logger.info("USING DAO: "+_odeConfig.getDAOConnectionFactory() + ", " + _odeConfig.getDAOConfStoreConnectionFactory()
+		_log.info("USING DAO: "+_odeConfig.getDAOConnectionFactory() + ", " + _odeConfig.getDAOConfStoreConnectionFactory()
 						+ ", " + _odeConfig.getDAOConfScheduleConnectionFactory());
 		try {
 			_daoCF = _db.createDaoCF();
@@ -254,7 +209,7 @@ public class BPELEngineImpl {
 		} catch (Exception ex) {
 			String errmsg = "DAO INSTANTIATION FAILED: "+_odeConfig.getDAOConnectionFactory() + " , " + _odeConfig.getDAOConfStoreConnectionFactory()
 							+ " and " + _odeConfig.getDAOConfScheduleConnectionFactory();
-			logger.log(Level.SEVERE, errmsg, ex);
+			_log.error(errmsg, ex);
 			throw new Exception(errmsg, ex);
 		}
 	}
@@ -276,8 +231,8 @@ public class BPELEngineImpl {
 	}
 
 	private void initBpelServer(EndpointReferenceContextImpl eprContext) {
-		if (logger.isLoggable(Level.FINE)) {
-			logger.fine("ODE initializing");
+		if (_log.isDebugEnabled()) {
+			_log.debug("ODE initializing");
 		}
 		ThreadFactory threadFactory = new ThreadFactory() {
 			int threadNumber = 0;
@@ -331,11 +286,11 @@ public class BPELEngineImpl {
 		_bpelServer.setHydrationLazyMinimumSize(_odeConfig.getHydrationLazyMinimumSize());
 	}
 	
-	public void deploy(BPELDeploymentUnit bdu) {
+	public void deploy(DeploymentUnit bdu) {
 		_store.deploy(bdu);
 	}
 
-	public void undeploy(BPELDeploymentUnit bdu) {
+	public void undeploy(DeploymentUnit bdu) {
 		_store.undeploy(bdu);
 	}
 	
@@ -345,11 +300,11 @@ public class BPELEngineImpl {
 		try {
 			if (_bpelServer != null)
 				try {
-					logger.fine("shutting down BPEL server.");
+					_log.debug("shutting down BPEL server.");
 					_bpelServer.shutdown();
 					_bpelServer = null;
 				} catch (Throwable ex) {
-					logger.log(Level.FINE, "Error stopping services.", ex);
+					_log.debug("Error stopping services.", ex);
 				}
 	              
 				_cacheProvider.stop();
@@ -367,21 +322,21 @@ public class BPELEngineImpl {
 
 				if( _cronScheduler != null ) {
 					try {
-						logger.fine("shutting down cron scheduler.");
+						_log.debug("shutting down cron scheduler.");
 						_cronScheduler.shutdown();
 						_cronScheduler = null;
 					} catch (Exception ex) {
-						logger.log(Level.FINE, "Cron scheduler couldn't be shutdown.", ex);
+						_log.debug("Cron scheduler couldn't be shutdown.", ex);
 					}
 				}
 	          
 				if (_scheduler != null)
 					try {
-						logger.fine("shutting down scheduler.");
+						_log.debug("shutting down scheduler.");
 						_scheduler.shutdown();
 						_scheduler = null;
 					} catch (Exception ex) {
-						logger.log(Level.FINE, "Scheduler couldn't be shutdown.", ex);
+						_log.debug("Scheduler couldn't be shutdown.", ex);
 					}
 
 				if (_store != null)
@@ -389,14 +344,14 @@ public class BPELEngineImpl {
 						_store.shutdown();
 						_store = null;
 					} catch (Throwable t) {
-						logger.log(Level.FINE, "Store could not be shutdown.", t);
+						_log.debug("Store could not be shutdown.", t);
 					}
 
 				if (_daoCF != null)
 					try {
 						_daoCF.shutdown();
 					} catch (Throwable ex) {
-						logger.log(Level.FINE, "Bpel DAO shutdown failed.", ex);
+						_log.debug("Bpel DAO shutdown failed.", ex);
 					} finally {
 						_daoCF = null;
 					}
@@ -405,7 +360,7 @@ public class BPELEngineImpl {
 					try {
 						_storeCF.shutdown();
 					} catch (Throwable ex) {
-						logger.log(Level.FINE, "Store DAO shutdown failed.", ex);
+						_log.debug("Store DAO shutdown failed.", ex);
 					} finally {
 						_storeCF = null;
 					}
@@ -414,7 +369,7 @@ public class BPELEngineImpl {
 					try {
 						_schedulerDaoCF.shutdown();
 					} catch (Throwable ex) {
-						logger.log(Level.FINE, "Scheduler DAO shutdown failed.", ex);
+						_log.debug("Scheduler DAO shutdown failed.", ex);
 					} finally {
 						_schedulerDaoCF = null;
 					}    
@@ -423,13 +378,13 @@ public class BPELEngineImpl {
 					try {
 						_db.shutdown();
 					} catch (Throwable ex) {
-						logger.log(Level.FINE, "DB shutdown failed.", ex);
+						_log.debug("DB shutdown failed.", ex);
 					} finally {
 						_db = null;
 					}
 
 				if (_txMgr != null) {
-					logger.fine("shutting down transaction manager.");
+					_log.debug("shutting down transaction manager.");
 					_txMgr = null;
 				}
 
@@ -439,7 +394,7 @@ public class BPELEngineImpl {
 	}
 	
 	private void registerEventListeners() {
-
+		
 		// let's always register the debugging listener....
 		_bpelServer.registerBpelEventListener(new DebugBpelEventListener());
 
@@ -450,9 +405,9 @@ public class BPELEngineImpl {
 				String listenerCN = tokenizer.nextToken();
 				try {
 					_bpelServer.registerBpelEventListener((BpelEventListener) Class.forName(listenerCN).newInstance());
-					logger.fine("REGISTERED EVENT LISTENER: "+listenerCN);
+					_log.debug("REGISTERED EVENT LISTENER: "+listenerCN);
 				} catch (Exception e) {
-					logger.warning("Couldn't register the event listener " + listenerCN + ", the class couldn't be "
+					_log.warn("Couldn't register the event listener " + listenerCN + ", the class couldn't be "
 								+ "loaded properly: " + e);
 				}
 			}
@@ -467,9 +422,9 @@ public class BPELEngineImpl {
 				String interceptorCN = tokenizer.nextToken();
 				try {
 					_bpelServer.registerMessageExchangeInterceptor((MessageExchangeInterceptor) Class.forName(interceptorCN).newInstance());
-					logger.fine("MESSAGE EXCHANGE INTERCEPTOR REGISTERED: "+interceptorCN);
+					_log.debug("MESSAGE EXCHANGE INTERCEPTOR REGISTERED: "+interceptorCN);
 				} catch (Exception e) {
-					logger.warning("Couldn't register the event listener " + interceptorCN + ", the class couldn't be "
+					_log.warn("Couldn't register the event listener " + interceptorCN + ", the class couldn't be "
 							+ "loaded properly: " + e);
 				}
 			}
@@ -485,7 +440,7 @@ public class BPELEngineImpl {
 
 	private void handleEvent(ProcessStoreEvent pse) {
 
-		logger.fine("Process store event: " + pse);
+		_log.debug("Process store event: " + pse);
 		
 		ProcessConf pconf = _store.getProcessConfiguration(pse.pid);
 		switch (pse.type) {
@@ -506,7 +461,7 @@ public class BPELEngineImpl {
 			if (pconf != null) {
 				_bpelServer.register(pconf);
 			} else {
-				logger.fine("slighly odd: recevied event " +
+				_log.debug("slighly odd: recevied event " +
 							pse + " for process not in store!");
 			}
 			break;
@@ -520,7 +475,7 @@ public class BPELEngineImpl {
 				if (pconf != null) {
 					_bpelServer.register(pconf);
 				} else {
-					logger.fine("slighly odd: recevied event " +
+					_log.debug("slighly odd: recevied event " +
 							pse + " for process not in store!");
 				}
 			} else {
@@ -546,17 +501,17 @@ public class BPELEngineImpl {
 		        
 			break;
 		default:
-			logger.fine("Ignoring store event: " + pse);
+			_log.debug("Ignoring store event: " + pse);
 		}
 
 		if( pconf != null ) {
 			if( pse.type == ProcessStoreEvent.Type.UNDEPLOYED) {
-				logger.fine("Cancelling all cron scheduled jobs on store event: " + pse);
+				_log.debug("Cancelling all cron scheduled jobs on store event: " + pse);
 				_bpelServer.getContexts().cronScheduler.cancelProcessCronJobs(pse.pid, true);
 			}
 
 			// Except for undeploy event, we need to re-schedule process dependent jobs
-			logger.fine("(Re)scheduling cron scheduled jobs on store event: " + pse);
+			_log.debug("(Re)scheduling cron scheduled jobs on store event: " + pse);
 			if( pse.type != ProcessStoreEvent.Type.UNDEPLOYED) {
 				_bpelServer.getContexts().cronScheduler.scheduleProcessCronJobs(pse.pid, pconf);
 			}
@@ -572,11 +527,11 @@ public class BPELEngineImpl {
    
 		try {
 			_txMgr.begin();
-			if (logger.isLoggable(Level.FINE)) logger.fine("Starting transaction.");
+			if (_log.isDebugEnabled()) _log.debug("Starting transaction.");
       
 			odeMex = createMessageExchange(serviceName, portName, operationName);
 			odeMex.setProperty("isTwoWay", Boolean.toString(odeMex.getOperation().getOutput() != null));
-			if (logger.isLoggable(Level.FINE)) logger.fine("Is two way operation? "+odeMex.getProperty("isTwoWay"));
+			if (_log.isDebugEnabled()) _log.debug("Is two way operation? "+odeMex.getProperty("isTwoWay"));
       
 			if (odeMex.getOperation() != null) {
 				// Preparing message to send to ODE
@@ -586,27 +541,27 @@ public class BPELEngineImpl {
 				
 				// TODO: Need to apply headers - should they be elements or strings, or both catered for?
 				
-				if (logger.isLoggable(Level.FINE)) {
-					logger.fine("Invoking ODE using MEX " + odeMex);
-					logger.fine("Message content:  " + DOMUtils.domToString(odeRequest.getMessage()));
+				if (_log.isDebugEnabled()) {
+					_log.debug("Invoking ODE using MEX " + odeMex);
+					_log.debug("Message content:  " + DOMUtils.domToString(odeRequest.getMessage()));
 				}
 
 				// Invoke ODE
 				responseFuture = odeMex.invoke(odeRequest);
 
-				logger.fine("Commiting ODE MEX " + odeMex);
+				_log.debug("Commiting ODE MEX " + odeMex);
 				try {
-					if (logger.isLoggable(Level.FINE)) logger.fine("Commiting transaction.");
+					if (_log.isDebugEnabled()) _log.debug("Commiting transaction.");
 					_txMgr.commit();
 				} catch (Exception e) {
-					logger.log(Level.SEVERE, "Commit failed", e);
+					_log.error("Commit failed", e);
 					success = false;
 				}
 			} else {
 				success = false;
 			}
 		} catch (Exception e) {
-			logger.log(Level.SEVERE, "Exception occured while invoking ODE", e);
+			_log.error("Exception occured while invoking ODE", e);
 			success = false;
 			String errmesg = e.getMessage();
 			if (errmesg == null) {
@@ -631,15 +586,15 @@ public class BPELEngineImpl {
 			} catch (Exception e) {
 				String errorMsg = "Timeout or execution error when waiting for response to MEX "
 									+ odeMex + " " + e.toString();
-				logger.log(Level.SEVERE, errorMsg, e);
+				_log.error(errorMsg, e);
 				throw new Exception(errorMsg);
 			}
        
 			// Hopefully we have a response
-			logger.fine("Handling response for MEX " + odeMex);
+			_log.debug("Handling response for MEX " + odeMex);
 			boolean commit = false;
 			try {
-				if (logger.isLoggable(Level.FINE)) logger.fine("Starting transaction.");
+				if (_log.isDebugEnabled()) _log.debug("Starting transaction.");
 				_txMgr.begin();
 			} catch (Exception ex) {
 				throw new Exception("Error starting transaction!", ex);
@@ -649,17 +604,17 @@ public class BPELEngineImpl {
 				odeMex = (MyRoleMessageExchange) _bpelServer.getEngine().getMessageExchange(odeMex.getMessageExchangeId());
 				ret = onResponse(odeMex);
 
-				logger.fine("Returning: "+ret);
+				_log.debug("Returning: "+ret);
 
 				commit = true;
 			} catch (Exception e) {
-				logger.log(Level.SEVERE, "Error processing response for MEX " + odeMex, e);
+				_log.error("Error processing response for MEX " + odeMex, e);
 				throw new Exception("An exception occured when invoking ODE.", e);
 			} finally {
 				odeMex.release(commit);
 				if (commit) {
 					try {
-						if (logger.isLoggable(Level.FINE)) logger.fine("Comitting transaction.");
+						if (_log.isDebugEnabled()) _log.debug("Comitting transaction.");
 						_txMgr.commit();
 					} catch (Exception e) {
 						throw new Exception("Commit failed!", e);
@@ -689,7 +644,7 @@ public class BPELEngineImpl {
 		String messageId = new GUID().toString();
 		MyRoleMessageExchange odeMex = _bpelServer.getEngine()
 				.createMessageExchange(messageId, serviceName, operationName);
-		if (logger.isLoggable(Level.FINE)) logger.fine("ODE routed to operation " +
+		if (_log.isDebugEnabled()) _log.debug("ODE routed to operation " +
 					odeMex.getOperation() + " from service " + serviceName);
 		return odeMex;
 	}
@@ -699,8 +654,8 @@ public class BPELEngineImpl {
 
 		switch (mex.getStatus()) {
 		case FAULT:
-			if (logger.isLoggable(Level.FINE))
-				logger.fine("Fault response message: " + mex.getFault());
+			if (_log.isDebugEnabled())
+				_log.debug("Fault response message: " + mex.getFault());
 
 			
 			// TODO: Throw 'fault' exception?
@@ -710,14 +665,14 @@ public class BPELEngineImpl {
 			break;
 		case ASYNC:
 		case RESPONSE:
-			ret = mex.getResponse().getMessage();        
-			if (logger.isLoggable(Level.FINE))
-				logger.fine("Response message " + ret);
+			ret = mex.getResponse().getMessage();
+			if (_log.isDebugEnabled())
+				_log.debug("Response message " + ret);
 			break;
 		case FAILURE:
-			if (logger.isLoggable(Level.FINE))
-				logger.fine("Failure response message: " + mex.getFault());
-			logger.severe("Failure details: "+mex.getFaultResponse());
+			if (_log.isDebugEnabled())
+				_log.debug("Failure response message: " + mex.getFault());
+			_log.error("Failure details: "+mex.getFaultResponse());
 
 			throw new Exception("Failure response message: "+mex.getFault()+" : "+mex.getFaultExplanation());
 		default:
@@ -736,7 +691,7 @@ public class BPELEngineImpl {
 			try {
 				return Long.parseLong(timeout);
 			} catch (NumberFormatException e) {
-				if (logger.isLoggable(Level.WARNING)) logger.warning("Mal-formatted Property: ["+ Properties.PROP_MEX_TIMEOUT+"="+timeout+"] Default value ("+Properties.DEFAULT_MEX_TIMEOUT+") will be used");
+				if (_log.isWarnEnabled()) _log.warn("Mal-formatted Property: ["+ Properties.PROP_MEX_TIMEOUT+"="+timeout+"] Default value ("+Properties.DEFAULT_MEX_TIMEOUT+") will be used");
 			}
 		}
 		return Properties.DEFAULT_MEX_TIMEOUT;

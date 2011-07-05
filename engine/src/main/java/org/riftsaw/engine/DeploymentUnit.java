@@ -19,29 +19,25 @@ package org.riftsaw.engine;
 
 /**
  * This class represents the BPEL deployment unit.
- * 
- * @author gbrown
  *
  */
-public class BPELDeploymentUnit {
-
-	public static final String BPEL_DEPLOY_XML = "bpel-deploy.xml";
-	public static final String DEPLOY_XML = "deploy.xml";
+public class DeploymentUnit {
+	
+	private String m_name=null;
+	private long m_lastModified=0;
+	private java.io.File m_deploymentDescriptor=null;
 
 	/**
 	 * The constructor for the deployment unit.
 	 * 
 	 * @param name The unique name for the deployment unit
 	 * @param lastModified When the deployment unit was last modified
+	 * @param deploymentDescriptor The deployment descriptor file
 	 */
-	public BPELDeploymentUnit(String name, long lastModified) {
+	public DeploymentUnit(String name, long lastModified, java.io.File deploymentDescriptor) {
 		m_name = name;
 		m_lastModified = lastModified;
-		
-		// Remove any .jar suffix
-		if (m_name != null && m_name.endsWith(".jar")) {
-			m_name = m_name.substring(0, m_name.length()-4);
-		}
+		m_deploymentDescriptor = deploymentDescriptor;
 	}
 	
 	/**
@@ -72,22 +68,8 @@ public class BPELDeploymentUnit {
 		return(m_deploymentDescriptor);
 	}
 	
-	/**
-	 * This method sets the deployment descriptor for the BPEL module
-	 * being deployed.
-	 * 
-	 * @param file The BPEL deployment descriptor
-	 */
-	public void setDeploymentDescriptor(java.io.File file) {
-		m_deploymentDescriptor = file;
-	}
-	
 	public String toString() {
-		return("BPELDeploymentUnit[name="+m_name+",lastModified="+m_lastModified+",descriptor="+
+		return("DeploymentUnit[name="+m_name+",lastModified="+m_lastModified+",descriptor="+
 						m_deploymentDescriptor+"]");
 	}
-	
-	private String m_name=null;
-	private long m_lastModified=0;
-	private java.io.File m_deploymentDescriptor=null;
 }

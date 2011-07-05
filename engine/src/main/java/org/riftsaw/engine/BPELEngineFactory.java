@@ -1,6 +1,6 @@
 /*
  * JBoss, Home of Professional Open Source
- * Copyright 2009, Red Hat Middleware LLC, and others contributors as indicated
+ * Copyright 2009-11, Red Hat Middleware LLC, and others contributors as indicated
  * by the @authors tag. All rights reserved.
  * See the copyright.txt in the distribution for a
  * full listing of individual contributors.
@@ -15,20 +15,21 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA  02110-1301, USA.
  */
-package org.riftsaw.engine.internal;
+package org.riftsaw.engine;
 
 /**
- * This interface represents an endpoint reference.
+ * This class provides a factory for BPELEngine instances.
  *
  */
-public interface EndpointReference {
+public class BPELEngineFactory {
 
 	/**
-	 * This method returns the endpoint reference as an
-	 * XML document.
+	 * This method returns a new uninitialized instance of a BPEL engine.
+	 * The caller is expected to manage the lifecycle of the engine.
 	 * 
-	 * @return The XML representation of the endpoint reference.
+	 * @return The BPEL engine instance
 	 */
-	public org.w3c.dom.Document toXML();
-	
+	public static BPELEngine getEngine() {
+		return(new org.riftsaw.engine.internal.BPELEngineImpl());
+	}
 }
