@@ -4,10 +4,15 @@ in other environments, e.g. SCA and more specifically the JBoss Switchyard proje
 
 To run the current test application:
 
-1) run "mvn eclipse:eclipse" from the top level folder
-2) import project 'embedded' into Eclipse
-3) select the "Run As->Java Application" menu item associated with the Java class 'org.riftsaw.RiftsawEngine' 
+mvn clean install
 
+IDE setup
+=====
+
+If you prefer running the applications in IDE, like eclipse or IntelliJ IDEA, you can run following command to set up the workspace.
+
+mvn eclipse:eclipse (for eclipse)
+mvn idea:idea (for IDEA)
 
 
 NOTES
