@@ -67,7 +67,7 @@
 	</modules>
   
 	<properties>
-		<riftsaw.ode.version>2.3.0-SNAPSHOT</riftsaw.ode.version>
+		<riftsaw.ode.version>3.0.0-SNAPSHOT</riftsaw.ode.version>
 		<riftsaw.engine.version>2.3.0-SNAPSHOT</riftsaw.engine.version>
 		<bpel.console.version>2.2.5-SNAPSHOT</bpel.console.version>
 		<activity.monitor.model.version>1.0.0.Final</activity.monitor.model.version>
