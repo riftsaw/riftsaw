@@ -59,6 +59,7 @@ import org.apache.ode.utils.Properties;
 import org.riftsaw.engine.BPELEngine;
 import org.riftsaw.engine.DeploymentUnit;
 import org.riftsaw.engine.Fault;
+import org.riftsaw.engine.ServiceLocator;
 import org.w3c.dom.Element;
 
 /**
@@ -83,7 +84,7 @@ public class BPELEngineImpl implements BPELEngine {
 	protected CacheProvider _cacheProvider;
 	//protected UDDIRegistration _uddiRegistration;
 
-	public void init() throws Exception {
+	public void init(ServiceLocator locator) throws Exception {
 
 		java.util.Properties props=new java.util.Properties();
 
@@ -119,7 +120,7 @@ public class BPELEngineImpl implements BPELEngine {
 		//initUDDIRegistration();
 		
 		_log.info("Initializing BPEL server.");
-		initBpelServer(eprContext);
+		initBpelServer(eprContext, locator);
 
 		_store.loadAll();
 
@@ -231,7 +232,7 @@ public class BPELEngineImpl implements BPELEngine {
 		return scheduler;
 	}
 
-	private void initBpelServer(EndpointReferenceContextImpl eprContext) {
+	private void initBpelServer(EndpointReferenceContextImpl eprContext, ServiceLocator locator) {
 		if (_log.isDebugEnabled()) {
 			_log.debug("ODE initializing");
 		}
@@ -267,7 +268,7 @@ public class BPELEngineImpl implements BPELEngine {
 		_bpelServer.setDaoConnectionFactory(_daoCF);
 		_bpelServer.setInMemDaoConnectionFactory(new BpelDAOConnectionFactoryImpl(_scheduler, _odeConfig.getInMemMexTtl()));
 		_bpelServer.setEndpointReferenceContext(eprContext);
-		_bpelServer.setMessageExchangeContext(new MessageExchangeContextImpl(null));
+		_bpelServer.setMessageExchangeContext(new MessageExchangeContextImpl(locator));
 		    
 		_bpelServer.setBindingContext(new RiftsawBindingContext());
 		    

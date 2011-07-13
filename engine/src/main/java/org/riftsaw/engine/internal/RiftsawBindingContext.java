@@ -41,7 +41,7 @@ public class RiftsawBindingContext implements BindingContext {
 	
 	public PartnerRoleChannel createPartnerRoleChannel(QName processId, PortType portType,
               Endpoint initialPartnerEndpoint) {
-		return(null);
+		return(new PartnerRoleChannelImpl(initialPartnerEndpoint));
 	}
 	
 	public class EndpointReferenceImpl implements org.apache.ode.bpel.iapi.EndpointReference {

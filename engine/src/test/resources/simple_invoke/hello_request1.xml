@@ -1,0 +1,3 @@
+<wsdl:sayHelloTo xmlns:wsdl="http://www.jboss.org/bpel/examples/wsdl">
+    <ToWhom>ME</ToWhom>
+</wsdl:sayHelloTo>

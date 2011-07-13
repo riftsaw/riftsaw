@@ -1,0 +1,96 @@
+<!--
+ * JBoss, Home of Professional Open Source
+ * Copyright 2009, Red Hat Middleware LLC, and others contributors as indicated
+ * by the @authors tag. All rights reserved.
+ * See the copyright.txt in the distribution for a
+ * full listing of individual contributors.
+ * This copyrighted material is made available to anyone wishing to use,
+ * modify, copy, or redistribute it subject to the terms and conditions
+ * of the GNU Lesser General Public License, v. 2.1.
+ * This program is distributed in the hope that it will be useful, but WITHOUT A
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+ * PARTICULAR PURPOSE.  See the GNU Lesser General Public License for more details.
+ * You should have received a copy of the GNU Lesser General Public License,
+ * v.2.1 along with this distribution; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+ * MA  02110-1301, USA.
+ -->
+<process name="SimpleInvoke"
+         targetNamespace="http://www.jboss.org/bpel/examples"
+         xmlns="http://docs.oasis-open.org/wsbpel/2.0/process/executable"
+         xmlns:tns="http://www.jboss.org/bpel/examples"
+         xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+         xmlns:intf="http://www.jboss.org/bpel/examples/wsdl"
+         xmlns:intf2="http://simple_invoke/helloworld"
+         queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath2.0"
+         expressionLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath2.0">
+
+  <import location="SimpleInvoke.wsdl"
+          namespace="http://www.jboss.org/bpel/examples/wsdl"
+          importType="http://schemas.xmlsoap.org/wsdl/" />
+
+  <import location="HelloWorldWS.wsdl"
+          namespace="http://simple_invoke/helloworld"
+          importType="http://schemas.xmlsoap.org/wsdl/" />
+
+  <partnerLinks>
+    <partnerLink name="theClient_PartnerLink"
+                 partnerLinkType="intf:myClientCalling_PartnerLinkType"
+                 myRole="me" />
+    <partnerLink name="theExternalService_PartnerLink"
+                 partnerLinkType="intf2:theExternalService_PartnerLinkType"
+                 partnerRole="callingTheExternalService"
+                 initializePartnerRole="yes"/>
+  </partnerLinks>
+
+  <variables>
+    <variable name="myVar" messageType="intf:GreetingTarget_Message"/>
+    <variable name="inVar" messageType="intf2:HelloWorld_sayHello"/>
+    <variable name="outVar" messageType="intf2:HelloWorld_sayHelloResponse"/>
+    <variable name="tempVar" type="xsd:string"/>
+  </variables>
+
+  <sequence>
+    <receive
+        name="request"
+        partnerLink="theClient_PartnerLink"
+        portType="intf:SimpleInvoke_PortType"
+        operation="sayHelloTo"
+        variable="myVar"
+        createInstance="yes"/>
+
+    <assign name="assignRequestToHelloWorldWS">
+      <!-- Ode requires variable initialization -->
+      <copy>
+        <from><literal><intf2:sayHello><toWhom xmlns=""/></intf2:sayHello></literal></from>
+        <to variable="inVar" part="sayHello"/>
+      </copy>
+      <!-- now the real copy -->
+      <copy>
+        <from variable="myVar" part="ToWhom"/>
+        <to>$inVar.sayHello/toWhom</to>
+      </copy>
+    </assign>
+
+    <invoke name="ICallTheExternalService"
+            partnerLink="theExternalService_PartnerLink"
+            portType="intf2:HelloWorld"
+            operation="sayHello"
+            inputVariable="inVar"
+            outputVariable="outVar"
+        />
+
+    <assign name="assignResponseOfHelloWorldWS">
+      <copy>
+        <from>concat($outVar.sayHelloResponse/return,' and BPEL')</from>
+        <to variable="myVar" part="ToWhom"/>
+      </copy>
+    </assign>
+
+    <reply name="response"
+           partnerLink="theClient_PartnerLink"
+           portType="intf:SimpleInvoke_PortType"
+           operation="sayHelloTo"
+           variable="myVar"/>
+  </sequence>
+</process>

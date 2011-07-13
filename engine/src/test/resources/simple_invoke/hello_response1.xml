@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:sayHelloTo xmlns:wsdl="http://www.jboss.org/bpel/examples/wsdl">
+    <ToWhom>Hello Joe Bloggs. Sincerely, JBossWS and BPEL</ToWhom>
+</wsdl:sayHelloTo>

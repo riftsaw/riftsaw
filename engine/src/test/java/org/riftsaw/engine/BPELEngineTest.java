@@ -19,6 +19,8 @@ package org.riftsaw.engine;
 
 import static org.junit.Assert.*;
 
+import java.util.Map;
+
 import javax.xml.namespace.QName;
 
 import org.apache.ode.utils.DOMUtils;
@@ -31,13 +33,14 @@ import org.w3c.dom.Element;
 public class BPELEngineTest {
 
 	private static BPELEngine m_engine=null;
+	private static TestServiceLocator m_locator=new TestServiceLocator();
 	
 	@BeforeClass
 	public static void runBeforeClass() {
 		m_engine = BPELEngineFactory.getEngine();
 		
 		try {
-			m_engine.init();
+			m_engine.init(m_locator);
 		} catch(Exception e) {
 			fail("Failed to initialize the engine: "+e);
 		}
@@ -143,5 +146,49 @@ public class BPELEngineTest {
 			fail("Failed: "+e);
 		}
 	}
+	
+	@Test
+	public void testSimpleInvoke() {
+		
+		m_locator.clear();
+		
+		m_locator.addService(new QName("http://simple_invoke/helloworld","HelloWorldWSService"),
+							"HelloWorldPort", new Service() {
 
+			public Element invoke(String operationName, Element mesg,
+						Map<String, Object> headers) throws Exception {
+				// TODO Auto-generated method stub
+				return DOMUtils.stringToDOM(
+						"<message><sayHelloResponse><ns2:sayHelloResponse xmlns:ns2=\"http://simple_invoke/helloworld\">"+
+						"	<return>Hello Joe Bloggs. Sincerely, JBossWS</return>"+
+						"</ns2:sayHelloResponse></sayHelloResponse></message>");
+			}
+		});
+		
+		try {
+			deploy("/simple_invoke/deploy.xml", "SimpleInvoke");
+			invoke(new QName("http://www.jboss.org/bpel/examples/wsdl","SimpleInvoke_Service"), "SimpleInvoke_Port",
+					"sayHelloTo", "/simple_invoke/hello_request1.xml", "/simple_invoke/hello_response1.xml", null);
+			undeploy("/simple_invoke/deploy.xml", "SimpleInvoke");
+		} catch(Exception e) {
+			fail("Failed: "+e);
+		}
+	}
+	
+	public static class TestServiceLocator implements ServiceLocator {
+
+		private java.util.Map<String,Service> m_services=new java.util.HashMap<String, Service>();
+		
+		public void addService(QName serviceName, String portName, Service service) {
+			m_services.put(serviceName.toString()+"-"+portName, service);
+		}
+		
+		public Service getService(QName serviceName, String portName) {
+			return(m_services.get(serviceName.toString()+"-"+portName));
+		}
+		
+		public void clear() {
+			m_services.clear();
+		}
+	}
 }

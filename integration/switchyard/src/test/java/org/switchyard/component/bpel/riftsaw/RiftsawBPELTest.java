@@ -28,6 +28,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.riftsaw.engine.BPELEngine;
 import org.riftsaw.engine.BPELEngineFactory;
+import org.riftsaw.engine.ServiceLocator;
 import org.switchyard.Message;
 import org.switchyard.ServiceDomain;
 import org.switchyard.component.bpel.config.model.BPELComponentImplementationModel;
@@ -44,13 +45,14 @@ import org.w3c.dom.Element;
 public class RiftsawBPELTest extends SwitchYardTestCase {
 
 	private static BPELEngine m_engine=null;
+	private static ServiceLocator m_locator=null;
 	
 	@BeforeClass
 	public static void runBeforeClass() {
 		m_engine = BPELEngineFactory.getEngine();
 		
 		try {
-			m_engine.init();
+			m_engine.init(m_locator);
 		} catch(Exception e) {
 			fail("Failed to initialize the engine: "+e);
 		}

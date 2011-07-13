@@ -17,52 +17,25 @@
  */
 package org.riftsaw.engine;
 
-import javax.xml.namespace.QName;
-
 import org.w3c.dom.Element;
 
 /**
- * This interface represents the BPEL engine, used to deploy
- * process definitions and invoke BPEL process instances.
+ * This interface represents an external service that can be invoked
+ * by a BPEL process.
  *
  */
-public interface BPELEngine {
-	
-	/**
-	 * This method initializes the BPEL engine.
-	 * 
-	 * @param locator The service locator
-	 * @throws Exception Failed to initialize
-	 */
-	public void init(ServiceLocator locator) throws Exception;
-	
-	/**
-	 * This method deploys a BPEL process definition.
-	 * 
-	 * @param bdu The BPEL process definition
-	 */
-	public void deploy(DeploymentUnit bdu);
+public interface Service {
 
 	/**
-	 * This method invokes a BPEL process instance. If a process
-	 * does not exist, one will be created. If the message is
-	 * for an existing process, it will be routed to the appropriate
-	 * instance based on correlaton information within the
-	 * message contents or header values.
+	 * This method invokes an operation on an external service.
 	 * 
-	 * @param serviceName The service name
-	 * @param portName The port name
 	 * @param operationName The operation name
 	 * @param mesg The multipart message
 	 * @param headers The optional header values
 	 * @return The response, or null if a one-way request
 	 * @throws Exception Failed to invoke operation
 	 */
-	public Element invoke(QName serviceName, String portName, String operationName, Element mesg,
+	public Element invoke(String operationName, Element mesg,
 						java.util.Map<String, Object> headers) throws Exception;
-	
-	public void undeploy(DeploymentUnit bdu);
-	
-	public void close() throws Exception;
 	
 }

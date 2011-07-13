@@ -61,7 +61,8 @@ public class BPELActivator extends BaseActivator {
 		m_engine = BPELEngineFactory.getEngine();
 		
 		try {
-			m_engine.init();
+			// TODO: Set an appropriate service locator
+			m_engine.init(null);
 		} catch(Exception e) {
 			throw new SwitchYardException("Failed to initialize the engine: "+e, e);
 		}

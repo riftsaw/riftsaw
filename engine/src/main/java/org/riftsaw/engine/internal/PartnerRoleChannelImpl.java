@@ -17,8 +17,11 @@
  */
 package org.riftsaw.engine.internal;
 
+import org.apache.ode.bpel.iapi.Endpoint;
 import org.apache.ode.bpel.iapi.PartnerRoleChannel;
+import org.apache.ode.utils.DOMUtils;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 /**
  * This class provides an implementation of the ODE PartnerRolechannel,
@@ -29,35 +32,41 @@ import org.w3c.dom.Document;
  */
 public class PartnerRoleChannelImpl implements PartnerRoleChannel {
 
-	public PartnerRoleChannelImpl(PartnerChannel channel) {
-		m_channel = channel;
-		m_epr = new EndpointReferenceProxy(m_channel.getEndpointReference());
+	private org.apache.ode.bpel.iapi.EndpointReference m_epr=null;
+	private Endpoint m_endpoint=null;
+
+	public PartnerRoleChannelImpl(Endpoint ep) {
+		m_endpoint = ep;
+		m_epr = new EndpointReferenceProxy(ep);
 	}
 	
-	public PartnerChannel getPartnerChannel() {
-		return(m_channel);
-	}
-
 	public org.apache.ode.bpel.iapi.EndpointReference getInitialEndpointReference() {
 		return(m_epr);
 	}
 	
+	public Endpoint getEndpoint() {
+		return(m_endpoint);
+	}
+	
 	public void close() {
 	}
-
-	private PartnerChannel m_channel=null;
-	private org.apache.ode.bpel.iapi.EndpointReference m_epr=null;
 	
 	public static class EndpointReferenceProxy implements org.apache.ode.bpel.iapi.EndpointReference {
 		
-		public EndpointReferenceProxy(EndpointReference ref) {
-			m_endpointRef = ref;
+		private Document m_xml=null;
+		
+		public EndpointReferenceProxy(Endpoint endpoint) {
+			try {
+				Element elem=DOMUtils.stringToDOM("<epr serviceName=\""+endpoint.serviceName+
+						"\" portName=\""+endpoint.portName+"\" />");
+				m_xml = DOMUtils.toDOMDocument(elem);
+			} catch(Exception e) {
+				e.printStackTrace();
+			}
 		}
 
 		public Document toXML() {
-			return(m_endpointRef.toXML());
+			return(m_xml);
 		}
-		
-		private EndpointReference m_endpointRef=null;
 	}
 }

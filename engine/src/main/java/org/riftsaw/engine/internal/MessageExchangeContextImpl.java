@@ -17,15 +17,12 @@
  */
 package org.riftsaw.engine.internal;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ode.bpel.iapi.*;
-
-import javax.xml.namespace.QName;
+import org.riftsaw.engine.Service;
+import org.riftsaw.engine.ServiceLocator;
+import org.w3c.dom.Element;
 
 /**
  * Implementation of the ODE {@link org.apache.ode.bpel.iapi.MessageExchangeContext}
@@ -34,10 +31,12 @@ import javax.xml.namespace.QName;
  */
 public class MessageExchangeContextImpl implements MessageExchangeContext {
 
+	private ServiceLocator m_locator=null;
+	
     private static final Log __log = LogFactory.getLog(MessageExchangeContextImpl.class);
     
-    /** The currently supported invocation styles. */
-    public MessageExchangeContextImpl(BPELEngineImpl server) {
+    public MessageExchangeContextImpl(ServiceLocator locator) {
+    	m_locator = locator;
     }
 
     public void invokePartnerUnreliable(PartnerRoleMessageExchange partnerRoleMessageExchange)
@@ -46,11 +45,37 @@ public class MessageExchangeContextImpl implements MessageExchangeContext {
             __log.debug("Invoking a partner operation: " + partnerRoleMessageExchange.getOperationName());
 
         PartnerRoleChannelImpl channel=(PartnerRoleChannelImpl)
-            partnerRoleMessageExchange.getChannel();
+        				partnerRoleMessageExchange.getChannel();
+        
+        Service service=m_locator.getService(channel.getEndpoint().serviceName,
+        					channel.getEndpoint().portName);
+        
+        if (service != null) {
+        	System.out.println("INVOKE SERVICE="+service);
+        	
+        	try {
+        		Element resp=service.invoke(partnerRoleMessageExchange.getOperationName(),
+        					partnerRoleMessageExchange.getRequest().getMessage(),
+        							null);
+        		
+        		if (partnerRoleMessageExchange.getMessageExchangePattern() ==
+        				MessageExchange.MessageExchangePattern.REQUEST_RESPONSE) {
+        			Message responseMessage = partnerRoleMessageExchange.createMessage(
+        					partnerRoleMessageExchange.getOperation().getOutput().getMessage().getQName());
+        			responseMessage.setMessage(resp);
+        			
+        			partnerRoleMessageExchange.reply(responseMessage);
+        			
+        			// TODO: Determine how to deal with faults
+        		}
+        	} catch(Exception e) {
+            	throw new ContextException("Failed to invoke external service", e);
+            }
+        }
         
         try
         {          
-          channel.getPartnerChannel().invoke(partnerRoleMessageExchange);
+          //channel.getPartnerChannel().invoke(partnerRoleMessageExchange);
 
 	        /*if (partnerRoleMessageExchange.getMessageExchangePattern() ==
 	        				MessageExchange.MessageExchangePattern.REQUEST_RESPONSE)
