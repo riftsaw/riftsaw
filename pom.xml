@@ -64,11 +64,12 @@
 
 	<modules>
 		<module>engine</module>
+		<module>integration/switchyard</module>
 	</modules>
   
 	<properties>
 		<riftsaw.ode.version>3.0.0-SNAPSHOT</riftsaw.ode.version>
-		<riftsaw.engine.version>2.3.0-SNAPSHOT</riftsaw.engine.version>
+		<riftsaw.engine.version>3.0.0-SNAPSHOT</riftsaw.engine.version>
 		<bpel.console.version>2.2.5-SNAPSHOT</bpel.console.version>
 		<activity.monitor.model.version>1.0.0.Final</activity.monitor.model.version>
 		<dsp.version>1.0.0.Final</dsp.version>
@@ -96,6 +97,7 @@
 		<picketlink.version>1.0.3.final</picketlink.version>
 		<juddi.version>3.1.0-SNAPSHOT</juddi.version>
 		<scout.version>1.2.3-SNAPSHOT</scout.version>
+		<switchyard.version>0.2.0-SNAPSHOT</switchyard.version>
 	</properties>
 
 	<dependencyManagement>

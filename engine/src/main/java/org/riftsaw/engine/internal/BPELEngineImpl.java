@@ -58,6 +58,7 @@ import org.apache.ode.utils.GUID;
 import org.apache.ode.utils.Properties;
 import org.riftsaw.engine.BPELEngine;
 import org.riftsaw.engine.DeploymentUnit;
+import org.riftsaw.engine.Fault;
 import org.w3c.dom.Element;
 
 /**
@@ -607,6 +608,10 @@ public class BPELEngineImpl implements BPELEngine {
 				_log.debug("Returning: "+ret);
 
 				commit = true;
+			} catch (Fault f) {
+				commit = true;
+				throw f;
+				
 			} catch (Exception e) {
 				_log.error("Error processing response for MEX " + odeMex, e);
 				throw new Exception("An exception occured when invoking ODE.", e);
@@ -657,12 +662,9 @@ public class BPELEngineImpl implements BPELEngine {
 			if (_log.isDebugEnabled())
 				_log.debug("Fault response message: " + mex.getFault());
 
-			
-			// TODO: Throw 'fault' exception?
-		    //this.responseXML = fault.getMessage();
-		    //this.faultName = faultName;
-			//invocationAdapter.createFault(mex.getOperation(), mex.getFault(), new ODEMessageAdapter(mex.getFaultResponse()));
-			break;
+			throw new Fault(mex.getFault(), mex.getFaultResponse().getMessage());
+
+			//break;
 		case ASYNC:
 		case RESPONSE:
 			ret = mex.getResponse().getMessage();

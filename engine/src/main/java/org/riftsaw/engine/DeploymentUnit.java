@@ -26,16 +26,19 @@ public class DeploymentUnit {
 	private String m_name=null;
 	private long m_lastModified=0;
 	private java.io.File m_deploymentDescriptor=null;
+	private String m_version=null;
 
 	/**
 	 * The constructor for the deployment unit.
 	 * 
 	 * @param name The unique name for the deployment unit
+	 * @param version The version
 	 * @param lastModified When the deployment unit was last modified
 	 * @param deploymentDescriptor The deployment descriptor file
 	 */
-	public DeploymentUnit(String name, long lastModified, java.io.File deploymentDescriptor) {
+	public DeploymentUnit(String name, String version, long lastModified, java.io.File deploymentDescriptor) {
 		m_name = name;
+		m_version = version;
 		m_lastModified = lastModified;
 		m_deploymentDescriptor = deploymentDescriptor;
 	}
@@ -47,6 +50,28 @@ public class DeploymentUnit {
 	 */
 	public String getName() {
 		return(m_name);
+	}
+	
+	/**
+	 * This method returns the name, modified with the
+	 * version number if specified.
+	 * 
+	 * @return The versioned name
+	 */
+	public String getVersionedName() {
+		if (getVersion() == null) {
+			return(getName());
+		}
+		return(getName()+"-"+getVersion());
+	}
+	
+	/**
+	 * This method returns the optional version of the deployment unit.
+	 * 
+	 * @return The version
+	 */
+	public String getVersion() {
+		return(m_version);
 	}
 	
 	/**
@@ -69,7 +94,8 @@ public class DeploymentUnit {
 	}
 	
 	public String toString() {
-		return("DeploymentUnit[name="+m_name+",lastModified="+m_lastModified+",descriptor="+
+		return("DeploymentUnit[name="+m_name+",version="+m_version+
+					",lastModified="+m_lastModified+",descriptor="+
 						m_deploymentDescriptor+"]");
 	}
 }

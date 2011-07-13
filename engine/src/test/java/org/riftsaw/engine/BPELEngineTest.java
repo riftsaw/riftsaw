@@ -57,7 +57,7 @@ public class BPELEngineTest {
 		
 		java.io.File deployFile=new java.io.File(url.getFile());
 		
-		DeploymentUnit bdu=new DeploymentUnit(processName, deployFile.lastModified(), deployFile);
+		DeploymentUnit bdu=new DeploymentUnit(processName, "1", deployFile.lastModified(), deployFile);
 
 		// Deploy the process
 		m_engine.deploy(bdu);
@@ -68,7 +68,7 @@ public class BPELEngineTest {
 		
 		java.io.File deployFile=new java.io.File(url.getFile());
 		
-		DeploymentUnit bdu=new DeploymentUnit(processName, deployFile.lastModified(), deployFile);
+		DeploymentUnit bdu=new DeploymentUnit(processName, "1", deployFile.lastModified(), deployFile);
 
 		// Deploy the process
 		try {

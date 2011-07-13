@@ -56,7 +56,7 @@ public class RiftSawProcessStore extends ProcessStoreImpl {
 	public void undeploy(DeploymentUnit bdu) {
 		__log.debug("Undeploy "+bdu);
 		
-		undeploy(bdu.getName());
+		undeploy(bdu.getVersionedName());
 	}
 
 	protected void doDeploy(final DeploymentUnit bdu) {
@@ -77,7 +77,7 @@ public class RiftSawProcessStore extends ProcessStoreImpl {
 		boolean deploy=exec(new ProcessStoreImpl.Callable<Boolean>() {
 			public Boolean call(ConfStoreDAOConnection conn) {
 				boolean ret=false;
-				DeploymentUnitDAO dudao = conn.getDeploymentUnit(bdu.getName());
+				DeploymentUnitDAO dudao = conn.getDeploymentUnit(bdu.getVersionedName());
 				if (dudao == null)
 					return true;
 
@@ -98,7 +98,7 @@ public class RiftSawProcessStore extends ProcessStoreImpl {
 
 						DeploymentUnitDir du=new DeploymentUnitDir(bdu.getDeploymentDescriptor().getParentFile());
 						
-						du.setName(bdu.getName());
+						du.setName(bdu.getVersionedName());
 
 						// Create the DU and compile it before acquiring lock.
 						//du.setExtensionValidators(getExtensionValidators());
@@ -125,7 +125,7 @@ public class RiftSawProcessStore extends ProcessStoreImpl {
 		if (deploy) {
 			__log.debug("Deploy new version: "+bdu.getDeploymentDescriptor().getParentFile());
 
-			deploy(bdu.getDeploymentDescriptor().getParentFile(), true, bdu.getName(), false);
+			deploy(bdu.getDeploymentDescriptor().getParentFile(), true, bdu.getVersionedName(), false);
 
 		} else {
 			__log.debug("Trigger Integration Layer to use existing version: "+bdu.getDeploymentDescriptor().getParentFile());
