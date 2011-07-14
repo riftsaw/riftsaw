@@ -82,7 +82,7 @@ public class BPELEngineTest {
 	}
 	
 	public void invoke(QName serviceName, String portName, String operation, String reqFile, String respFile,
-								String faultName) throws Exception {
+								QName faultName) throws Exception {
 		java.net.URL url=BPELEngineImpl.class.getResource(reqFile);
 		
 		java.io.InputStream is=url.openStream();
@@ -171,6 +171,165 @@ public class BPELEngineTest {
 					"sayHelloTo", "/simple_invoke/hello_request1.xml", "/simple_invoke/hello_response1.xml", null);
 			undeploy("/simple_invoke/deploy.xml", "SimpleInvoke");
 		} catch(Exception e) {
+			fail("Failed: "+e);
+		}
+	}
+	
+	@Test
+	public void testLoanApproval1() {
+		
+		m_locator.clear();
+		
+		m_locator.addService(new QName("http://example.com/loan-approval/wsdl/","loanApprover"),
+							"loanApprover_Port", new Service() {
+
+			public Element invoke(String operationName, Element mesg,
+						Map<String, Object> headers) throws Exception {
+				fail("Should not be contacting the loan approver");
+				return null;
+			}
+		});
+		
+		m_locator.addService(new QName("http://example.com/loan-approval/wsdl/","riskAssessor"),
+							"riskAssessor_Port", new Service() {
+
+			public Element invoke(String operationName, Element mesg,
+						Map<String, Object> headers) throws Exception {
+				// TODO Auto-generated method stub
+				return DOMUtils.stringToDOM(
+						"<wsdl:checkResponse xmlns:wsdl=\"http://example.com/loan-approval/wsdl/\">"+
+						"         <level>low</level>"+
+						"      </wsdl:checkResponse>");
+			}
+		});
+
+		try {
+			deploy("/loan_approval/deploy.xml", "loanApprovalProcess");
+			invoke(new QName("http://example.com/loan-approval/wsdl/","loanService"), "loanService_Port",
+					"request", "/loan_approval/loanreq1.xml", "/loan_approval/loanresp1.xml", null);
+			undeploy("/loan_approval/deploy.xml", "loanApprovalProcess");
+		} catch(Exception e) {
+			fail("Failed: "+e);
+		}
+	}
+	
+	@Test
+	public void testLoanApproval2() {
+		
+		m_locator.clear();
+		
+		m_locator.addService(new QName("http://example.com/loan-approval/wsdl/","loanApprover"),
+							"loanApprover_Port", new Service() {
+
+			public Element invoke(String operationName, Element mesg,
+						Map<String, Object> headers) throws Exception {
+				// TODO Auto-generated method stub
+				return DOMUtils.stringToDOM(
+						"<wsdl:approveResponse xmlns:wsdl=\"http://example.com/loan-approval/wsdl/\">"+
+								"<accept>Evaluated and Approved</accept>"+
+								"</wsdl:approveResponse>");
+			}
+		});
+		
+		m_locator.addService(new QName("http://example.com/loan-approval/wsdl/","riskAssessor"),
+							"riskAssessor_Port", new Service() {
+
+			public Element invoke(String operationName, Element mesg,
+						Map<String, Object> headers) throws Exception {
+				// TODO Auto-generated method stub
+				return DOMUtils.stringToDOM(
+						"<wsdl:checkResponse xmlns:wsdl=\"http://example.com/loan-approval/wsdl/\">"+
+						"         <level>high</level>"+
+						"      </wsdl:checkResponse>");
+			}
+		});
+
+		try {
+			deploy("/loan_approval/deploy.xml", "loanApprovalProcess");
+			invoke(new QName("http://example.com/loan-approval/wsdl/","loanService"), "loanService_Port",
+					"request", "/loan_approval/loanreq2.xml", "/loan_approval/loanresp2.xml", null);
+			undeploy("/loan_approval/deploy.xml", "loanApprovalProcess");
+		} catch(Exception e) {
+			fail("Failed: "+e);
+		}
+	}
+	
+	@Test
+	public void testLoanApproval3() {
+		
+		m_locator.clear();
+		
+		m_locator.addService(new QName("http://example.com/loan-approval/wsdl/","loanApprover"),
+							"loanApprover_Port", new Service() {
+
+			public Element invoke(String operationName, Element mesg,
+						Map<String, Object> headers) throws Exception {
+				
+				Fault f=new Fault(new QName("http://example.com/loan-approval/wsdl/","loanProcessFault"),
+							DOMUtils.stringToDOM(
+						"<message><errorCode><ns1:integer xmlns:ns1=\"http://example.com/loan-approval/xsd/error-messages/\">21000</ns1:integer></errorCode></message>"));
+				throw f;
+			}
+		});
+		
+		m_locator.addService(new QName("http://example.com/loan-approval/wsdl/","riskAssessor"),
+							"riskAssessor_Port", new Service() {
+
+			public Element invoke(String operationName, Element mesg,
+						Map<String, Object> headers) throws Exception {
+				// TODO Auto-generated method stub
+				return DOMUtils.stringToDOM(
+						"<wsdl:checkResponse xmlns:wsdl=\"http://example.com/loan-approval/wsdl/\">"+
+						"         <level>high</level>"+
+						"      </wsdl:checkResponse>");
+			}
+		});
+
+		try {
+			deploy("/loan_approval/deploy.xml", "loanApprovalProcess");
+			invoke(new QName("http://example.com/loan-approval/wsdl/","loanService"), "loanService_Port",
+					"request", "/loan_approval/loanreq3.xml", "/loan_approval/loanresp3.xml",
+					new QName("http://example.com/loan-approval/wsdl/","unableToHandleRequest"));
+			undeploy("/loan_approval/deploy.xml", "loanApprovalProcess");
+		} catch(Exception e) {
+			fail("Failed: "+e);
+		}
+	}
+	
+	@Test
+	public void testLoanApproval4() {
+		
+		m_locator.clear();
+		
+		m_locator.addService(new QName("http://example.com/loan-approval/wsdl/","loanApprover"),
+							"loanApprover_Port", new Service() {
+
+			public Element invoke(String operationName, Element mesg,
+						Map<String, Object> headers) throws Exception {
+				
+				fail("Should not be contacting the loan approver");
+				return null;
+			}
+		});
+		
+		m_locator.addService(new QName("http://example.com/loan-approval/wsdl/","riskAssessor"),
+							"riskAssessor_Port", new Service() {
+
+			public Element invoke(String operationName, Element mesg,
+						Map<String, Object> headers) throws Exception {
+				fail("Should not be contacting the loan assessor");
+				return null;
+			}
+		});
+
+		try {
+			deploy("/loan_approval/deploy.xml", "loanApprovalProcess");
+			invoke(new QName("http://example.com/loan-approval/wsdl/","loanService"), "loanService_Port",
+					"request", "/loan_approval/loanreq4.xml", "/loan_approval/loanresp4.xml",
+					new QName("http://example.com/loan-approval/wsdl/","unableToHandleRequest"));
+			undeploy("/loan_approval/deploy.xml", "loanApprovalProcess");
+		} catch(Exception e) {
+			e.printStackTrace();
 			fail("Failed: "+e);
 		}
 	}

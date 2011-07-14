@@ -20,6 +20,7 @@ package org.riftsaw.engine.internal;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ode.bpel.iapi.*;
+import org.riftsaw.engine.Fault;
 import org.riftsaw.engine.Service;
 import org.riftsaw.engine.ServiceLocator;
 import org.w3c.dom.Element;
@@ -65,34 +66,17 @@ public class MessageExchangeContextImpl implements MessageExchangeContext {
         			responseMessage.setMessage(resp);
         			
         			partnerRoleMessageExchange.reply(responseMessage);
-        			
-        			// TODO: Determine how to deal with faults
         		}
+        	} catch(Fault f) {
+        		javax.wsdl.Fault fault=partnerRoleMessageExchange.getOperation().getFault(f.getFaultName().getLocalPart());
+     			Message faultMessage = partnerRoleMessageExchange.createMessage(
+    					fault.getMessage().getQName());
+     			faultMessage.setMessage(f.getFaultMessage());
+    			
+    			partnerRoleMessageExchange.replyWithFault(f.getFaultName(), faultMessage);
         	} catch(Exception e) {
-            	throw new ContextException("Failed to invoke external service", e);
-            }
-        }
-        
-        try
-        {          
-          //channel.getPartnerChannel().invoke(partnerRoleMessageExchange);
-
-	        /*if (partnerRoleMessageExchange.getMessageExchangePattern() ==
-	        				MessageExchange.MessageExchangePattern.REQUEST_RESPONSE)
-          {
-
-            Message responseMessage = partnerRoleMessageExchange.createMessage(
-               partnerRoleMessageExchange.getOperation().getOutput().getMessage().getQName()
-            );
-            responseMessage.setMessage(resp);
-
-            partnerRoleMessageExchange.reply(responseMessage);
-
-	        } */
-        }
-        catch(Exception e)
-        {
-        	throw new ContextException("Failed to invoke external service", e);
+        		throw new ContextException("Failed to invoke external service", e);
+        	}
         }
     }
 
