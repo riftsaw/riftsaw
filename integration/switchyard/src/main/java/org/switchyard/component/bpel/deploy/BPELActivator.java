@@ -33,6 +33,7 @@ import org.switchyard.ServiceReference;
 import org.switchyard.component.bpel.config.model.BPELComponentImplementationModel;
 import org.switchyard.component.bpel.exchange.BPELExchangeHandler;
 import org.switchyard.component.bpel.exchange.BPELExchangeHandlerFactory;
+import org.switchyard.component.bpel.riftsaw.RiftsawServiceLocator;
 import org.switchyard.config.model.Model;
 import org.switchyard.config.model.composite.ComponentServiceModel;
 import org.switchyard.deploy.BaseActivator;
@@ -61,8 +62,9 @@ public class BPELActivator extends BaseActivator {
 		m_engine = BPELEngineFactory.getEngine();
 		
 		try {
-			// TODO: Set an appropriate service locator
-			m_engine.init(null);
+			RiftsawServiceLocator locator=new RiftsawServiceLocator(getServiceDomain());
+			
+			m_engine.init(locator);
 		} catch(Exception e) {
 			throw new SwitchYardException("Failed to initialize the engine: "+e, e);
 		}

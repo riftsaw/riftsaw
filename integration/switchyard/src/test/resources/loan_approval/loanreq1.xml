@@ -1,0 +1,6 @@
+<wsdl:request xmlns:wsdl="http://example.com/loan-approval/wsdl/">
+   <firstName>Fred</firstName>
+   <name>Bloggs</name>
+   <amount>1000</amount>
+</wsdl:request>
+

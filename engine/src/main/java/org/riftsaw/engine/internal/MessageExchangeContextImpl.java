@@ -52,7 +52,9 @@ public class MessageExchangeContextImpl implements MessageExchangeContext {
         					channel.getEndpoint().portName);
         
         if (service != null) {
-        	System.out.println("INVOKE SERVICE="+service);
+        	if (__log.isDebugEnabled()) {
+                __log.debug("Invoke service="+service);
+        	}
         	
         	try {
         		Element resp=service.invoke(partnerRoleMessageExchange.getOperationName(),

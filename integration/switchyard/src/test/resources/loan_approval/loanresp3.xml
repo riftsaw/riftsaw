@@ -1,0 +1,2 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<message><errorCode><ns1:integer xmlns:ns1="http://example.com/loan-approval/xsd/error-messages/">21000</ns1:integer></errorCode></message>
