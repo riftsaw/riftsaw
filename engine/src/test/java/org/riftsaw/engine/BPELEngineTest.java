@@ -207,9 +207,14 @@ public class BPELEngineTest {
 			deploy("/loan_approval/deploy.xml", "loanApprovalProcess");
 			invoke(new QName("http://example.com/loan-approval/wsdl/","loanService"), "loanService_Port",
 					"request", "/loan_approval/loanreq1.xml", "/loan_approval/loanresp1.xml", null);
-			undeploy("/loan_approval/deploy.xml", "loanApprovalProcess");
 		} catch(Exception e) {
 			fail("Failed: "+e);
+		} finally {
+			try {
+				undeploy("/loan_approval/deploy.xml", "loanApprovalProcess");
+			} catch(Exception e) {
+				fail("Failed to undeploy: "+e);
+			}
 		}
 	}
 	
@@ -248,9 +253,14 @@ public class BPELEngineTest {
 			deploy("/loan_approval/deploy.xml", "loanApprovalProcess");
 			invoke(new QName("http://example.com/loan-approval/wsdl/","loanService"), "loanService_Port",
 					"request", "/loan_approval/loanreq2.xml", "/loan_approval/loanresp2.xml", null);
-			undeploy("/loan_approval/deploy.xml", "loanApprovalProcess");
 		} catch(Exception e) {
 			fail("Failed: "+e);
+		} finally {
+			try {
+				undeploy("/loan_approval/deploy.xml", "loanApprovalProcess");
+			} catch(Exception e) {
+				fail("Failed to undeploy: "+e);
+			}
 		}
 	}
 	
@@ -290,9 +300,14 @@ public class BPELEngineTest {
 			invoke(new QName("http://example.com/loan-approval/wsdl/","loanService"), "loanService_Port",
 					"request", "/loan_approval/loanreq3.xml", "/loan_approval/loanresp3.xml",
 					new QName("http://example.com/loan-approval/wsdl/","unableToHandleRequest"));
-			undeploy("/loan_approval/deploy.xml", "loanApprovalProcess");
 		} catch(Exception e) {
 			fail("Failed: "+e);
+		} finally {
+			try {
+				undeploy("/loan_approval/deploy.xml", "loanApprovalProcess");
+			} catch(Exception e) {
+				fail("Failed to undeploy: "+e);
+			}
 		}
 	}
 	
@@ -327,10 +342,15 @@ public class BPELEngineTest {
 			invoke(new QName("http://example.com/loan-approval/wsdl/","loanService"), "loanService_Port",
 					"request", "/loan_approval/loanreq4.xml", "/loan_approval/loanresp4.xml",
 					new QName("http://example.com/loan-approval/wsdl/","unableToHandleRequest"));
-			undeploy("/loan_approval/deploy.xml", "loanApprovalProcess");
 		} catch(Exception e) {
 			e.printStackTrace();
 			fail("Failed: "+e);
+		} finally {
+			try {
+				undeploy("/loan_approval/deploy.xml", "loanApprovalProcess");
+			} catch(Exception e) {
+				fail("Failed to undeploy: "+e);
+			}
 		}
 	}
 	

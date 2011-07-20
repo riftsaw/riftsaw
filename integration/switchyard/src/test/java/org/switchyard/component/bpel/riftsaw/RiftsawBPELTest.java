@@ -20,8 +20,6 @@ package org.switchyard.component.bpel.riftsaw;
 
 import static org.junit.Assert.fail;
 
-import java.util.Map;
-
 import javax.xml.namespace.QName;
 
 import org.apache.ode.utils.DOMUtils;
@@ -30,9 +28,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.riftsaw.engine.BPELEngine;
 import org.riftsaw.engine.BPELEngineFactory;
-import org.riftsaw.engine.Fault;
-import org.riftsaw.engine.Service;
-import org.riftsaw.engine.ServiceLocator;
 import org.switchyard.BaseHandler;
 import org.switchyard.Exchange;
 import org.switchyard.HandlerException;

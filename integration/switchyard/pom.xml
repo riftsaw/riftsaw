@@ -26,6 +26,16 @@
 			<artifactId>switchyard-api</artifactId>
 			<version>${switchyard.version}</version>
 		</dependency>
+    <dependency>
+      <groupId>org.switchyard</groupId>
+      <artifactId>switchyard-plugin</artifactId>
+      <version>0.1.0</version>
+    </dependency>
+    <dependency>
+      <groupId>org.switchyard.components</groupId>
+      <artifactId>switchyard-component-bean</artifactId>
+      <version>0.1.0</version>
+    </dependency>
 		<dependency>
 			<groupId>org.switchyard</groupId>
 			<artifactId>switchyard-deploy</artifactId>
@@ -43,9 +53,21 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
+			<groupId>org.switchyard.components</groupId>
+			<artifactId>switchyard-component-soap</artifactId>
+			<version>${switchyard.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>${junit.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>commons-httpclient</groupId>
+			<artifactId>commons-httpclient</artifactId>
+			<version>3.1</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
@@ -120,6 +142,9 @@
 						<include>**/*TestCase.java</include>
 						<include>**/*Test.java</include>
 					</includes>
+					<excludes>
+						<exclude>**/BPEL*Test.java</exclude>
+					</excludes>
 				</configuration>
 			</plugin>
 		</plugins>
