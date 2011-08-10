@@ -140,6 +140,19 @@ public class BPELEngineTest {
 	}
 	
 	@Test
+	public void testHelloWorldRedeploy() {
+		
+		try {
+			deploy("/hello_world/deploy.xml", "hello_world");
+			undeploy("/hello_world/deploy.xml", "hello_world");
+			deploy("/hello_world/deploy.xml", "hello_world");
+			undeploy("/hello_world/deploy.xml", "hello_world");
+		} catch(Exception e) {
+			fail("Failed: "+e);
+		}
+	}
+	
+	@Test
 	public void testHelloWorld() {
 		
 		try {
@@ -152,7 +165,6 @@ public class BPELEngineTest {
 		}
 	}
 	
-	/*
 	@Test
 	public void testSimpleInvoke() {
 		
@@ -359,7 +371,6 @@ public class BPELEngineTest {
 			}
 		}
 	}
-	*/
 	
 	public static class TestServiceLocator implements ServiceLocator {
 
