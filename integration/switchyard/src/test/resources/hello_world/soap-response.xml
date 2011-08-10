@@ -1,8 +1,4 @@
-<env:Envelope xmlns:env="http://schemas.xmlsoap.org/soap/envelope/">
-   <env:Header/>
-   <env:Body>
-      <odens:helloResponse xmlns:odens="http://www.jboss.org/bpel/examples/wsdl">
-         <TestPart>Hello World</TestPart>
-      </odens:helloResponse>
-   </env:Body>
-</env:Envelope>
+<?xml version="1.0" encoding="UTF-8"?>
+<hello>
+   <TestPart>Hello World</TestPart>
+</hello>

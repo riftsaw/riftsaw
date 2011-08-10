@@ -28,6 +28,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.riftsaw.engine.BPELEngine;
 import org.riftsaw.engine.BPELEngineFactory;
+import org.riftsaw.engine.internal.BPELEngineImpl;
 import org.switchyard.BaseHandler;
 import org.switchyard.Exchange;
 import org.switchyard.HandlerException;
@@ -38,14 +39,16 @@ import org.switchyard.component.bpel.config.model.v1.V1BPELComponentImplementati
 import org.switchyard.component.bpel.exchange.BPELExchangeHandler;
 import org.switchyard.component.bpel.exchange.BPELExchangeHandlerFactory;
 import org.switchyard.test.InvocationFaultException;
-import org.switchyard.test.SwitchYardTestCase;
+import org.switchyard.test.SwitchYardTestKit;
 import org.w3c.dom.Element;
 
 /**
  * Tests the Riftsaw BPEL implementation.
  *
  */
-public class RiftsawBPELTest extends SwitchYardTestCase {
+public class RiftsawBPELTest {
+
+    private SwitchYardTestKit _testKit;
 
 	private static BPELEngine m_engine=null;
 	private static RiftsawServiceLocator m_locator=new RiftsawServiceLocator(null);
@@ -55,7 +58,12 @@ public class RiftsawBPELTest extends SwitchYardTestCase {
 		m_engine = BPELEngineFactory.getEngine();
 		
 		try {
-			m_engine.init(m_locator);
+			java.util.Properties props=new java.util.Properties();
+
+			java.io.InputStream is=BPELEngineImpl.class.getClassLoader().getResourceAsStream("bpel.properties");	
+			props.load(is);
+	
+			m_engine.init(m_locator, props);
 		} catch(Exception e) {
 			fail("Failed to initialize the engine: "+e);
 		}
@@ -70,9 +78,18 @@ public class RiftsawBPELTest extends SwitchYardTestCase {
 		}
 	}
 	
-    //@Test
+    @org.junit.Before
+    public void init() {
+    	try {
+    		_testKit = new SwitchYardTestKit(this);
+    	} catch(Exception e) {
+    		fail("Unable to initialize testkit");
+    	}
+    }
+    
+    @Test
     public void testHelloWorldService() throws Exception {
-        ServiceDomain serviceDomain = getServiceDomain();
+        ServiceDomain serviceDomain = _testKit.getServiceDomain();
         
         QName qname=new QName("http://www.jboss.org/bpel/examples/wsdl", "HelloService");
         
@@ -86,7 +103,7 @@ public class RiftsawBPELTest extends SwitchYardTestCase {
 
         handler.init(qname, bci_model, m_engine);
 
-        java.net.URL url=RiftsawBPELTest.class.getResource("/hello_world/hello_request1.xml");
+        java.net.URL url=RiftsawBPELTest.class.getResource("/hello_world/soap-request.xml");
 		
 		java.io.InputStream is=url.openStream();
 		
@@ -96,9 +113,9 @@ public class RiftsawBPELTest extends SwitchYardTestCase {
 		is.close();
 
 		// Register the service
-		registerInOutService("HelloWorld", handler);
+		_testKit.registerInOutService("HelloWorld", handler);
 		
-		Message resp=newInvoker("HelloWorld.hello").sendInOut(new String(b));
+		Message resp=_testKit.newInvoker("HelloWorld.hello").sendInOut(new String(b));
 		
 		if (resp == null) {
 			fail("No response returned");
@@ -110,12 +127,12 @@ public class RiftsawBPELTest extends SwitchYardTestCase {
 		
 		Element elem=(Element)resp.getContent();
 		
-		verifyMessage(elem, "/hello_world/hello_response1.xml");
+		verifyMessage(elem, "/hello_world/soap-response.xml");
     }
     
     @Test
     public void testLoanApproval1() throws Exception {
-        ServiceDomain serviceDomain = getServiceDomain();
+        ServiceDomain serviceDomain = _testKit.getServiceDomain();
         m_locator.setServiceDomain(serviceDomain);
        
         QName qname=new QName("http://example.com/loan-approval/wsdl/", "loanService");
@@ -167,9 +184,9 @@ public class RiftsawBPELTest extends SwitchYardTestCase {
         });
 
 		// Register the service
-		registerInOutService("loanApprovalProcess", handler);
+        _testKit.registerInOutService("loanApprovalProcess", handler);
 		
-		Message resp=newInvoker("loanApprovalProcess.request").sendInOut(new String(b));
+		Message resp=_testKit.newInvoker("loanApprovalProcess.request").sendInOut(new String(b));
 		
 		if (resp == null) {
 			fail("No response returned");
@@ -186,7 +203,7 @@ public class RiftsawBPELTest extends SwitchYardTestCase {
 
     @Test
     public void testLoanApproval2() throws Exception {
-        ServiceDomain serviceDomain = getServiceDomain();
+        ServiceDomain serviceDomain = _testKit.getServiceDomain();
         m_locator.setServiceDomain(serviceDomain);
        
         QName qname=new QName("http://example.com/loan-approval/wsdl/", "loanService");
@@ -250,9 +267,9 @@ public class RiftsawBPELTest extends SwitchYardTestCase {
         });
 
 		// Register the service
-		registerInOutService("loanApprovalProcess", handler);
+        _testKit.registerInOutService("loanApprovalProcess", handler);
 		
-		Message resp=newInvoker("loanApprovalProcess.request").sendInOut(new String(b));
+		Message resp=_testKit.newInvoker("loanApprovalProcess.request").sendInOut(new String(b));
 		
 		if (resp == null) {
 			fail("No response returned");
@@ -269,7 +286,7 @@ public class RiftsawBPELTest extends SwitchYardTestCase {
 
     @Test
     public void testLoanApproval3() throws Exception {
-        ServiceDomain serviceDomain = getServiceDomain();
+        ServiceDomain serviceDomain = _testKit.getServiceDomain();
         m_locator.setServiceDomain(serviceDomain);
        
         QName qname=new QName("http://example.com/loan-approval/wsdl/", "loanService");
@@ -336,9 +353,9 @@ public class RiftsawBPELTest extends SwitchYardTestCase {
         });
 
 		// Register the service
-		registerInOutService("loanApprovalProcess", handler);
+        _testKit.registerInOutService("loanApprovalProcess", handler);
 		
-		Message resp=newInvoker("loanApprovalProcess.request").sendInOut(new String(b));
+		Message resp=_testKit.newInvoker("loanApprovalProcess.request").sendInOut(new String(b));
 
 		// TODO: Why is the response not returned as a InvocationFaultException??
 		
@@ -357,7 +374,7 @@ public class RiftsawBPELTest extends SwitchYardTestCase {
 
     @Test
     public void testLoanApproval4() throws Exception {
-        ServiceDomain serviceDomain = getServiceDomain();
+        ServiceDomain serviceDomain = _testKit.getServiceDomain();
         m_locator.setServiceDomain(serviceDomain);
        
         QName qname=new QName("http://example.com/loan-approval/wsdl/", "loanService");
@@ -397,10 +414,10 @@ public class RiftsawBPELTest extends SwitchYardTestCase {
         });
 
 		// Register the service
-		registerInOutService("loanApprovalProcess", handler);
+        _testKit.registerInOutService("loanApprovalProcess", handler);
 		
 		try {
-			newInvoker("loanApprovalProcess.request").sendInOut(new String(b));
+			_testKit.newInvoker("loanApprovalProcess.request").sendInOut(new String(b));
 			fail("Should have thrown an exception");
 		} catch(InvocationFaultException ife) {
 					

@@ -32,9 +32,10 @@ public interface BPELEngine {
 	 * This method initializes the BPEL engine.
 	 * 
 	 * @param locator The service locator
+	 * @param props The properties
 	 * @throws Exception Failed to initialize
 	 */
-	public void init(ServiceLocator locator) throws Exception;
+	public void init(ServiceLocator locator, java.util.Properties props) throws Exception;
 	
 	/**
 	 * This method deploys a BPEL process definition.

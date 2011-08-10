@@ -18,10 +18,12 @@
  */
 package org.switchyard.component.bpel.riftsaw;
 
+import static org.junit.Assert.fail;
+
 import org.junit.Test;
-import org.switchyard.test.SwitchYardTestCase;
 
 import org.switchyard.test.SwitchYardTestCaseConfig;
+import org.switchyard.test.SwitchYardTestKit;
 import org.switchyard.test.mixins.CDIMixIn;
 import org.switchyard.test.mixins.HTTPMixIn;
 import org.switchyard.transform.config.model.TransformSwitchYardScanner;
@@ -31,12 +33,23 @@ import org.switchyard.component.bean.config.model.BeanSwitchYardScanner;
         config = "/hello_world/switchyard.xml",
         scanners = {BeanSwitchYardScanner.class, TransformSwitchYardScanner.class},
         mixins = {CDIMixIn.class, HTTPMixIn.class})
-public class BPELHelloWorldTest extends SwitchYardTestCase {
+public class BPELHelloWorldTest {
 
+    private SwitchYardTestKit _testKit;
+
+    @org.junit.Before
+    public void init() {
+    	try {
+    		_testKit = new SwitchYardTestKit(this);
+    	} catch(Exception e) {
+    		fail("Unable to initialize testkit");
+    	}
+    }
+    
     @Test
     public void invokeHelloWorldService() throws Exception {
     	System.out.println("START TEST");
-        getMixIn(HTTPMixIn.class).
+        _testKit.getMixIn(HTTPMixIn.class).
                 postResourceAndTestXML("http://localhost:18001/HelloService",
                 		"/hello_world/soap-request.xml", "/hello_world/soap-response.xml");
     }

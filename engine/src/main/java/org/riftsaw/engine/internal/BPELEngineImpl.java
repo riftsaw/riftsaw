@@ -84,16 +84,10 @@ public class BPELEngineImpl implements BPELEngine {
 	protected CacheProvider _cacheProvider;
 	//protected UDDIRegistration _uddiRegistration;
 
-	public void init(ServiceLocator locator) throws Exception {
+	public void init(ServiceLocator locator, java.util.Properties props) throws Exception {
 
-		java.util.Properties props=new java.util.Properties();
-
-		try {
-			java.io.InputStream is=BPELEngineImpl.class.getClassLoader().getResourceAsStream("bpel.properties");
-	
-			props.load(is);
-		} catch(Exception e) {
-			_log.error("Failed to load properties", e);
+		if (props == null) {
+			props = new java.util.Properties();
 		}
 
 		_log.info("ODE PROPS="+props);
@@ -223,7 +217,7 @@ public class BPELEngineImpl implements BPELEngine {
 		String clusterNodeName="node1";
 		
 		//logger.info("Scheduler node name: "+clusterNodeName);
-		  
+		
 		SimpleScheduler scheduler = new SimpleScheduler(clusterNodeName,
 						_schedulerDaoCF, _txMgr, _odeConfig.getProperties());
 		scheduler.setExecutorService(_executorService);

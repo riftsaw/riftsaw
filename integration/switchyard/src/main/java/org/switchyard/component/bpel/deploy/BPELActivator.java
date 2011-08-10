@@ -25,6 +25,7 @@ import javax.xml.namespace.QName;
 
 import org.riftsaw.engine.BPELEngine;
 import org.riftsaw.engine.BPELEngineFactory;
+import org.riftsaw.engine.internal.BPELEngineImpl;
 import org.switchyard.ExchangeHandler;
 import org.switchyard.ServiceReference;
 //import org.riftsaw.switchyard.component.bpel.config.model.BPELComponentImplementationModel;
@@ -64,7 +65,18 @@ public class BPELActivator extends BaseActivator {
 		try {
 			RiftsawServiceLocator locator=new RiftsawServiceLocator(getServiceDomain());
 			
-			m_engine.init(locator);
+			java.util.Properties props=new java.util.Properties();
+
+			// Temporary approach until can get properties from environment
+			try {
+				java.io.InputStream is=BPELEngineImpl.class.getClassLoader().getResourceAsStream("bpel.properties");
+		
+				props.load(is);
+			} catch(Exception e) {
+				// TODO: Ignore for now
+			}
+
+			m_engine.init(locator, props);
 		} catch(Exception e) {
 			throw new SwitchYardException("Failed to initialize the engine: "+e, e);
 		}
