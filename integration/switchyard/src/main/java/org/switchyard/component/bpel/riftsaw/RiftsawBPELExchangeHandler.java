@@ -21,6 +21,8 @@ package org.switchyard.component.bpel.riftsaw;
 import javax.xml.namespace.QName;
 
 import org.apache.log4j.Logger;
+import org.hibernate.util.XMLHelper;
+import org.milyn.xml.XmlUtil;
 import org.riftsaw.engine.BPELEngine;
 import org.riftsaw.engine.DeploymentUnit;
 import org.riftsaw.engine.Fault;
@@ -32,6 +34,7 @@ import org.switchyard.ServiceDomain;
 import org.switchyard.ServiceReference;
 import org.switchyard.component.bpel.config.model.BPELComponentImplementationModel;
 import org.switchyard.component.bpel.exchange.BaseBPELExchangeHandler;
+import org.switchyard.exception.SwitchYardException;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
@@ -46,11 +49,14 @@ public class RiftsawBPELExchangeHandler extends BaseBPELExchangeHandler {
     private final ServiceDomain m_serviceDomain;
     private BPELEngine m_engine=null;
     private QName m_serviceName=null;
+    private javax.wsdl.Definition m_wsdl=null;
+    private javax.wsdl.PortType m_portType=null;
     private String m_portName=null;
     private String m_version=null;
 
     /**
-     * Constructs a new DroolsBpmExchangeHandler within the specified ServiceDomain.
+     * Constructs a new RiftSaw BPEL ExchangeHandler within the specified ServiceDomain.
+     * 
      * @param serviceDomain the specified ServiceDomain
      */
     public RiftsawBPELExchangeHandler(ServiceDomain serviceDomain) {
@@ -60,12 +66,20 @@ public class RiftsawBPELExchangeHandler extends BaseBPELExchangeHandler {
     /**
      * {@inheritDoc}
      */
-    public void init(QName qname, BPELComponentImplementationModel model, BPELEngine engine) {
+    public void init(QName qname, BPELComponentImplementationModel model,
+    				javax.wsdl.Definition wsdl, BPELEngine engine) {
     	
     	m_engine = engine;
     	m_serviceName = QName.valueOf(model.getServiceName());
     	m_portName = model.getPortName();
     	m_version = model.getVersion();
+    	m_wsdl = wsdl;
+    	
+    	// Obtain the port type from the service and port name
+    	javax.wsdl.Service service=m_wsdl.getService(m_serviceName);
+    	javax.wsdl.Port port=service.getPort(m_portName);
+    	
+    	m_portType = port.getBinding().getPortType();
     	
     	String descriptor=model.getProcessDescriptor();
     	
@@ -98,12 +112,25 @@ public class RiftsawBPELExchangeHandler extends BaseBPELExchangeHandler {
             java.util.Map<String,Object> headers=new java.util.HashMap<String, Object>();
             
             try {
+            	// Find part name associated with operation on port type
+            	String partName=getPartName(exchange.getContract().getServiceOperation().getName());
+            	
+            	// Create wrapper for request message, adding it to the appropriate named
+            	// part associated with the operation being involed
+            	Element newreq=request.getOwnerDocument().createElement("message");
+            	Element part=request.getOwnerDocument().createElement(partName);
+            	newreq.appendChild(part);
+            	part.appendChild(request);
+            	
+            	// Invoke the operation on the BPEL process
             	Element response=m_engine.invoke(m_serviceName, m_portName,
             			exchange.getContract().getServiceOperation().getName(),
-            					(Element)request, headers);
-            	
+            					newreq, headers);
+
                 Message message = exchange.createMessage();
-                message.setContent(response);
+                
+                // Strip off wrapper and part to just return the part contents
+                message.setContent(response.getFirstChild().getFirstChild());
                 
                 exchange.send(message);
 
@@ -111,7 +138,7 @@ public class RiftsawBPELExchangeHandler extends BaseBPELExchangeHandler {
             	Message faultMessage=exchange.createMessage();
             	faultMessage.setContent(f.getFaultMessage());
             	
-            	// TODO: What about the fault code?
+            	// TODO: What about the fault code? - do we need to strip off part wrapper?
             	
             	exchange.sendFault(faultMessage);
             	
@@ -119,6 +146,24 @@ public class RiftsawBPELExchangeHandler extends BaseBPELExchangeHandler {
             	e.printStackTrace();
             }
         }
+    }
+    
+    protected String getPartName(String operationName) {
+    	String ret=null;
+    	javax.wsdl.Operation op=m_portType.getOperation(operationName, null, null);
+    	
+    	if (op != null) {
+    		java.util.Map<?,?> parts=op.getInput().getMessage().getParts();
+    		
+    		if (parts.size() != 1) {
+    			throw new SwitchYardException("Only expecting a single message part for operation '"+
+    						operationName+", on service "+m_serviceName+" port "+m_portName);
+    		}
+    		
+    		ret = (String)parts.keySet().iterator().next();
+    	}
+    	
+    	return(ret);
     }
 
      /**

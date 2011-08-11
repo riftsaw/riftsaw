@@ -26,16 +26,16 @@
 			<artifactId>switchyard-api</artifactId>
 			<version>${switchyard.version}</version>
 		</dependency>
-    <dependency>
-      <groupId>org.switchyard</groupId>
-      <artifactId>switchyard-plugin</artifactId>
-      <version>0.1.0</version>
-    </dependency>
-    <dependency>
-      <groupId>org.switchyard.components</groupId>
-      <artifactId>switchyard-component-bean</artifactId>
-      <version>0.1.0</version>
-    </dependency>
+		<dependency>
+			<groupId>org.switchyard</groupId>
+			<artifactId>switchyard-plugin</artifactId>
+			<version>${switchyard.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.switchyard.components</groupId>
+			<artifactId>switchyard-component-bean</artifactId>
+			<version>${switchyard.version}</version>
+		</dependency>
 		<dependency>
 			<groupId>org.switchyard</groupId>
 			<artifactId>switchyard-deploy</artifactId>
@@ -143,7 +143,8 @@
 						<include>**/*Test.java</include>
 					</includes>
 					<excludes>
-						<exclude>**/BPEL*Test.java</exclude>
+						<exclude>**/RiftsawBPELTest.java</exclude>
+						<exclude>**/BPELHelloWorldTest.java</exclude>
 					</excludes>
 				</configuration>
 			</plugin>

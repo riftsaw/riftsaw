@@ -2,9 +2,7 @@
    <soapenv:Header/>
    <soapenv:Body>
       <exam:sayHello>
-         <exam:parameters>
-            <exam:input>Fred</exam:input>
-         </exam:parameters>
+         <exam:input>Fred</exam:input>
       </exam:sayHello>
    </soapenv:Body>
 </soapenv:Envelope>

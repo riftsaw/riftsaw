@@ -48,7 +48,6 @@ public class BPELSayHelloTest {
     
     @Test
     public void invokeSayHelloService() throws Exception {
-    	System.out.println("START TEST");
         _testKit.getMixIn(HTTPMixIn.class).
                 postResourceAndTestXML("http://localhost:18001/SayHelloService",
                 		"/say_hello/soap-request.xml", "/say_hello/soap-response.xml");

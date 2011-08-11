@@ -33,27 +33,33 @@ import org.switchyard.component.bpel.config.model.BPELComponentImplementationMod
 public interface BPELExchangeHandler extends ExchangeHandler {
 
     /**
-     * Initializes the BpmExchangeHandler.
+     * Initializes the BPELExchangeHandler.
+     * 
      * @param qname the qualified name
      * @param model the configuration
+     * @param wsdl the WSDL definition
      * @param engine the BPEL engine
      */
-    public void init(QName qname, BPELComponentImplementationModel model, BPELEngine engine);
+    public void init(QName qname, BPELComponentImplementationModel model,
+    				javax.wsdl.Definition wsdl, BPELEngine engine);
 
     /**
-     * Starts the BpmExchangeHandler.
+     * Starts the BPELExchangeHandler.
+     * 
      * @param serviceRef the service reference
      */
     public void start(ServiceReference serviceRef);
 
     /**
-     * Stops the BpmExchangeHandler.
+     * Stops the BPELExchangeHandler.
+     * 
      * @param serviceRef the service reference
      */
     public void stop(ServiceReference serviceRef);
 
     /**
-     * Destroys the BpmExchangeHandler.
+     * Destroys the BPELExchangeHandler.
+     * 
      * @param serviceRef the service reference
      */
     public void destroy(ServiceReference serviceRef);

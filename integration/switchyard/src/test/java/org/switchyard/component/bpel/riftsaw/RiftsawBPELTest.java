@@ -36,6 +36,7 @@ import org.switchyard.Message;
 import org.switchyard.ServiceDomain;
 import org.switchyard.component.bpel.config.model.BPELComponentImplementationModel;
 import org.switchyard.component.bpel.config.model.v1.V1BPELComponentImplementationModel;
+import org.switchyard.component.bpel.deploy.BPELActivator;
 import org.switchyard.component.bpel.exchange.BPELExchangeHandler;
 import org.switchyard.component.bpel.exchange.BPELExchangeHandlerFactory;
 import org.switchyard.test.InvocationFaultException;
@@ -101,7 +102,7 @@ public class RiftsawBPELTest {
         bci_model.setPortName("HelloPort");
         //bci_model.setVersion("1");
 
-        handler.init(qname, bci_model, m_engine);
+        handler.init(qname, bci_model, BPELActivator.getWSDLDefinition("hello_world/HelloWorld.wsdl"), m_engine);
 
         java.net.URL url=RiftsawBPELTest.class.getResource("/hello_world/soap-request.xml");
 		
@@ -145,7 +146,7 @@ public class RiftsawBPELTest {
         bci_model.setPortName("loanService_Port");
         //bci_model.setVersion("1");
 
-        handler.init(qname, bci_model, m_engine);
+        handler.init(qname, bci_model, BPELActivator.getWSDLDefinition("loan_approval/loanServicePT.wsdl"), m_engine);
 
         java.net.URL url=RiftsawBPELTest.class.getResource("/loan_approval/loanreq1.xml");
 		
@@ -216,7 +217,7 @@ public class RiftsawBPELTest {
         bci_model.setPortName("loanService_Port");
         //bci_model.setVersion("1");
 
-        handler.init(qname, bci_model, m_engine);
+        handler.init(qname, bci_model, BPELActivator.getWSDLDefinition("loan_approval/loanServicePT.wsdl"), m_engine);
 
         java.net.URL url=RiftsawBPELTest.class.getResource("/loan_approval/loanreq2.xml");
 		
@@ -299,7 +300,7 @@ public class RiftsawBPELTest {
         bci_model.setPortName("loanService_Port");
         //bci_model.setVersion("1");
 
-        handler.init(qname, bci_model, m_engine);
+        handler.init(qname, bci_model, BPELActivator.getWSDLDefinition("loan_approval/loanServicePT.wsdl"), m_engine);
 
         java.net.URL url=RiftsawBPELTest.class.getResource("/loan_approval/loanreq3.xml");
 		
@@ -387,7 +388,7 @@ public class RiftsawBPELTest {
         bci_model.setPortName("loanService_Port");
         //bci_model.setVersion("1");
 
-        handler.init(qname, bci_model, m_engine);
+        handler.init(qname, bci_model, BPELActivator.getWSDLDefinition("loan_approval/loanServicePT.wsdl"), m_engine);
 
         java.net.URL url=RiftsawBPELTest.class.getResource("/loan_approval/loanreq4.xml");
 		

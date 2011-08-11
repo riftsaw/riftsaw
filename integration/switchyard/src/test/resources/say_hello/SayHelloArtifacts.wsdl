@@ -16,23 +16,11 @@
         <schema attributeFormDefault="unqualified" elementFormDefault="qualified" 
                 targetNamespace="http://www.jboss.org/bpel/examples" 
                 xmlns="http://www.w3.org/2001/XMLSchema">
-        
-                <complexType name="SayHelloRequestType">
-                    <sequence>
-                        <element name="input" type="string"/>
-                    </sequence>
-                </complexType>
 
-                <complexType name="SayHelloResponseType">
-                    <sequence>
-                        <element name="result" type="string"/>
-                    </sequence>
-                </complexType>
- 
         <element name="sayHello">
             <complexType>
                 <sequence>
-                    <element name="parameters" type="tns:SayHelloRequestType"/>
+                    <element name="input" type="string" />
                  </sequence>
             </complexType>
         </element>
@@ -40,7 +28,7 @@
         <element name="sayHelloResponse">
             <complexType>
                 <sequence>
-                    <element name="parameters" type="tns:SayHelloResponseType"/>
+                    <element name="results" type="string"/>
                  </sequence>
             </complexType>
         </element>
