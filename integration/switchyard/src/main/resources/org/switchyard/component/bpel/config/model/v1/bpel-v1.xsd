@@ -31,6 +31,9 @@ MA  02110-1301, USA.
         <complexContent>
             <extension base="sca:Implementation">
                 <attribute name="processDescriptor" type="string" use="optional" default="deploy.xml"/>
+                <attribute name="serviceName" type="string" />
+                <attribute name="portName" type="string" />
+                <attribute name="version" type="string" use="optional" default="1"/>
             </extension>
         </complexContent>
     </complexType>

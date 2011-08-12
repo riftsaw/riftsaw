@@ -11,30 +11,30 @@
      <sca:composite name="loanservice" targetNamespace="urn:bpel:test:1.0">
         <sca:service name="loanService" promote="loanService">
             <soap:binding.soap>
-                <soap:serverPort>18001</soap:serverPort>
                 <soap:wsdl>loan_approval/loanService/loanServicePT.wsdl</soap:wsdl>
+                <soap:serverPort>18001</soap:serverPort>
             </soap:binding.soap>
          </sca:service>
 
          <sca:component name="loanService">
-             <sca:service name="loanService">
-                 <sca:interface.wsdl interface="loan_approval/loanService/loanServicePT.wsdl#wsdl.porttype(loanServicePT)"/>
-             </sca:service>
              <bpel:implementation.bpel processDescriptor="loan_approval/loanService/deploy.xml"
                      version="1" serviceName="{http://example.com/loan-approval/loanService/}loanService"
                                  portName="loanService_Port"/>
+             <sca:service name="loanService">
+                 <sca:interface.wsdl interface="loan_approval/loanService/loanServicePT.wsdl#wsdl.porttype(loanServicePT)"/>
+             </sca:service>
              <sca:reference name="riskAssessor" >
                  <sca:interface.wsdl interface="loan_approval/riskAssessment/riskAssessmentPT.wsdl#wsdl.porttype(riskAssessmentPT)"/>
              </sca:reference>
          </sca:component>
          
          <sca:component name="riskAssessor" >
-             <sca:service name="riskAssessor">
-                 <sca:interface.wsdl interface="loan_approval/riskAssessment/riskAssessmentPT.wsdl#wsdl.porttype(riskAssessmentPT)"/>
-             </sca:service>
              <bpel:implementation.bpel processDescriptor="loan_approval/riskAssessment/deploy.xml"
                      version="1" serviceName="{http://example.com/loan-approval/riskAssessment/}riskAssessor"
                                  portName="riskAssessor_Port"/>
+             <sca:service name="riskAssessor">
+                 <sca:interface.wsdl interface="loan_approval/riskAssessment/riskAssessmentPT.wsdl#wsdl.porttype(riskAssessmentPT)"/>
+             </sca:service>
          </sca:component>
 
      </sca:composite>
