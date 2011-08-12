@@ -1,0 +1,124 @@
+<process name="loanApprovalProcess"
+
+   targetNamespace="http://example.com/loan-approval/loanService/"
+
+   xmlns="http://docs.oasis-open.org/wsbpel/2.0/process/executable"
+
+   xmlns:lns="http://example.com/loan-approval/loanService/"
+
+   suppressJoinFailure="yes">
+
+ 
+
+   <import importType="http://schemas.xmlsoap.org/wsdl/"
+
+      location="loanServicePT.wsdl"
+
+      namespace="http://example.com/loan-approval/loanService/" />
+
+ 
+
+   <partnerLinks>
+
+      <partnerLink name="customer" 
+
+         partnerLinkType="lns:loanPartnerLT"
+
+         myRole="loanService" />
+
+<!--
+      <partnerLink name="approver"
+
+         partnerLinkType="lns:loanApprovalLT" 
+
+         partnerRole="approver" />
+
+      <partnerLink name="assessor"
+
+         partnerLinkType="lns:riskAssessmentLT"
+
+         partnerRole="assessor" />
+-->
+   </partnerLinks>
+
+ 
+
+   <variables>
+
+      <variable name="request" messageType="lns:requestMessage" />
+      <variable name="requestResponse" messageType="lns:requestResponseMessage" />
+      
+    <!--
+      <variable name="check" messageType="lns:checkMessage" />
+      <variable name="approve" messageType="lns:approveMessage" />
+
+      <variable name="checkResponse" messageType="lns:checkResponseMessage" />
+      <variable name="approveResponse" messageType="lns:approveResponseMessage" />
+	-->
+      <variable name="faultResponse" 
+
+         messageType="lns:errorMessage" />
+
+   </variables>
+
+ 
+
+   <faultHandlers>
+
+      <catch faultName="lns:loanProcessFault" 
+
+         faultVariable="error"
+
+         faultMessageType="lns:errorMessage">
+
+         <reply partnerLink="customer" 
+
+            portType="lns:loanServicePT"
+
+            operation="request" variable="error"
+
+            faultName="lns:unableToHandleRequest" />
+
+      </catch>
+
+   </faultHandlers>
+
+ 
+
+   <sequence>
+
+      <receive partnerLink="customer" 
+
+         portType="lns:loanServicePT"
+
+         operation="request" 
+
+         variable="request"
+
+         createInstance="yes">
+
+      </receive>
+
+        <assign validate="no" name="AssignName">
+            <copy>
+                <from><literal><tns:RequestResponse xmlns:tns="http://example.com/loan-approval/loanService/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <tns:accept>yes</tns:accept>
+</tns:RequestResponse>
+</literal></from>
+                <to variable="requestResponse" part="parameter"></to>
+            </copy>
+        </assign>
+
+      <reply partnerLink="customer" 
+
+         portType="lns:loanServicePT"
+
+         operation="request" 
+
+         variable="requestResponse">
+
+      </reply>
+
+   </sequence>
+
+</process>

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<switchyard xmlns="urn:switchyard-config:switchyard:1.0"
+             xmlns:swyd="urn:switchyard-config:switchyard:1.0"
+             xmlns:trfm="urn:switchyard-config:transform:1.0"
+             xmlns:bean="urn:switchyard-component-bean:config:1.0"
+             xmlns:soap="urn:switchyard-component-soap:config:1.0"
+             xmlns:bpel="urn:switchyard-component-bpel:config:1.0"
+             xmlns:sca="http://docs.oasis-open.org/ns/opencsa/sca/200912"
+             targetNamespace="urn:switchyard-quickstart:bpel-loan-approval:0.1.0"
+             name="loanapproval">
+     <sca:composite name="loanservice" targetNamespace="urn:bpel:test:1.0">
+        <sca:service name="loanService" promote="loanService">
+            <soap:binding.soap>
+                <soap:serverPort>18001</soap:serverPort>
+                <soap:wsdl>loan_approval/loanService/loanServicePT.wsdl</soap:wsdl>
+            </soap:binding.soap>
+         </sca:service>
+
+         <sca:component name="loanService">
+             <sca:service name="loanService">
+                 <sca:interface.wsdl interface="loan_approval/loanService/loanServicePT.wsdl#wsdl.porttype(loanServicePT)"/>
+             </sca:service>
+             <bpel:implementation.bpel processDescriptor="loan_approval/loanService/deploy.xml"
+                     version="1" serviceName="{http://example.com/loan-approval/loanService/}loanService"
+                                 portName="loanService_Port"/>
+             <sca:reference name="riskAssessor" >
+                 <sca:interface.wsdl interface="loan_approval/riskAssessment/riskAssessmentPT.wsdl#wsdl.porttype(riskAssessmentPT)"/>
+             </sca:reference>
+         </sca:component>
+         
+         <sca:component name="riskAssessor" >
+             <sca:service name="riskAssessor">
+                 <sca:interface.wsdl interface="loan_approval/riskAssessment/riskAssessmentPT.wsdl#wsdl.porttype(riskAssessmentPT)"/>
+             </sca:service>
+             <bpel:implementation.bpel processDescriptor="loan_approval/riskAssessment/deploy.xml"
+                     version="1" serviceName="{http://example.com/loan-approval/riskAssessment/}riskAssessor"
+                                 portName="riskAssessor_Port"/>
+         </sca:component>
+
+     </sca:composite>
+</switchyard>

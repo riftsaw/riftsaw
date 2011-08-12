@@ -27,7 +27,6 @@ import org.riftsaw.engine.Service;
 import org.riftsaw.engine.ServiceLocator;
 import org.switchyard.BaseHandler;
 import org.switchyard.Exchange;
-import org.switchyard.ExchangeHandler;
 import org.switchyard.HandlerException;
 import org.switchyard.Message;
 import org.switchyard.ServiceDomain;

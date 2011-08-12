@@ -1,6 +1,6 @@
-/*
+<!--
  * JBoss, Home of Professional Open Source
- * Copyright 2009-11, Red Hat Middleware LLC, and others contributors as indicated
+ * Copyright 2009, Red Hat Middleware LLC, and others contributors as indicated
  * by the @authors tag. All rights reserved.
  * See the copyright.txt in the distribution for a
  * full listing of individual contributors.
@@ -14,27 +14,25 @@
  * v.2.1 along with this distribution; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA  02110-1301, USA.
- */
-package org.riftsaw.engine;
+ -->
+<deploy xmlns="http://www.apache.org/ode/schemas/dd/2007/03"
+	xmlns:bpl="http://example.com/loan-approval/loanService/" 
+	xmlns:intf="http://example.com/loan-approval/loanService/"
+    >
 
-import javax.xml.namespace.QName;
-
-/**
- * This interface provides access to external services that can be used
- * by the BPEL processes.
- *
- */
-public interface ServiceLocator {
-
-	/**
-	 * This method returns the service associated with the supplied
-	 * service and port name.
-	 * 
-	 * @param serviceName The service name
-	 * @param portName The port name
-	 * @return The service associated with the supplied serviceName/portName,
-	 * 					or null if not found
-	 */
-	public Service getService(QName serviceName, String portName);
-	
-}
+	<process name="bpl:loanApprovalProcess">
+		<active>true</active>
+        <process-events generate="all"/>
+		<provide partnerLink="customer">
+			<service name="intf:loanService" port="loanService_Port"/>
+		</provide>
+		<!--
+		<invoke partnerLink="approver">
+			<service name="intf:loanApprover" port="loanApprover_Port"/>
+		</invoke>		
+		<invoke partnerLink="assessor">
+			<service name="intf:riskAssessor" port="riskAssessor_Port"/>
+		</invoke>
+		-->		
+	</process>
+</deploy>

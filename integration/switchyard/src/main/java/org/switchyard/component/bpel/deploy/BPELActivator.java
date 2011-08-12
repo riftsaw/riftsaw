@@ -33,6 +33,7 @@ import org.switchyard.component.bpel.exchange.BPELExchangeHandler;
 import org.switchyard.component.bpel.exchange.BPELExchangeHandlerFactory;
 import org.switchyard.component.bpel.riftsaw.RiftsawServiceLocator;
 import org.switchyard.config.model.Model;
+import org.switchyard.config.model.composite.ComponentReferenceModel;
 import org.switchyard.config.model.composite.ComponentServiceModel;
 import org.switchyard.deploy.BaseActivator;
 import org.switchyard.exception.SwitchYardException;
@@ -46,6 +47,7 @@ public class BPELActivator extends BaseActivator {
     private Map<QName,BPELExchangeHandler> m_handlers = new HashMap<QName,BPELExchangeHandler>();
 
 	private BPELEngine m_engine=null;
+	private RiftsawServiceLocator m_locator=null;
 	
     /**
      * Constructs a new Activator of type "bpel".
@@ -60,7 +62,7 @@ public class BPELActivator extends BaseActivator {
 		m_engine = BPELEngineFactory.getEngine();
 		
 		try {
-			RiftsawServiceLocator locator=new RiftsawServiceLocator(getServiceDomain());
+			m_locator=new RiftsawServiceLocator(getServiceDomain());
 			
 			java.util.Properties props=new java.util.Properties();
 
@@ -73,7 +75,7 @@ public class BPELActivator extends BaseActivator {
 				// TODO: Ignore for now
 			}
 
-			m_engine.init(locator, props);
+			m_engine.init(m_locator, props);
 		} catch(Exception e) {
 			throw new SwitchYardException("Failed to initialize the engine: "+e, e);
 		}
@@ -104,7 +106,13 @@ public class BPELActivator extends BaseActivator {
     		
     		m_handlers.put(qname, handler);
     		return handler;
+    	} else if (model instanceof ComponentReferenceModel) {
+    		ComponentReferenceModel crm=(ComponentReferenceModel)model;
+    		
+    		// TODO: Not sure whether we need to do anything here
+    		return null;
     	}
+    	
     	throw new SwitchYardException("No BPEL component implementations found for service " + qname);
     }
 	

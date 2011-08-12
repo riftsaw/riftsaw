@@ -16,21 +16,15 @@
  * MA  02110-1301, USA.
  -->
 <deploy xmlns="http://www.apache.org/ode/schemas/dd/2007/03"
-	xmlns:bpl="http://example.com/loan-approval/" 
-	xmlns:intf="http://example.com/loan-approval/wsdl/"
+	xmlns:bpl="http://example.com/loan-approval/riskAssessment/" 
+	xmlns:intf="http://example.com/loan-approval/riskAssessment/"
     >
 
-	<process name="bpl:loanApprovalProcess">
+	<process name="bpl:riskAssessmentProcess">
 		<active>true</active>
         <process-events generate="all"/>
-		<provide partnerLink="customer">
-			<service name="intf:loanService" port="loanService_Port"/>
-		</provide>
-		<invoke partnerLink="approver">
-			<service name="intf:loanApprover" port="loanApprover_Port"/>
-		</invoke>		
-		<invoke partnerLink="assessor">
+		<provide partnerLink="assessor">
 			<service name="intf:riskAssessor" port="riskAssessor_Port"/>
-		</invoke>		
+		</provide>
 	</process>
 </deploy>

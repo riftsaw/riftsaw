@@ -1,6 +1,5 @@
-<wsdl:request xmlns:wsdl="http://example.com/loan-approval/wsdl/">
+<ns1:request xmlns:ns1="http://example.com/loan-approval/loanService/">
    <firstName>Fred</firstName>
    <name>Bloggs</name>
    <amount>1000</amount>
-</wsdl:request>
-
+</ns1:request>
