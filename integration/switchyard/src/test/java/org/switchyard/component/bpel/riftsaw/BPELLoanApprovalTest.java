@@ -48,7 +48,7 @@ public class BPELLoanApprovalTest {
     }
     
     @Test
-    public void invokeSayHelloService() throws Exception {
+    public void sendLoanRequest1() throws Exception {
         _testKit.getMixIn(HTTPMixIn.class).
                 postResourceAndTestXML("http://localhost:18001/loanService",
                 		"/loan_approval/soap-loanreq1.xml", "/loan_approval/soap-loanresp1.xml");

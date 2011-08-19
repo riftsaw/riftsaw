@@ -18,10 +18,8 @@
  */
 package org.switchyard.component.bpel.config.model.v1;
 
-import static org.switchyard.component.bpel.process.ProcessConstants.PROCESS_DESCRIPTOR;
+import static org.switchyard.component.bpel.process.ProcessConstants.PROCESS;
 import static org.switchyard.component.bpel.process.ProcessConstants.VERSION;
-import static org.switchyard.component.bpel.process.ProcessConstants.SERVICE_NAME;
-import static org.switchyard.component.bpel.process.ProcessConstants.PORT_NAME;
 
 import org.switchyard.component.bpel.config.model.BPELComponentImplementationModel;
 import org.switchyard.config.Configuration;
@@ -54,15 +52,15 @@ public class V1BPELComponentImplementationModel extends V1ComponentImplementatio
     /**
      * {@inheritDoc}
      */
-    public String getProcessDescriptor() {
-        return getModelAttribute(PROCESS_DESCRIPTOR);
+    public String getProcess() {
+        return getModelAttribute(PROCESS);
     }
 
     /**
      * {@inheritDoc}
      */
-    public BPELComponentImplementationModel setProcessDescriptor(String processDescriptor) {
-        setModelAttribute(PROCESS_DESCRIPTOR, processDescriptor);
+    public BPELComponentImplementationModel setProcess(String process) {
+        setModelAttribute(PROCESS, process);
         return this;
     }
     
@@ -86,43 +84,4 @@ public class V1BPELComponentImplementationModel extends V1ComponentImplementatio
         return this;
     }
 
-    /**
-     * Gets the "serviceName" attribute.
-     *
-     * @return the "serviceName" attribute
-     */
-    public String getServiceName() {
-        return getModelAttribute(SERVICE_NAME);
-    }
-
-    /**
-     * Sets the "serviceName" attribute.
-     *
-     * @param serviceName the "serviceName" attribute
-     * @return this instance (useful for chaining)
-     */
-    public BPELComponentImplementationModel setServiceName(String serviceName) {
-        setModelAttribute(SERVICE_NAME, serviceName);
-        return this;
-    }
-
-    /**
-     * Gets the "portName" attribute.
-     *
-     * @return the "portName" attribute
-     */
-    public String getPortName() {
-        return getModelAttribute(PORT_NAME);
-    }
-
-    /**
-     * Sets the "portName" attribute.
-     *
-     * @param portName the "portName" attribute
-     * @return this instance (useful for chaining)
-     */
-    public BPELComponentImplementationModel setPortName(String portName) {
-        setModelAttribute(PORT_NAME, portName);
-        return this;
-    }
 }

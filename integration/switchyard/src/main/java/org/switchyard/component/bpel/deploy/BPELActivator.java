@@ -93,7 +93,7 @@ public class BPELActivator extends BaseActivator {
     		
     		BPELComponentImplementationModel bciModel=null;
     		
-    		if (((ComponentServiceModel)model).getComponent().getImplementation() instanceof BPELComponentImplementationModel) {
+       		if (((ComponentServiceModel)model).getComponent().getImplementation() instanceof BPELComponentImplementationModel) {
     			bciModel = (BPELComponentImplementationModel)((ComponentServiceModel)model).getComponent().getImplementation();
     		} else {
     			throw new SwitchYardException("Component is not BPEL");
@@ -104,7 +104,7 @@ public class BPELActivator extends BaseActivator {
     		}
     		
     		handler.init(qname, bciModel,
-    				getWSDLDefinition(((ComponentServiceModel) model).getInterface().getInterface()),
+    				((ComponentServiceModel) model).getInterface().getInterface(),
     				m_engine);
     		
     		m_handlers.put(qname, handler);
@@ -122,31 +122,6 @@ public class BPELActivator extends BaseActivator {
     	throw new SwitchYardException("No BPEL component implementations found for service " + qname);
     }
 	
-	public static javax.wsdl.Definition getWSDLDefinition(String location) throws SwitchYardException {
-		javax.wsdl.Definition ret=null;
-		
-		if (location == null) {
-			throw new SwitchYardException("WSDL location has not been specified");
-		} else {
-			try {
-				int index=location.indexOf('#');
-				
-				if (index != -1) {
-					location = location.substring(0, index);
-				}
-				
-				java.net.URL url=ClassLoader.getSystemResource(location);
-				
-		        ret = javax.wsdl.factory.WSDLFactory.newInstance().newWSDLReader().readWSDL(url.getFile());
-				
-			} catch(Exception e) {
-				throw new SwitchYardException("Failed to load WSDL '"+location+"'", e);
-			}
-		}
-
-		return(ret);
-	}
-
     /**
      * {@inheritDoc}
      */

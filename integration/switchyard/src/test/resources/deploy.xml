@@ -17,7 +17,6 @@
  -->
 <deploy xmlns="http://www.apache.org/ode/schemas/dd/2007/03"
 	xmlns:ls="http://example.com/loan-approval/loanService/" 
-	xmlns:ls="http://example.com/loan-approval/loanService/"
 	xmlns:ra="http://example.com/loan-approval/riskAssessment/"
 	xmlns:examples="http://www.jboss.org/bpel/examples"
     >
@@ -52,5 +51,5 @@
 			<service name="examples:SayHelloService" port="SayHelloPort"/>
 		</provide>
 	</process>
-</deploy>
+	
 </deploy>

@@ -37,11 +37,11 @@ public interface BPELExchangeHandler extends ExchangeHandler {
      * 
      * @param qname the qualified name
      * @param model the configuration
-     * @param wsdl the WSDL definition
+     * @param intf the WSDL interface details
      * @param engine the BPEL engine
      */
     public void init(QName qname, BPELComponentImplementationModel model,
-    				javax.wsdl.Definition wsdl, BPELEngine engine);
+    				String intf, BPELEngine engine);
 
     /**
      * Starts the BPELExchangeHandler.

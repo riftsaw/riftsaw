@@ -21,8 +21,6 @@ package org.switchyard.component.bpel.riftsaw;
 import javax.xml.namespace.QName;
 
 import org.apache.log4j.Logger;
-import org.hibernate.util.XMLHelper;
-import org.milyn.xml.XmlUtil;
 import org.riftsaw.engine.BPELEngine;
 import org.riftsaw.engine.DeploymentUnit;
 import org.riftsaw.engine.Fault;
@@ -44,15 +42,20 @@ import org.w3c.dom.Node;
  */
 public class RiftsawBPELExchangeHandler extends BaseBPELExchangeHandler {
 
-    private static final Logger logger = Logger.getLogger(RiftsawBPELExchangeHandler.class);
+    private static final String DEPLOY_XML = "deploy.xml";
+
+	private static final String WSDL_PORTTYPE_PREFIX = "#wsdl.porttype(";
+
+	private static final Logger logger = Logger.getLogger(RiftsawBPELExchangeHandler.class);
 
     private final ServiceDomain m_serviceDomain;
     private BPELEngine m_engine=null;
     private QName m_serviceName=null;
     private javax.wsdl.Definition m_wsdl=null;
     private javax.wsdl.PortType m_portType=null;
-    private String m_portName=null;
     private String m_version=null;
+    private static java.util.Map<QName, QName> m_serviceRefToCompositeMap=
+    					new java.util.HashMap<QName, QName>();
 
     /**
      * Constructs a new RiftSaw BPEL ExchangeHandler within the specified ServiceDomain.
@@ -67,32 +70,116 @@ public class RiftsawBPELExchangeHandler extends BaseBPELExchangeHandler {
      * {@inheritDoc}
      */
     public void init(QName qname, BPELComponentImplementationModel model,
-    				javax.wsdl.Definition wsdl, BPELEngine engine) {
+    				String intf, BPELEngine engine) {
     	
     	m_engine = engine;
-    	m_serviceName = QName.valueOf(model.getServiceName());
-    	m_portName = model.getPortName();
+    	//m_serviceName = QName.valueOf(model.getServiceName());
+    	//m_portName = model.getPortName();
     	m_version = model.getVersion();
-    	m_wsdl = wsdl;
     	
-    	// Obtain the port type from the service and port name
-    	javax.wsdl.Service service=m_wsdl.getService(m_serviceName);
-    	javax.wsdl.Port port=service.getPort(m_portName);
+    	m_wsdl = getWSDLDefinition(intf);
     	
-    	m_portType = port.getBinding().getPortType();
+    	m_portType = getPortType(intf, m_wsdl);
     	
-    	String descriptor=model.getProcessDescriptor();
+    	javax.wsdl.Service service=getServiceForPortType(m_portType, m_wsdl);
     	
-		java.net.URL url=ClassLoader.getSystemResource(descriptor);
-		
-		java.io.File deployFile=new java.io.File(url.getFile());
-		
-		DeploymentUnit bdu=new DeploymentUnit(qname.getLocalPart(), m_version,
-							deployFile.lastModified(), deployFile);
+    	m_serviceName = service.getQName();
+    	
+    	// TODO: If there are multiple services using the same BPEL implementation,
+    	// then need to reference count, and only deploy/undeploy once. Need to
+    	// undeploy when the service refs are stopped or destroyed
+    	
+    	// TODO: Better way to manage deployed processes and the service refs to understand
+    	// when to undeploy the deployment unit
+    	
+    	// Check if composite is already been initialized for BPEL processes
+    	QName compositeName=model.getComponent().getComposite().getQName();
+    	
+    	if (m_serviceRefToCompositeMap.containsValue(compositeName) == false) {  	
+			java.net.URL url=ClassLoader.getSystemResource(DEPLOY_XML);
+			
+			java.io.File deployFile=new java.io.File(url.getFile());
+			
+			DeploymentUnit bdu=new DeploymentUnit(qname.getLocalPart(), m_version,
+								deployFile.lastModified(), deployFile);
+	
+			// Deploy the process
+			engine.deploy(bdu);
+    	}
 
-		// Deploy the process
-		engine.deploy(bdu);
-    }
+    	m_serviceRefToCompositeMap.put(qname, compositeName);
+	}
+
+	public static javax.wsdl.Definition getWSDLDefinition(String location) throws SwitchYardException {
+		javax.wsdl.Definition ret=null;
+		
+		if (location == null) {
+			throw new SwitchYardException("WSDL location has not been specified");
+		} else {
+			try {
+				int index=location.indexOf('#');
+				
+				if (index != -1) {
+					location = location.substring(0, index);
+				}
+				
+				java.net.URL url=ClassLoader.getSystemResource(location);
+				
+		        ret = javax.wsdl.factory.WSDLFactory.newInstance().newWSDLReader().readWSDL(url.getFile());
+				
+			} catch(Exception e) {
+				throw new SwitchYardException("Failed to load WSDL '"+location+"'", e);
+			}
+		}
+
+		return(ret);
+	}
+
+	public static javax.wsdl.PortType getPortType(String location, javax.wsdl.Definition wsdl)
+									throws SwitchYardException {
+		javax.wsdl.PortType ret=null;
+		
+		if (location == null) {
+			throw new SwitchYardException("WSDL location has not been specified");
+		} else {
+			int index=location.indexOf(WSDL_PORTTYPE_PREFIX);
+			
+			if (index != -1) {
+				String portTypeName = location.substring(index+WSDL_PORTTYPE_PREFIX.length(), location.length()-1);
+				
+				ret = wsdl.getPortType(new QName(wsdl.getTargetNamespace(), portTypeName));
+			}
+		}
+
+		return(ret);
+	}
+	
+	public static javax.wsdl.Service getServiceForPortType(javax.wsdl.PortType portType,
+								javax.wsdl.Definition wsdl) {
+		javax.wsdl.Service ret=null;
+		
+		java.util.Iterator<?> iter=wsdl.getServices().values().iterator();
+		while (ret == null && iter.hasNext()) {
+			ret = (javax.wsdl.Service)iter.next();
+			
+			java.util.Iterator<?> ports=ret.getPorts().values().iterator();
+			boolean f_found=false;
+			
+			while (!f_found && ports.hasNext()) {
+				javax.wsdl.Port port=(javax.wsdl.Port)ports.next(); 
+				
+				if (port.getBinding().getPortType() == portType) {
+					f_found = true;
+				}
+			}
+			
+			if (!f_found) {
+				ret = null;
+			}
+		}
+		
+		return(ret);
+	}
 
     /**
      * {@inheritDoc}
@@ -123,7 +210,7 @@ public class RiftsawBPELExchangeHandler extends BaseBPELExchangeHandler {
             	part.appendChild(request);
             	
             	// Invoke the operation on the BPEL process
-            	Element response=m_engine.invoke(m_serviceName, m_portName,
+            	Element response=m_engine.invoke(m_serviceName, null,
             			exchange.getContract().getServiceOperation().getName(),
             					newreq, headers);
 
@@ -157,7 +244,7 @@ public class RiftsawBPELExchangeHandler extends BaseBPELExchangeHandler {
     		
     		if (parts.size() != 1) {
     			throw new SwitchYardException("Only expecting a single message part for operation '"+
-    						operationName+", on service "+m_serviceName+" port "+m_portName);
+    						operationName+", on service "+m_serviceName); //+" port "+m_portName);
     		}
     		
     		ret = (String)parts.keySet().iterator().next();

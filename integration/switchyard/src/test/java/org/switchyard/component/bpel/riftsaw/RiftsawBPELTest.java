@@ -97,12 +97,11 @@ public class RiftsawBPELTest {
         BPELExchangeHandler handler = BPELExchangeHandlerFactory.instance().newBPELExchangeHandler(serviceDomain);
 
         BPELComponentImplementationModel bci_model = new V1BPELComponentImplementationModel();
-        bci_model.setProcessDescriptor("hello_world/deploy.xml");
-        bci_model.setServiceName(qname.toString());
-        bci_model.setPortName("HelloPort");
+        QName processQName=new QName("http://www.jboss.org/bpel/examples", "HelloWorld");
+        bci_model.setProcess(processQName.toString());
         //bci_model.setVersion("1");
 
-        handler.init(qname, bci_model, BPELActivator.getWSDLDefinition("hello_world/HelloWorld.wsdl"), m_engine);
+        handler.init(qname, bci_model, "hello_world/HelloWorld.wsdl#wsdl.porttype(HelloPortType)", m_engine);
 
         java.net.URL url=RiftsawBPELTest.class.getResource("/hello_world/soap-request.xml");
 		
@@ -141,12 +140,11 @@ public class RiftsawBPELTest {
         BPELExchangeHandler handler = BPELExchangeHandlerFactory.instance().newBPELExchangeHandler(serviceDomain);
 
         BPELComponentImplementationModel bci_model = new V1BPELComponentImplementationModel();
-        bci_model.setProcessDescriptor("loan_approval/deploy.xml");
-        bci_model.setServiceName(qname.toString());
-        bci_model.setPortName("loanService_Port");
-        //bci_model.setVersion("1");
+        QName processQName=new QName("http://example.com/loan-approval/loanService/", "loanApprovalProcess");
+        bci_model.setProcess(processQName.toString());
+         //bci_model.setVersion("1");
 
-        handler.init(qname, bci_model, BPELActivator.getWSDLDefinition("loan_approval/loanServicePT.wsdl"), m_engine);
+        handler.init(qname, bci_model, "loanServicePT.wsdl#wsdl.porttype(loanServicePT)", m_engine);
 
         java.net.URL url=RiftsawBPELTest.class.getResource("/loan_approval/loanreq1.xml");
 		
@@ -212,12 +210,11 @@ public class RiftsawBPELTest {
         BPELExchangeHandler handler = BPELExchangeHandlerFactory.instance().newBPELExchangeHandler(serviceDomain);
 
         BPELComponentImplementationModel bci_model = new V1BPELComponentImplementationModel();
-        bci_model.setProcessDescriptor("loan_approval/deploy.xml");
-        bci_model.setServiceName(qname.toString());
-        bci_model.setPortName("loanService_Port");
+        QName processQName=new QName("http://example.com/loan-approval/loanService/", "loanApprovalProcess");
+        bci_model.setProcess(processQName.toString());
         //bci_model.setVersion("1");
 
-        handler.init(qname, bci_model, BPELActivator.getWSDLDefinition("loan_approval/loanServicePT.wsdl"), m_engine);
+        handler.init(qname, bci_model, "loanServicePT.wsdl#wsdl.porttype(loanServicePT)", m_engine);
 
         java.net.URL url=RiftsawBPELTest.class.getResource("/loan_approval/loanreq2.xml");
 		
@@ -295,12 +292,11 @@ public class RiftsawBPELTest {
         BPELExchangeHandler handler = BPELExchangeHandlerFactory.instance().newBPELExchangeHandler(serviceDomain);
 
         BPELComponentImplementationModel bci_model = new V1BPELComponentImplementationModel();
-        bci_model.setProcessDescriptor("loan_approval/deploy.xml");
-        bci_model.setServiceName(qname.toString());
-        bci_model.setPortName("loanService_Port");
+        QName processQName=new QName("http://example.com/loan-approval/loanService/", "loanApprovalProcess");
+        bci_model.setProcess(processQName.toString());
         //bci_model.setVersion("1");
 
-        handler.init(qname, bci_model, BPELActivator.getWSDLDefinition("loan_approval/loanServicePT.wsdl"), m_engine);
+        handler.init(qname, bci_model, "loanServicePT.wsdl#wsdl.porttype(loanServicePT)", m_engine);
 
         java.net.URL url=RiftsawBPELTest.class.getResource("/loan_approval/loanreq3.xml");
 		
@@ -383,12 +379,11 @@ public class RiftsawBPELTest {
         BPELExchangeHandler handler = BPELExchangeHandlerFactory.instance().newBPELExchangeHandler(serviceDomain);
 
         BPELComponentImplementationModel bci_model = new V1BPELComponentImplementationModel();
-        bci_model.setProcessDescriptor("loan_approval/deploy.xml");
-        bci_model.setServiceName(qname.toString());
-        bci_model.setPortName("loanService_Port");
+        QName processQName=new QName("http://example.com/loan-approval/loanService/", "loanApprovalProcess");
+        bci_model.setProcess(processQName.toString());
         //bci_model.setVersion("1");
 
-        handler.init(qname, bci_model, BPELActivator.getWSDLDefinition("loan_approval/loanServicePT.wsdl"), m_engine);
+        handler.init(qname, bci_model, "loanServicePT.wsdl#wsdl.porttype(loanServicePT)", m_engine);
 
         java.net.URL url=RiftsawBPELTest.class.getResource("/loan_approval/loanreq4.xml");
 		

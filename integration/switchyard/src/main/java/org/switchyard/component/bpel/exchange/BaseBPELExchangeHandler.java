@@ -18,27 +18,12 @@
  */
 package org.switchyard.component.bpel.exchange;
 
-import static org.switchyard.Scope.IN;
-/*
-import static org.switchyard.component.bpm.process.ProcessConstants.PROCESS_ACTION_TYPE_VAR;
-import static org.switchyard.component.bpm.process.ProcessConstants.PROCESS_EVENT_VAR;
-import static org.switchyard.component.bpm.process.ProcessConstants.PROCESS_EVENT_TYPE_VAR;
-import static org.switchyard.component.bpm.process.ProcessConstants.PROCESS_INSTANCE_ID_VAR;
-import static org.switchyard.component.bpm.process.ProcessConstants.PROCESS_NAMESPACE;
-*/
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 
-import javax.xml.namespace.QName;
-
 import org.switchyard.BaseHandler;
-import org.switchyard.Context;
-import org.switchyard.Message;
-import org.switchyard.Property;
 import org.switchyard.common.type.Classes;
-import org.switchyard.common.xml.XMLHelper;
-//import org.switchyard.component.bpm.process.ProcessActionType;
 import org.switchyard.exception.SwitchYardException;
 
 /**
@@ -46,80 +31,6 @@ import org.switchyard.exception.SwitchYardException;
  *
  */
 public abstract class BaseBPELExchangeHandler extends BaseHandler implements BPELExchangeHandler {
-
-    /**
-     * Gets the ProcessActionType from the Exchange Context.
-     * @param context the Exchange Context
-     * @return the ProcessActionType
-     */
-	/*
-    protected ProcessActionType getProcessActionType(Context context) {
-        Property property = context.getProperty(PROCESS_ACTION_TYPE_VAR, IN);
-        Object value = property != null ? property.getValue() : null;
-        if (value instanceof ProcessActionType) {
-            return (ProcessActionType)value;
-        } else if (value instanceof QName) {
-            return ProcessActionType.valueOf((QName)value);
-        } else if (value instanceof String) {
-            return ProcessActionType.valueOf(XMLHelper.createQName(PROCESS_NAMESPACE, (String)value));
-        }
-        return null;
-    }
-    */
-
-    /**
-     * Gets the process instance id from the Exchange Context.
-     * @param context the Exchange Context
-     * @return the process instance id
-     */
-    /*
-    protected Long getProcessInstanceId(Context context) {
-        Property property = context.getProperty(PROCESS_INSTANCE_ID_VAR, IN);
-        Object value = property != null ? property.getValue() : null;
-        if (value instanceof Long) {
-            return (Long)value;
-        } else if (value instanceof Number) {
-            return Long.valueOf(((Number)value).longValue());
-        } else if (value instanceof String) {
-            return Long.valueOf((String)value);
-        }
-        return null;
-    }
-    */
-
-    /**
-     * Gets the process event type from the Exchange Context.
-     * @param context the Exchange Context
-     * @return the process event type
-     */
-    /*
-    protected String getProcessEventType(Context context) {
-        Property property = context.getProperty(PROCESS_EVENT_TYPE_VAR, IN);
-        Object value = property != null ? property.getValue() : null;
-        if (value instanceof String) {
-            return (String)value;
-        } else if (value != null) {
-            return String.valueOf(value);
-        }
-        return null;
-    }
-    */
-
-    /**
-     * Gets the process event from the Exchange Context.
-     * @param context the Exchange Context
-     * @return the process event
-     */
-    /*
-    protected Object getProcessEvent(Context context, Message message) {
-        Property property = context.getProperty(PROCESS_EVENT_VAR, IN);
-        Object value = property != null ? property.getValue() : null;
-        if (value == null && message != null) {
-            value = message.getContent();
-        }
-        return value;
-    }
-    */
 
     /**
      * Creates a URL for the given resource location.

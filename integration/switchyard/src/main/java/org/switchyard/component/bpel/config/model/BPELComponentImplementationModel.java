@@ -31,7 +31,7 @@ public interface BPELComponentImplementationModel extends ComponentImplementatio
     /**
      * The "bpel" namespace.
      */
-    public static final String DEFAULT_NAMESPACE = "urn:switchyard-component-bpel:config:1.0";
+    public static final String DEFAULT_NAMESPACE = "http://docs.oasis-open.org/ns/opencsa/sca/200903";
 
     /**
      * The "bpel" implementation type.
@@ -39,19 +39,19 @@ public interface BPELComponentImplementationModel extends ComponentImplementatio
     public static final String BPEL = "bpel";
     
     /**
-     * Gets the "processDescriptor" attribute.
+     * Gets the "process" attribute.
      *
-     * @return the "processDescriptor" attribute
+     * @return the "process" attribute
      */
-    public String getProcessDescriptor();
+    public String getProcess();
 
     /**
-     * Sets the "processDescriptor" attribute.
+     * Sets the "process" attribute.
      *
-     * @param processDescriptor the "processDescriptor" attribute
+     * @param process the "process" attribute
      * @return this instance (useful for chaining)
      */
-    public BPELComponentImplementationModel setProcessDescriptor(String processDescriptor);
+    public BPELComponentImplementationModel setProcess(String process);
 
     /**
      * Gets the "version" attribute.
@@ -68,35 +68,4 @@ public interface BPELComponentImplementationModel extends ComponentImplementatio
      */
     public BPELComponentImplementationModel setVersion(String version);
 
-    /**
-     * Gets the "serviceName" attribute.
-     *
-     * @return the "serviceName" attribute
-     */
-    public String getServiceName();
-
-    /**
-     * Sets the "serviceName" attribute.
-     *
-     * @param serviceName the "serviceName" attribute
-     * @return this instance (useful for chaining)
-     */
-    public BPELComponentImplementationModel setServiceName(String serviceName);
-
-    /**
-     * Gets the "portName" attribute.
-     *
-     * @return the "portName" attribute
-     */
-    public String getPortName();
-
-    /**
-     * Sets the "portName" attribute.
-     *
-     * @param portName the "portName" attribute
-     * @return this instance (useful for chaining)
-     */
-    public BPELComponentImplementationModel setPortName(String portName);
-
-    
 }

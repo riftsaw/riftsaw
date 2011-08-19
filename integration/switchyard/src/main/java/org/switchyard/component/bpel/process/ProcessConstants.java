@@ -29,27 +29,17 @@ public final class ProcessConstants {
     /**
      * The default process namespace.
      */
-    public static final String PROCESS_NAMESPACE = "urn:switchyard-component-bpel:process:1.0";
+    public static final String PROCESS_NAMESPACE = "http://docs.oasis-open.org/ns/opencsa/sca/200903";
 
     /** processDescriptor . */
-    public static final String PROCESS_DESCRIPTOR = "processDescriptor";
-    /** {urn:switchyard-component-bpel:process:1.0}processDescriptor . */
-    public static final String PROCESS_DESCRIPTOR_VAR = new QName(PROCESS_NAMESPACE, PROCESS_DESCRIPTOR).toString();
+    public static final String PROCESS = "process";
+    /** {http://docs.oasis-open.org/ns/opencsa/sca/200903}process . */
+    public static final String PROCESS_VAR = new QName(PROCESS_NAMESPACE, PROCESS).toString();
 
     /** version . */
     public static final String VERSION = "version";
-    /** {urn:switchyard-component-bpel:process:1.0}version . */
+    /** {http://docs.oasis-open.org/ns/opencsa/sca/200903}version . */
     public static final String VERSION_VAR = new QName(PROCESS_NAMESPACE, VERSION).toString();
-
-    /** serviceName . */
-    public static final String SERVICE_NAME = "serviceName";
-    /** {urn:switchyard-component-bpel:process:1.0}serviceName . */
-    public static final String SERVICE_NAME_VAR = new QName(PROCESS_NAMESPACE, SERVICE_NAME).toString();
-
-    /** processDescriptor . */
-    public static final String PORT_NAME = "portName";
-    /** {urn:switchyard-component-bpel:process:1.0}processDescriptor . */
-    public static final String PORT_NAME_VAR = new QName(PROCESS_NAMESPACE, PROCESS_DESCRIPTOR).toString();
 
     private ProcessConstants() {}
 
