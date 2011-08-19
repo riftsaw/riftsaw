@@ -32,6 +32,7 @@ import org.switchyard.Message;
 import org.switchyard.ServiceDomain;
 import org.switchyard.ServiceReference;
 import org.switchyard.component.bpel.config.model.BPELComponentImplementationModel;
+import org.switchyard.config.DOMConfiguration;
 import org.switchyard.config.model.composite.ComponentReferenceModel;
 import org.switchyard.exception.SwitchYardException;
 import org.switchyard.metadata.ExchangeContract;
@@ -80,24 +81,27 @@ public class RiftsawServiceLocator implements ServiceLocator {
 			BPELComponentImplementationModel impl=
 					(BPELComponentImplementationModel)crm.getComponent().getImplementation();
 			
-			try {
-				java.net.URL top=ClassLoader.getSystemResource("loan_approval");
-				
-				System.out.println("Scan resources under: "+top);
-				
-				java.util.Enumeration<java.net.URL> urls=ClassLoader.getSystemResources("deploy.xml");
-				
-				while (urls.hasMoreElements()) {
-					java.net.URL url=urls.nextElement();
-					
-					System.out.println("LOCATED AT: "+url);
-				}
-			} catch(Exception e) {
-				throw new SwitchYardException("Unable to find BPEL deployment descriptor(s)", e);
-			}
-
-
+			String local=impl.getProcess();
+			String ns=null;
+			int index=0;
 			
+			if ((index=local.indexOf(':')) != -1) {
+				// TODO: For now ignore the namespace
+				//String prefix = local.substring(0, index);
+				local = local.substring(index+1);
+			}
+			
+			QName processName=new QName(ns, local);
+			
+			//if (logger.isDebugEnabled()) {
+				logger.info("Register reference "+crm.getName()+" ("+crm.getQName()+") for process "+processName);
+			//}
+			
+				
+			// TODO: Register the wsdl and port type against the process name. When a service lookup is requested,
+			// use the process name to get the relevant config group, and the service/port names to access the
+			// wsdl to see if the port type can be found - if so, then that is the reference (qname/name) to
+			// use with the serviceDomain lookup.
 		} else {
 			throw new SwitchYardException("Could not find BPEL implementation associated with reference");
 		}

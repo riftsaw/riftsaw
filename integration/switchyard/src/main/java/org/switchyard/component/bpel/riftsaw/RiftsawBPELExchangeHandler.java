@@ -44,8 +44,6 @@ public class RiftsawBPELExchangeHandler extends BaseBPELExchangeHandler {
 
     private static final String DEPLOY_XML = "deploy.xml";
 
-	private static final String WSDL_PORTTYPE_PREFIX = "#wsdl.porttype(";
-
 	private static final Logger logger = Logger.getLogger(RiftsawBPELExchangeHandler.class);
 
     private final ServiceDomain m_serviceDomain;
@@ -77,11 +75,11 @@ public class RiftsawBPELExchangeHandler extends BaseBPELExchangeHandler {
     	//m_portName = model.getPortName();
     	m_version = model.getVersion();
     	
-    	m_wsdl = getWSDLDefinition(intf);
+    	m_wsdl = WSDLHelper.getWSDLDefinition(intf);
     	
-    	m_portType = getPortType(intf, m_wsdl);
+    	m_portType = WSDLHelper.getPortType(intf, m_wsdl);
     	
-    	javax.wsdl.Service service=getServiceForPortType(m_portType, m_wsdl);
+    	javax.wsdl.Service service=WSDLHelper.getServiceForPortType(m_portType, m_wsdl);
     	
     	m_serviceName = service.getQName();
     	
@@ -108,77 +106,6 @@ public class RiftsawBPELExchangeHandler extends BaseBPELExchangeHandler {
     	}
 
     	m_serviceRefToCompositeMap.put(qname, compositeName);
-	}
-
-	public static javax.wsdl.Definition getWSDLDefinition(String location) throws SwitchYardException {
-		javax.wsdl.Definition ret=null;
-		
-		if (location == null) {
-			throw new SwitchYardException("WSDL location has not been specified");
-		} else {
-			try {
-				int index=location.indexOf('#');
-				
-				if (index != -1) {
-					location = location.substring(0, index);
-				}
-				
-				java.net.URL url=ClassLoader.getSystemResource(location);
-				
-		        ret = javax.wsdl.factory.WSDLFactory.newInstance().newWSDLReader().readWSDL(url.getFile());
-				
-			} catch(Exception e) {
-				throw new SwitchYardException("Failed to load WSDL '"+location+"'", e);
-			}
-		}
-
-		return(ret);
-	}
-
-	public static javax.wsdl.PortType getPortType(String location, javax.wsdl.Definition wsdl)
-									throws SwitchYardException {
-		javax.wsdl.PortType ret=null;
-		
-		if (location == null) {
-			throw new SwitchYardException("WSDL location has not been specified");
-		} else {
-			int index=location.indexOf(WSDL_PORTTYPE_PREFIX);
-			
-			if (index != -1) {
-				String portTypeName = location.substring(index+WSDL_PORTTYPE_PREFIX.length(), location.length()-1);
-				
-				ret = wsdl.getPortType(new QName(wsdl.getTargetNamespace(), portTypeName));
-			}
-		}
-
-		return(ret);
-	}
-	
-	public static javax.wsdl.Service getServiceForPortType(javax.wsdl.PortType portType,
-								javax.wsdl.Definition wsdl) {
-		javax.wsdl.Service ret=null;
-		
-		java.util.Iterator<?> iter=wsdl.getServices().values().iterator();
-		while (ret == null && iter.hasNext()) {
-			ret = (javax.wsdl.Service)iter.next();
-			
-			java.util.Iterator<?> ports=ret.getPorts().values().iterator();
-			boolean f_found=false;
-			
-			while (!f_found && ports.hasNext()) {
-				javax.wsdl.Port port=(javax.wsdl.Port)ports.next(); 
-				
-				if (port.getBinding().getPortType() == portType) {
-					f_found = true;
-				}
-			}
-			
-			if (!f_found) {
-				ret = null;
-			}
-		}
-		
-		return(ret);
 	}
 
     /**
