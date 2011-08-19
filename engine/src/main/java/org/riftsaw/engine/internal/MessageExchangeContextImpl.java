@@ -47,8 +47,9 @@ public class MessageExchangeContextImpl implements MessageExchangeContext {
 
         PartnerRoleChannelImpl channel=(PartnerRoleChannelImpl)
         				partnerRoleMessageExchange.getChannel();
-        
-        Service service=m_locator.getService(channel.getEndpoint().serviceName,
+     
+        Service service=m_locator.getService(partnerRoleMessageExchange.getCaller(),
+        					channel.getEndpoint().serviceName,
         					channel.getEndpoint().portName);
         
         if (service != null) {

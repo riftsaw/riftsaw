@@ -30,11 +30,12 @@ public interface ServiceLocator {
 	 * This method returns the service associated with the supplied
 	 * service and port name.
 	 * 
+	 * @param processName The calling process name
 	 * @param serviceName The service name
 	 * @param portName The port name
 	 * @return The service associated with the supplied serviceName/portName,
 	 * 					or null if not found
 	 */
-	public Service getService(QName serviceName, String portName);
+	public Service getService(QName processName, QName serviceName, String portName);
 	
 }

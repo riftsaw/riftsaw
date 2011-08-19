@@ -16,24 +16,41 @@
  * MA  02110-1301, USA.
  -->
 <deploy xmlns="http://www.apache.org/ode/schemas/dd/2007/03"
-	xmlns:bpl="http://example.com/loan-approval/loanService/" 
-	xmlns:intf="http://example.com/loan-approval/loanService/"
+	xmlns:ls="http://example.com/loan-approval/loanService/" 
+	xmlns:ls="http://example.com/loan-approval/loanService/"
 	xmlns:ra="http://example.com/loan-approval/riskAssessment/"
+	xmlns:examples="http://www.jboss.org/bpel/examples"
     >
 
-	<process name="bpl:loanApprovalProcess">
+	<!-- loan_approval/loanService example -->
+	<process name="ls:loanApprovalProcess">
 		<active>true</active>
         <process-events generate="all"/>
 		<provide partnerLink="customer">
-			<service name="intf:loanService" port="loanService_Port"/>
+			<service name="ls:loanService" port="loanService_Port"/>
 		</provide>
 		<invoke partnerLink="assessor" usePeer2Peer="false">
 			<service name="ra:riskAssessor" port="riskAssessor_Port"/>
 		</invoke>
-		<!--
-		<invoke partnerLink="approver">
-			<service name="intf:loanApprover" port="loanApprover_Port"/>
-		</invoke>		
-		-->		
 	</process>
+	
+	<!-- loan_approval/riskAssessment example -->
+	<process name="ra:riskAssessmentProcess">
+		<active>true</active>
+        <process-events generate="all"/>
+		<provide partnerLink="assessor">
+			<service name="ra:riskAssessor" port="riskAssessor_Port"/>
+		</provide>
+	</process>
+
+	<!-- say_hello example -->
+	<process name="examples:SayHello">
+		<active>true</active>
+		<retired>false</retired>
+		<process-events generate="all"/>
+		<provide partnerLink="client">
+			<service name="examples:SayHelloService" port="SayHelloPort"/>
+		</provide>
+	</process>
+</deploy>
 </deploy>

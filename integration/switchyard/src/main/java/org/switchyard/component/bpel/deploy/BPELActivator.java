@@ -54,11 +54,9 @@ public class BPELActivator extends BaseActivator {
      */
     public BPELActivator() {
         super("bpel");
-        
-        init();
     }
 
-	public void init() {
+	protected void init() {
 		m_engine = BPELEngineFactory.getEngine();
 		
 		try {
@@ -85,6 +83,11 @@ public class BPELActivator extends BaseActivator {
      * {@inheritDoc}
      */
 	public ExchangeHandler init(QName qname, Model model) {
+		
+		if (m_engine == null) {
+	        init();
+		}
+		
     	if (model instanceof ComponentServiceModel) {
     		BPELExchangeHandler handler = BPELExchangeHandlerFactory.instance().newBPELExchangeHandler(getServiceDomain());
     		
@@ -109,7 +112,10 @@ public class BPELActivator extends BaseActivator {
     	} else if (model instanceof ComponentReferenceModel) {
     		ComponentReferenceModel crm=(ComponentReferenceModel)model;
     		
-    		// TODO: Not sure whether we need to do anything here
+    		// Initialize the reference, by setting up a mapping from the referenced
+    		// wsdl to the referenced service
+    		m_locator.initialiseReference(crm);
+    		
     		return null;
     	}
     	

@@ -31,6 +31,9 @@ import org.switchyard.HandlerException;
 import org.switchyard.Message;
 import org.switchyard.ServiceDomain;
 import org.switchyard.ServiceReference;
+import org.switchyard.component.bpel.config.model.BPELComponentImplementationModel;
+import org.switchyard.config.model.composite.ComponentReferenceModel;
+import org.switchyard.exception.SwitchYardException;
 import org.switchyard.metadata.ExchangeContract;
 import org.w3c.dom.Element;
 
@@ -58,7 +61,7 @@ public class RiftsawServiceLocator implements ServiceLocator {
 		return(m_serviceDomain);
 	}
 	
-	public Service getService(QName serviceName, String portName) {	
+	public Service getService(QName processName, QName serviceName, String portName) {	
 		ServiceReference sref=m_serviceDomain.getService(serviceName);
 		
 		if (sref == null) {
@@ -67,6 +70,38 @@ public class RiftsawServiceLocator implements ServiceLocator {
 		}
 		
 		return(new ServiceProxy(sref));
+	}
+	
+	public void initialiseReference(ComponentReferenceModel crm) {
+		
+		// Find the BPEL implementation associated with the reference
+		if (crm.getComponent() != null &&
+					crm.getComponent().getImplementation() instanceof BPELComponentImplementationModel) {
+			BPELComponentImplementationModel impl=
+					(BPELComponentImplementationModel)crm.getComponent().getImplementation();
+			
+			try {
+				java.net.URL top=ClassLoader.getSystemResource("loan_approval");
+				
+				System.out.println("Scan resources under: "+top);
+				
+				java.util.Enumeration<java.net.URL> urls=ClassLoader.getSystemResources("deploy.xml");
+				
+				while (urls.hasMoreElements()) {
+					java.net.URL url=urls.nextElement();
+					
+					System.out.println("LOCATED AT: "+url);
+				}
+			} catch(Exception e) {
+				throw new SwitchYardException("Unable to find BPEL deployment descriptor(s)", e);
+			}
+
+
+			
+		} else {
+			throw new SwitchYardException("Could not find BPEL implementation associated with reference");
+		}
+		
 	}
 
 	public static class ServiceProxy implements Service {

@@ -380,7 +380,7 @@ public class BPELEngineTest {
 			m_services.put(serviceName.toString()+"-"+portName, service);
 		}
 		
-		public Service getService(QName serviceName, String portName) {
+		public Service getService(QName processName, QName serviceName, String portName) {
 			return(m_services.get(serviceName.toString()+"-"+portName));
 		}
 		
