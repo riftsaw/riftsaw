@@ -32,10 +32,10 @@ import org.switchyard.Message;
 import org.switchyard.ServiceDomain;
 import org.switchyard.ServiceReference;
 import org.switchyard.component.bpel.config.model.BPELComponentImplementationModel;
-import org.switchyard.config.DOMConfiguration;
 import org.switchyard.config.model.composite.ComponentReferenceModel;
 import org.switchyard.exception.SwitchYardException;
-import org.switchyard.metadata.ExchangeContract;
+import org.switchyard.metadata.BaseExchangeContract;
+import org.switchyard.metadata.ServiceOperation;
 import org.w3c.dom.Element;
 
 /**
@@ -49,6 +49,7 @@ public class RiftsawServiceLocator implements ServiceLocator {
     private static final Logger logger = Logger.getLogger(RiftsawServiceLocator.class);
 
 	private ServiceDomain m_serviceDomain=null;
+	private java.util.Map<QName, RegistryEntry> m_registry=new java.util.HashMap<QName, RegistryEntry>();
 	
 	public RiftsawServiceLocator(ServiceDomain serviceDomain) {
 		m_serviceDomain = serviceDomain;
@@ -62,8 +63,22 @@ public class RiftsawServiceLocator implements ServiceLocator {
 		return(m_serviceDomain);
 	}
 	
-	public Service getService(QName processName, QName serviceName, String portName) {	
-		ServiceReference sref=m_serviceDomain.getService(serviceName);
+	public Service getService(QName processName, QName serviceName, String portName) {
+		// Currently need to just use the local part, without the version number, to
+		// lookup the registry entry
+		int index=processName.getLocalPart().indexOf('-');
+		QName localProcessName=new QName(null, processName.getLocalPart().substring(0,index));
+		
+		RegistryEntry re=m_registry.get(localProcessName);
+		
+		if (re == null) {
+			logger.error("No service references found for process '"+processName+"'");
+			return(null);
+		}
+		
+		QName switchYardService=re.getService(serviceName, portName);
+		
+		ServiceReference sref=m_serviceDomain.getService(switchYardService);
 		
 		if (sref == null) {
 			logger.error("No service found for '"+serviceName+"' (port "+portName+")");
@@ -93,19 +108,58 @@ public class RiftsawServiceLocator implements ServiceLocator {
 			
 			QName processName=new QName(ns, local);
 			
-			//if (logger.isDebugEnabled()) {
-				logger.info("Register reference "+crm.getName()+" ("+crm.getQName()+") for process "+processName);
-			//}
+			if (logger.isDebugEnabled()) {
+				logger.debug("Register reference "+crm.getName()+" ("+crm.getQName()+") for process "+processName);
+			}
 			
-				
-			// TODO: Register the wsdl and port type against the process name. When a service lookup is requested,
-			// use the process name to get the relevant config group, and the service/port names to access the
-			// wsdl to see if the port type can be found - if so, then that is the reference (qname/name) to
-			// use with the serviceDomain lookup.
+			RegistryEntry re=m_registry.get(processName);
+			
+			if (re == null) {
+				re = new RegistryEntry();
+				m_registry.put(processName, re);
+			}
+			
+			javax.wsdl.Definition wsdl=WSDLHelper.getWSDLDefinition(crm.getInterface().getInterface());
+			javax.wsdl.PortType portType=WSDLHelper.getPortType(crm.getInterface().getInterface(), wsdl);
+			
+			re.register(wsdl, portType.getQName(), crm.getQName());
+
 		} else {
 			throw new SwitchYardException("Could not find BPEL implementation associated with reference");
 		}
 		
+	}
+	
+	public static class RegistryEntry {
+		
+		private java.util.List<javax.wsdl.Definition> m_wsdls=new java.util.Vector<javax.wsdl.Definition>();
+		private java.util.List<QName> m_portTypes=new java.util.Vector<QName>();
+		private java.util.List<QName> m_services=new java.util.Vector<QName>();
+		
+		public void register(javax.wsdl.Definition wsdl, QName portType, QName service) {
+			m_wsdls.add(wsdl);
+			m_portTypes.add(portType);
+			m_services.add(service);
+		}
+		
+		public QName getService(QName serviceName, String portName) {
+			QName ret=null;
+			
+			for (int i=0; ret == null && i < m_wsdls.size(); i++) {
+				javax.wsdl.Service service=m_wsdls.get(i).getService(serviceName);
+				
+				if (service != null) {
+					javax.wsdl.Port port=service.getPort(portName);
+					
+					if (port != null &&
+							port.getBinding().getPortType().getQName().equals(m_portTypes.get(i))) {
+						ret = m_services.get(i);
+					}
+				}
+			}
+			
+			return(ret);
+		}
 	}
 
 	public static class ServiceProxy implements Service {
@@ -120,11 +174,21 @@ public class RiftsawServiceLocator implements ServiceLocator {
 				Map<String, Object> headers) throws Exception {
 			Semaphore sem=new Semaphore(0);
 			
+			// If message has a top level element of 'message', then need to
+			// unwrap the first two levels
+			if (mesg.getLocalName().equals("message")) {
+				mesg = (Element)mesg.getFirstChild().getFirstChild();
+			}
+			
 			// Need to create an exchange
 			ResponseHandler rh=new ResponseHandler();
 			rh.init(sem);
+			
+			ServiceOperation op=m_serviceReference.getInterface().getOperation(operationName);
+			
+			BaseExchangeContract exchangeContract = new BaseExchangeContract(op);
 						
-			Exchange exchange=m_serviceReference.createExchange(ExchangeContract.IN_OUT, rh);
+			Exchange exchange=m_serviceReference.createExchange(exchangeContract, rh);
 			
 			Message req=exchange.createMessage();			
 			req.setContent(mesg);
