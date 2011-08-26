@@ -24,6 +24,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 
+import javax.transaction.Transaction;
 import javax.transaction.TransactionManager;
 import javax.xml.namespace.QName;
 
@@ -520,11 +521,22 @@ public class BPELEngineImpl implements BPELEngine {
 		boolean success = true;
 		MyRoleMessageExchange odeMex = null;
 		Future<?> responseFuture = null;
-   
+		Transaction current=null;
+		boolean immediate=_odeConfig.getProperty("invoke.immediate", Boolean.FALSE.toString()).
+											equalsIgnoreCase(Boolean.TRUE.toString());
+		
 		try {
-			_txMgr.begin();
-			if (_log.isDebugEnabled()) _log.debug("Starting transaction.");
+			current =_txMgr.getTransaction();
+			if (current == null) {
+				_txMgr.begin();
+				if (_log.isDebugEnabled()) _log.debug("Starting transaction.");
+			} else {
+				if (_log.isDebugEnabled()) _log.debug("Using existing transaction.");	
+				immediate = true;
+			}
       
+			if (_log.isDebugEnabled()) _log.debug("Immediate invocation mode: "+immediate);	
+
 			odeMex = createMessageExchange(serviceName, portName, operationName);
 			odeMex.setProperty("isTwoWay", Boolean.toString(odeMex.getOperation().getOutput() != null));
 			if (_log.isDebugEnabled()) _log.debug("Is two way operation? "+odeMex.getProperty("isTwoWay"));
@@ -543,15 +555,19 @@ public class BPELEngineImpl implements BPELEngine {
 				}
 
 				// Invoke ODE
-				responseFuture = odeMex.invoke(odeRequest);
+				// NOTE: 'immediate' parameter could be either true, so that requests invoked immediately?
+				// or 'current != null', so only true if request being performed in an outer transaction
+				responseFuture = odeMex.invoke(odeRequest, immediate);
 
 				_log.debug("Commiting ODE MEX " + odeMex);
-				try {
-					if (_log.isDebugEnabled()) _log.debug("Commiting transaction.");
-					_txMgr.commit();
-				} catch (Exception e) {
-					_log.error("Commit failed", e);
-					success = false;
+				if (current == null) {
+					try {
+						if (_log.isDebugEnabled()) _log.debug("Commiting transaction.");
+						_txMgr.commit();
+					} catch (Exception e) {
+						_log.error("Commit failed", e);
+						success = false;
+					}
 				}
 			} else {
 				success = false;
@@ -567,33 +583,40 @@ public class BPELEngineImpl implements BPELEngine {
 		} finally {
 			if (!success) {
 				if (odeMex != null) odeMex.release(success);
-				try {
-					_txMgr.rollback();
-				} catch (Exception e) {
-					throw new Exception("Rollback failed", e);
+				
+				if (current == null) {
+					try {
+						_txMgr.rollback();
+					} catch (Exception e) {
+						throw new Exception("Rollback failed", e);
+					}
 				}
 			}
 		}
 
 		if (odeMex.getOperation().getOutput() != null) {
-			// Waits for the response to arrive
-			try {
-				responseFuture.get(resolveTimeout(serviceName, portName, odeMex), TimeUnit.MILLISECONDS);
-			} catch (Exception e) {
-				String errorMsg = "Timeout or execution error when waiting for response to MEX "
-									+ odeMex + " " + e.toString();
-				_log.error(errorMsg, e);
-				throw new Exception(errorMsg);
+			if (!immediate) {
+				// Waits for the response to arrive
+				try {
+					responseFuture.get(resolveTimeout(serviceName, portName, odeMex), TimeUnit.MILLISECONDS);
+				} catch (Exception e) {
+					String errorMsg = "Timeout or execution error when waiting for response to MEX "
+										+ odeMex + " " + e.toString();
+					_log.error(errorMsg, e);
+					throw new Exception(errorMsg);
+				}
 			}
        
 			// Hopefully we have a response
 			_log.debug("Handling response for MEX " + odeMex);
 			boolean commit = false;
-			try {
-				if (_log.isDebugEnabled()) _log.debug("Starting transaction.");
-				_txMgr.begin();
-			} catch (Exception ex) {
-				throw new Exception("Error starting transaction!", ex);
+			if (current == null) {
+				try {
+					if (_log.isDebugEnabled()) _log.debug("Starting transaction.");
+					_txMgr.begin();
+				} catch (Exception ex) {
+					throw new Exception("Error starting transaction!", ex);
+				}
 			}
 			try {
 				// Refreshing the message exchange
@@ -612,18 +635,20 @@ public class BPELEngineImpl implements BPELEngine {
 				throw new Exception("An exception occured when invoking ODE.", e);
 			} finally {
 				odeMex.release(commit);
-				if (commit) {
-					try {
-						if (_log.isDebugEnabled()) _log.debug("Comitting transaction.");
-						_txMgr.commit();
-					} catch (Exception e) {
-						throw new Exception("Commit failed!", e);
-					}
-				} else {
-					try {
-						_txMgr.rollback();
-					} catch (Exception ex) {
-						throw new Exception("Rollback failed!", ex);
+				if (current == null) {
+					if (commit) {
+						try {
+							if (_log.isDebugEnabled()) _log.debug("Comitting transaction.");
+							_txMgr.commit();
+						} catch (Exception e) {
+							throw new Exception("Commit failed!", e);
+						}
+					} else {
+						try {
+							_txMgr.rollback();
+						} catch (Exception ex) {
+							throw new Exception("Rollback failed!", ex);
+						}
 					}
 				}
         //}
