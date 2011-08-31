@@ -47,6 +47,18 @@ public class BPELLoanApprovalTest {
     	}
     }
     
+    @org.junit.After
+    public void close() {
+    	if (_testKit != null) {
+	    	try {
+	    		_testKit.cleanup();
+	    	} catch(Exception e) {
+	    		e.printStackTrace();
+	    		fail("Unable to cleanup testkit: "+e);
+	    	}
+    	}
+    }
+    
     @Test
     public void sendLoanRequest1() throws Exception {
         _testKit.getMixIn(HTTPMixIn.class).

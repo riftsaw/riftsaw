@@ -84,6 +84,7 @@ public class BPELEngineImpl implements BPELEngine {
 	protected CronScheduler _cronScheduler;
 	protected CacheProvider _cacheProvider;
 	//protected UDDIRegistration _uddiRegistration;
+	protected ServiceLocator _serviceLocator;
 
 	public void init(ServiceLocator locator, java.util.Properties props) throws Exception {
 
@@ -94,6 +95,7 @@ public class BPELEngineImpl implements BPELEngine {
 		_log.info("ODE PROPS="+props);
 
 		_odeConfig = new OdeConfigProperties(props, "bpel.");
+		_serviceLocator = locator;
 
 		_log.info("Initializing transaction manager");
 		initTxMgr();
@@ -136,6 +138,16 @@ public class BPELEngineImpl implements BPELEngine {
 
 		_log.info("Starting scheduler");
 		_scheduler.start();
+	}
+	
+	/**
+	 * This method returns the service locator
+	 * associated with the BPEL engine.
+	 * 
+	 * @return The service locator
+	 */
+	public ServiceLocator getServiceLocator() {
+		return(_serviceLocator);
 	}
 	
 	protected void initProcessStore(EndpointReferenceContext eprContext) {

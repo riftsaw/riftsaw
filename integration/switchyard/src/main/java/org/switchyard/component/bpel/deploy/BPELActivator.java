@@ -23,8 +23,10 @@ import java.util.Map;
 
 import javax.xml.namespace.QName;
 
+import org.apache.log4j.Logger;
 import org.riftsaw.engine.BPELEngine;
 import org.riftsaw.engine.BPELEngineFactory;
+import org.riftsaw.engine.ServiceLocator;
 import org.riftsaw.engine.internal.BPELEngineImpl;
 import org.switchyard.ExchangeHandler;
 import org.switchyard.ServiceReference;
@@ -44,10 +46,11 @@ import org.switchyard.exception.SwitchYardException;
  */
 public class BPELActivator extends BaseActivator {
 
+    private static final Logger logger = Logger.getLogger(BPELActivator.class);
+	
     private Map<QName,BPELExchangeHandler> m_handlers = new HashMap<QName,BPELExchangeHandler>();
 
-	private BPELEngine m_engine=null;
-	private RiftsawServiceLocator m_locator=null;
+	private static BPELEngine m_engine=null;
 	
     /**
      * Constructs a new Activator of type "bpel".
@@ -57,25 +60,29 @@ public class BPELActivator extends BaseActivator {
     }
 
 	protected void init() {
-		m_engine = BPELEngineFactory.getEngine();
+		synchronized(this) {
+			if (m_engine == null) {
+				m_engine = BPELEngineFactory.getEngine();
+				
+				try {
+					ServiceLocator locator=new RiftsawServiceLocator(getServiceDomain());
+					
+					java.util.Properties props=new java.util.Properties();
 		
-		try {
-			m_locator=new RiftsawServiceLocator(getServiceDomain());
-			
-			java.util.Properties props=new java.util.Properties();
-
-			// Temporary approach until can get properties from environment
-			try {
-				java.io.InputStream is=BPELEngineImpl.class.getClassLoader().getResourceAsStream("bpel.properties");
+					// Temporary approach until can get properties from environment
+					try {
+						java.io.InputStream is=BPELEngineImpl.class.getClassLoader().getResourceAsStream("bpel.properties");
+				
+						props.load(is);
+					} catch(Exception e) {
+						// TODO: Ignore for now
+					}
 		
-				props.load(is);
-			} catch(Exception e) {
-				// TODO: Ignore for now
+					m_engine.init(locator, props);
+				} catch(Exception e) {
+					throw new SwitchYardException("Failed to initialize the engine: "+e, e);
+				}
 			}
-
-			m_engine.init(m_locator, props);
-		} catch(Exception e) {
-			throw new SwitchYardException("Failed to initialize the engine: "+e, e);
 		}
 	}
 	
@@ -84,9 +91,7 @@ public class BPELActivator extends BaseActivator {
      */
 	public ExchangeHandler init(QName qname, Model model) {
 		
-		if (m_engine == null) {
-	        init();
-		}
+        init();
 		
     	if (model instanceof ComponentServiceModel) {
     		BPELExchangeHandler handler = BPELExchangeHandlerFactory.instance().newBPELExchangeHandler(getServiceDomain());
@@ -114,7 +119,7 @@ public class BPELActivator extends BaseActivator {
     		
     		// Initialize the reference, by setting up a mapping from the referenced
     		// wsdl to the referenced service
-    		m_locator.initialiseReference(crm);
+    		((RiftsawServiceLocator)m_engine.getServiceLocator()).initialiseReference(crm);
     		
     		return null;
     	}
@@ -154,6 +159,17 @@ public class BPELActivator extends BaseActivator {
     			m_handlers.remove(serviceRef.getName());
     		}
     	}
+    	
+    	// Check if engine should be removed
+    	synchronized(this) {
+	    	if (m_handlers.size() == 0 && m_engine != null) {
+	    		try {
+	    			m_engine.close();
+	    			m_engine = null;
+	    		} catch(Exception e) {
+	    			logger.error("Failed to close BPEL engine", e);
+	    		}
+	    	}
+    	}
     }
-
 }

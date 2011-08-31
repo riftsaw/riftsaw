@@ -38,6 +38,14 @@ public interface BPELEngine {
 	public void init(ServiceLocator locator, java.util.Properties props) throws Exception;
 	
 	/**
+	 * This method returns the service locator
+	 * associated with the BPEL engine.
+	 * 
+	 * @return The service locator
+	 */
+	public ServiceLocator getServiceLocator();
+	
+	/**
 	 * This method deploys a BPEL process definition.
 	 * 
 	 * @param bdu The BPEL process definition

@@ -46,6 +46,18 @@ public class BPELSayHelloTest {
     	}
     }
     
+    @org.junit.After
+    public void close() {
+    	if (_testKit != null) {
+	    	try {
+	    		_testKit.cleanup();
+	    	} catch(Exception e) {
+	    		e.printStackTrace();
+	    		fail("Unable to cleanup testkit: "+e);
+	    	}
+    	}
+    }
+    
     @Test
     public void invokeSayHelloService() throws Exception {
         _testKit.getMixIn(HTTPMixIn.class).

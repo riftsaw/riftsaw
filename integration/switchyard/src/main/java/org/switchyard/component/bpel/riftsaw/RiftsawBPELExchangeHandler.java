@@ -54,6 +54,7 @@ public class RiftsawBPELExchangeHandler extends BaseBPELExchangeHandler {
     private String m_version=null;
     private static java.util.Map<QName, QName> m_serviceRefToCompositeMap=
     					new java.util.HashMap<QName, QName>();
+    private static java.util.Map<QName, DeploymentUnit> m_deployed=new java.util.HashMap<QName, DeploymentUnit>();
 
     /**
      * Constructs a new RiftSaw BPEL ExchangeHandler within the specified ServiceDomain.
@@ -103,6 +104,8 @@ public class RiftsawBPELExchangeHandler extends BaseBPELExchangeHandler {
 	
 			// Deploy the process
 			engine.deploy(bdu);
+			
+			m_deployed.put(qname, bdu);
     	}
 
     	m_serviceRefToCompositeMap.put(qname, compositeName);
@@ -112,7 +115,7 @@ public class RiftsawBPELExchangeHandler extends BaseBPELExchangeHandler {
      * {@inheritDoc}
      */
     public void start(ServiceReference serviceRef) {
-    	System.out.println("START: "+serviceRef);
+    	if (logger.isDebugEnabled()) logger.debug("START: "+serviceRef);
     }
 
     /**
@@ -184,14 +187,20 @@ public class RiftsawBPELExchangeHandler extends BaseBPELExchangeHandler {
      * {@inheritDoc}
      */
     public void stop(ServiceReference serviceRef) {
-    	System.out.println("STOP: "+serviceRef);
+    	if (logger.isDebugEnabled()) logger.debug("STOP: "+serviceRef);
+    	
+    	DeploymentUnit bdu=m_deployed.get(serviceRef.getName());
+    	
+    	if (bdu != null) {    		
+    		m_engine.undeploy(bdu);
+    	}
     }
 
     /**
      * {@inheritDoc}
      */
     public void destroy(ServiceReference serviceRef) {
-    	System.out.println("DESTROY: "+serviceRef);
+    	if (logger.isDebugEnabled()) logger.debug("DESTROY: "+serviceRef);
     }
 
 }
