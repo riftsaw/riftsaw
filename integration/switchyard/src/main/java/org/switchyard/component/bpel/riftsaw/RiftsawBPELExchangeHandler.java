@@ -28,7 +28,6 @@ import org.switchyard.Exchange;
 import org.switchyard.ExchangePattern;
 import org.switchyard.HandlerException;
 import org.switchyard.Message;
-import org.switchyard.ServiceDomain;
 import org.switchyard.ServiceReference;
 import org.switchyard.component.bpel.config.model.BPELComponentImplementationModel;
 import org.switchyard.component.bpel.exchange.BaseBPELExchangeHandler;
@@ -46,7 +45,6 @@ public class RiftsawBPELExchangeHandler extends BaseBPELExchangeHandler {
 
 	private static final Logger logger = Logger.getLogger(RiftsawBPELExchangeHandler.class);
 
-    private final ServiceDomain m_serviceDomain;
     private BPELEngine m_engine=null;
     private QName m_serviceName=null;
     private javax.wsdl.Definition m_wsdl=null;
@@ -61,8 +59,7 @@ public class RiftsawBPELExchangeHandler extends BaseBPELExchangeHandler {
      * 
      * @param serviceDomain the specified ServiceDomain
      */
-    public RiftsawBPELExchangeHandler(ServiceDomain serviceDomain) {
-        m_serviceDomain = serviceDomain;
+    public RiftsawBPELExchangeHandler() {
     }
 
     /**
@@ -72,8 +69,6 @@ public class RiftsawBPELExchangeHandler extends BaseBPELExchangeHandler {
     				String intf, BPELEngine engine) {
     	
     	m_engine = engine;
-    	//m_serviceName = QName.valueOf(model.getServiceName());
-    	//m_portName = model.getPortName();
     	m_version = model.getVersion();
     	
     	m_wsdl = WSDLHelper.getWSDLDefinition(intf);
@@ -83,13 +78,6 @@ public class RiftsawBPELExchangeHandler extends BaseBPELExchangeHandler {
     	javax.wsdl.Service service=WSDLHelper.getServiceForPortType(m_portType, m_wsdl);
     	
     	m_serviceName = service.getQName();
-    	
-    	// TODO: If there are multiple services using the same BPEL implementation,
-    	// then need to reference count, and only deploy/undeploy once. Need to
-    	// undeploy when the service refs are stopped or destroyed
-    	
-    	// TODO: Better way to manage deployed processes and the service refs to understand
-    	// when to undeploy the deployment unit
     	
     	// Check if composite is already been initialized for BPEL processes
     	QName compositeName=model.getComponent().getComposite().getQName();
@@ -133,7 +121,7 @@ public class RiftsawBPELExchangeHandler extends BaseBPELExchangeHandler {
             	String partName=getPartName(exchange.getContract().getServiceOperation().getName());
             	
             	// Create wrapper for request message, adding it to the appropriate named
-            	// part associated with the operation being involed
+            	// part associated with the operation being invoked
             	Element newreq=request.getOwnerDocument().createElement("message");
             	Element part=request.getOwnerDocument().createElement(partName);
             	newreq.appendChild(part);
@@ -153,9 +141,9 @@ public class RiftsawBPELExchangeHandler extends BaseBPELExchangeHandler {
 
             } catch(Fault f) {
             	Message faultMessage=exchange.createMessage();
-            	faultMessage.setContent(f.getFaultMessage());
             	
-            	// TODO: What about the fault code? - do we need to strip off part wrapper?
+            	// TODO: What about the fault code?
+            	faultMessage.setContent(f.getFaultMessage().getFirstChild().getFirstChild());
             	
             	exchange.sendFault(faultMessage);
             	
@@ -194,6 +182,8 @@ public class RiftsawBPELExchangeHandler extends BaseBPELExchangeHandler {
     	if (bdu != null) {    		
     		m_engine.undeploy(bdu);
     	}
+    	
+    	m_serviceRefToCompositeMap.remove(serviceRef.getName());
     }
 
     /**

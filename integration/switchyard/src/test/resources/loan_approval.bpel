@@ -23,10 +23,18 @@
    </variables>
 
    <faultHandlers>
-      <catch faultName="lns:loanProcessFault" faultVariable="error"
-						faultMessageType="lns:errorMessage">
-         <reply partnerLink="customer" portType="lns:loanServicePT" operation="request" variable="error"
-            			faultName="lns:unableToHandleRequest" />
+      <catch faultName="ans:loanProcessFault" faultVariable="error"
+						faultMessageType="ans:errorMessage">
+		<sequence>
+	        <assign validate="no" name="CopyFaultValue">
+	            <copy>
+	                <from variable="error" part="errorCode"></from>
+	                <to variable="faultResponse" part="errorCode"></to>
+	            </copy>
+	        </assign>
+	         <reply partnerLink="customer" portType="lns:loanServicePT" operation="request" variable="faultResponse"
+	            			faultName="lns:unableToHandleRequest" />
+	     </sequence>
       </catch>
    </faultHandlers>
 

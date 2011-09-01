@@ -23,6 +23,8 @@ import java.util.concurrent.Semaphore;
 import javax.xml.namespace.QName;
 
 import org.apache.log4j.Logger;
+import org.apache.ode.utils.DOMUtils;
+import org.riftsaw.engine.Fault;
 import org.riftsaw.engine.Service;
 import org.riftsaw.engine.ServiceLocator;
 import org.switchyard.BaseHandler;
@@ -76,6 +78,14 @@ public class RiftsawServiceLocator implements ServiceLocator {
 			return(null);
 		}
 		
+		Service ret=re.getService(serviceName, portName, m_serviceDomain);
+		
+		if (ret == null) {
+			logger.error("No service found for '"+serviceName+"' (port "+portName+")");
+		}
+		
+		return(ret);
+		/*
 		QName switchYardService=re.getService(serviceName, portName);
 		
 		ServiceReference sref=m_serviceDomain.getService(switchYardService);
@@ -86,6 +96,7 @@ public class RiftsawServiceLocator implements ServiceLocator {
 		}
 		
 		return(new ServiceProxy(sref));
+		*/
 	}
 	
 	public void initialiseReference(ComponentReferenceModel crm) {
@@ -142,8 +153,8 @@ public class RiftsawServiceLocator implements ServiceLocator {
 			m_services.add(service);
 		}
 		
-		public QName getService(QName serviceName, String portName) {
-			QName ret=null;
+		public Service getService(QName serviceName, String portName, ServiceDomain serviceDomain) {
+			Service ret=null;
 			
 			for (int i=0; ret == null && i < m_wsdls.size(); i++) {
 				javax.wsdl.Service service=m_wsdls.get(i).getService(serviceName);
@@ -153,11 +164,20 @@ public class RiftsawServiceLocator implements ServiceLocator {
 					
 					if (port != null &&
 							port.getBinding().getPortType().getQName().equals(m_portTypes.get(i))) {
-						ret = m_services.get(i);
+						QName switchYardService=m_services.get(i);
+						
+						ServiceReference sref=serviceDomain.getService(switchYardService);
+						
+						if (sref == null) {
+							logger.error("No service found for '"+serviceName+"' (port "+portName+")");
+							return(null);
+						}
+						
+						ret = new ServiceProxy(sref, port.getBinding().getPortType());
 					}
 				}
 			}
-			
+
 			return(ret);
 		}
 	}
@@ -165,24 +185,23 @@ public class RiftsawServiceLocator implements ServiceLocator {
 	public static class ServiceProxy implements Service {
 		
 		private ServiceReference m_serviceReference=null;
+		private javax.wsdl.PortType m_portType=null;
 		
-		public ServiceProxy(ServiceReference sref) {
+		public ServiceProxy(ServiceReference sref, javax.wsdl.PortType portType) {
 			m_serviceReference = sref;
+			m_portType = portType;
 		}
 
 		public Element invoke(String operationName, Element mesg,
 				Map<String, Object> headers) throws Exception {
-			Semaphore sem=new Semaphore(0);
+			//Semaphore sem=new Semaphore(0);
 			
-			// If message has a top level element of 'message', then need to
-			// unwrap the first two levels
-			if (mesg.getLocalName().equals("message")) {
-				mesg = (Element)mesg.getFirstChild().getFirstChild();
-			}
+			// Unwrap the first two levels, to remove the part wrapper
+			mesg = (Element)mesg.getFirstChild().getFirstChild();
 			
 			// Need to create an exchange
 			ResponseHandler rh=new ResponseHandler();
-			rh.init(sem);
+			rh.init();
 			
 			ServiceOperation op=m_serviceReference.getInterface().getOperation(operationName);
 			
@@ -195,7 +214,7 @@ public class RiftsawServiceLocator implements ServiceLocator {
 			exchange.send(req);
 			
 			// Wait for response
-			sem.acquire();
+			//sem.acquire();
 			
 			Message resp=rh.getMessage();
 			
@@ -206,22 +225,42 @@ public class RiftsawServiceLocator implements ServiceLocator {
 				throw new Exception("Response is not an Element for operation '"+operationName+
 						"' on service: "+m_serviceReference.getName());
 			}
+
+			// TODO: GPB NEED TO ADD APPROPRIATE WRAPPER
+			// Need to add wrapper
+        	Element respelem=(Element)resp.getContent();
+        	
+        	javax.wsdl.Operation operation=m_portType.getOperation(operationName, null, null);
+        	
+			if (rh.isFault()) {
+				Element newfault=respelem.getOwnerDocument().createElement("message");
+				Element part=respelem.getOwnerDocument().createElement("errorCode");
+				newfault.appendChild(part);
+				part.appendChild(respelem);		
+
+				throw new Fault(null, newfault); //(Element)resp.getContent());
+			}
 			
 			// TODO Handle one-way requests, faults and headers
+			Element newresp=respelem.getOwnerDocument().createElement("message");
+			Element part=respelem.getOwnerDocument().createElement("part");
+			newresp.appendChild(part);
+			part.appendChild(respelem);		
 			
-			return((Element)resp.getContent());
+			return((Element)newresp); //resp.getContent());
 		}
 		
 		public class ResponseHandler extends BaseHandler {
 			
-			private Semaphore m_semaphore=null;
+			//private Semaphore m_semaphore=null;
 			private Message m_message=null;
+			private boolean m_fault=false;
 			
 			public ResponseHandler() {
 			}
 			
-			public void init(Semaphore sem) {
-				m_semaphore = sem;
+			public void init() {//Semaphore sem) {
+				//m_semaphore = sem;
 			}
 			
 			public Message getMessage() {
@@ -230,16 +269,21 @@ public class RiftsawServiceLocator implements ServiceLocator {
 			
 			public void handleFault(final Exchange exchange) {
 				m_message = exchange.getMessage();
+				m_fault = true;
 				
 				// TODO: How to distinguish fault?
 				
-				m_semaphore.release();
+				//m_semaphore.release();
+			}
+			
+			public boolean isFault() {
+				return(m_fault);
 			}
 
 			public void handleMessage(final Exchange exchange) throws HandlerException {
 				m_message = exchange.getMessage();
 				
-				m_semaphore.release();
+				//m_semaphore.release();
 			}
 
 		}

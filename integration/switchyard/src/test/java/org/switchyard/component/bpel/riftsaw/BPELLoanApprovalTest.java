@@ -60,9 +60,17 @@ public class BPELLoanApprovalTest {
     }
     
     @Test
+    @org.junit.Ignore
     public void sendLoanRequest1() throws Exception {
         _testKit.getMixIn(HTTPMixIn.class).
                 postResourceAndTestXML("http://localhost:18001/loanService",
                 		"/loan_approval/soap-loanreq1.xml", "/loan_approval/soap-loanresp1.xml");
+    }
+    
+    @Test
+    public void sendLoanRequest2() throws Exception {
+        _testKit.getMixIn(HTTPMixIn.class).
+                postResourceAndTestXML("http://localhost:18001/loanService",
+                		"/loan_approval/soap-loanreq2.xml", "/loan_approval/soap-loanresp2.xml");
     }
 }

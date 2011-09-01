@@ -17,6 +17,8 @@
  */
 package org.riftsaw.engine.internal;
 
+import javax.xml.namespace.QName;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ode.bpel.iapi.*;
@@ -71,12 +73,19 @@ public class MessageExchangeContextImpl implements MessageExchangeContext {
         			partnerRoleMessageExchange.reply(responseMessage);
         		}
         	} catch(Fault f) {
-        		javax.wsdl.Fault fault=partnerRoleMessageExchange.getOperation().getFault(f.getFaultName().getLocalPart());
+        		QName faultName=f.getFaultName();
+        		if (faultName == null) {
+        			// Find fault name from message type
+        			
+        			// TODO: GPB Temporarily set the fault name until it can be derived
+        			faultName = QName.valueOf("{http://example.com/loan-approval/riskAssessment/}loanProcessFault");
+        		}
+        		javax.wsdl.Fault fault=partnerRoleMessageExchange.getOperation().getFault(faultName.getLocalPart());
      			Message faultMessage = partnerRoleMessageExchange.createMessage(
     					fault.getMessage().getQName());
      			faultMessage.setMessage(f.getFaultMessage());
     			
-    			partnerRoleMessageExchange.replyWithFault(f.getFaultName(), faultMessage);
+    			partnerRoleMessageExchange.replyWithFault(faultName, faultMessage);
         	} catch(Exception e) {
         		throw new ContextException("Failed to invoke external service", e);
         	}

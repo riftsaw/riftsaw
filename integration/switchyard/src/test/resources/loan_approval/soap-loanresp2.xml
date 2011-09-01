@@ -1,0 +1,3 @@
+<?xml version='1.0' encoding='UTF-8'?><SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/"><SOAP-ENV:Body>
+	<integer xmlns="http://example.com/loan-approval/xsd/error-messages/">1</integer>
+</SOAP-ENV:Body></SOAP-ENV:Envelope>

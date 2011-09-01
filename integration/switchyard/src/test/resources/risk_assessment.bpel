@@ -53,26 +53,56 @@
 
       </receive>
 
-        <assign validate="no" name="AssignName">
-            <copy>
-                <from><literal><tns:CheckResponse xmlns:tns="http://example.com/loan-approval/loanService/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <tns:level>low</tns:level>
-</tns:CheckResponse>
-</literal></from>
-                <to variable="checkResponse" part="parameter"></to>
-            </copy>
-        </assign>
-
-      <reply partnerLink="assessor" 
-
-         portType="lns:riskAssessmentPT"
-
-         operation="check" 
-
-         variable="checkResponse">
-
-      </reply>
-
+		<if>
+		<!-- $check.parameter/check/amount/text() >= 1000 -->
+   			<condition>
+				true()
+			</condition>
+			<sequence>
+		        <assign validate="no" name="AssignFaultValue">
+		            <copy>
+		                <from><literal>
+		                	<integer xmlns="http://example.com/loan-approval/xsd/error-messages/">1</integer>
+						</literal></from>
+		                <to variable="faultResponse" part="errorCode"></to>
+		            </copy>
+		        </assign>
+				<!--throw faultName="lns:loanProcessFault" faultVariable="faultResponse" / -->
+			      <reply partnerLink="assessor" 
+			         portType="lns:riskAssessmentPT"
+			         operation="check" 
+					 faultName="lns:loanProcessFault"
+			         variable="faultResponse">
+			
+			      </reply>
+			
+			</sequence>
+			<else>
+				<sequence>
+				
+			        <assign validate="no" name="AssignName">
+			            <copy>
+			                <from><literal><tns:CheckResponse xmlns:tns="http://example.com/loan-approval/loanService/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+			  <tns:level>low</tns:level>
+			</tns:CheckResponse>
+			</literal></from>
+			                <to variable="checkResponse" part="parameter"></to>
+			            </copy>
+			        </assign>
+			
+			      <reply partnerLink="assessor" 
+			
+			         portType="lns:riskAssessmentPT"
+			
+			         operation="check" 
+			
+			         variable="checkResponse">
+			
+			      </reply>
+			
+				</sequence>
+			</else>
+		</if>
    </sequence>
 
 </process>
