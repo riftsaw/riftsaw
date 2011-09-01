@@ -54,9 +54,12 @@
       </receive>
 
 		<if>
-		<!-- $check.parameter/check/amount/text() >= 1000 -->
+		<!-- $check.parameter/check/amount/text() >= 1000 
+		$check.parameter/lns:check/amount >= 1000
+		$check.parameter/check/firstName != 'Fred'
+		-->
    			<condition>
-				true()
+				<![CDATA[$check.parameter//amount >= 1000]]>
 			</condition>
 			<sequence>
 		        <assign validate="no" name="AssignFaultValue">

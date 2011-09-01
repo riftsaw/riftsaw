@@ -19,8 +19,11 @@
 package org.switchyard.component.bpel.riftsaw;
 
 import javax.xml.namespace.QName;
+import javax.xml.soap.Detail;
+import javax.xml.soap.SOAPFault;
 
 import org.apache.log4j.Logger;
+import org.apache.ode.utils.DOMUtils;
 import org.riftsaw.engine.BPELEngine;
 import org.riftsaw.engine.DeploymentUnit;
 import org.riftsaw.engine.Fault;
@@ -118,14 +121,10 @@ public class RiftsawBPELExchangeHandler extends BaseBPELExchangeHandler {
             
             try {
             	// Find part name associated with operation on port type
-            	String partName=getPartName(exchange.getContract().getServiceOperation().getName());
+            	javax.wsdl.Operation operation=m_portType.getOperation(
+            			exchange.getContract().getServiceOperation().getName(), null, null);
             	
-            	// Create wrapper for request message, adding it to the appropriate named
-            	// part associated with the operation being invoked
-            	Element newreq=request.getOwnerDocument().createElement("message");
-            	Element part=request.getOwnerDocument().createElement(partName);
-            	newreq.appendChild(part);
-            	part.appendChild(request);
+            	Element newreq=WSDLHelper.wrapRequestMessagePart((Element)request, operation);
             	
             	// Invoke the operation on the BPEL process
             	Element response=m_engine.invoke(m_serviceName, null,
@@ -135,17 +134,34 @@ public class RiftsawBPELExchangeHandler extends BaseBPELExchangeHandler {
                 Message message = exchange.createMessage();
                 
                 // Strip off wrapper and part to just return the part contents
-                message.setContent(response.getFirstChild().getFirstChild());
+                message.setContent(WSDLHelper.unwrapMessagePart(response));
                 
                 exchange.send(message);
 
             } catch(Fault f) {
             	Message faultMessage=exchange.createMessage();
             	
-            	// TODO: What about the fault code?
-            	faultMessage.setContent(f.getFaultMessage().getFirstChild().getFirstChild());
-            	
-            	exchange.sendFault(faultMessage);
+            	try {
+            		/*
+	            	SOAPFault fault=javax.xml.soap.SOAPFactory.newInstance().createFault("", f.getFaultName());
+	            	
+	            	Detail detail=fault.addDetail();
+	            	Node cloned=detail.getOwnerDocument().importNode(WSDLHelper.unwrapMessagePart(f.getFaultMessage()), true);	            	
+	            	detail.appendChild(cloned);
+	            	
+	            	javax.xml.ws.soap.SOAPFaultException soapFault=
+	            			new javax.xml.ws.soap.SOAPFaultException(fault);
+	            	
+	            	faultMessage.setContent(soapFault);
+	            	*/
+            		
+	            	// TODO: What about the fault code?
+	            	faultMessage.setContent(WSDLHelper.unwrapMessagePart(f.getFaultMessage()));
+	            	
+	            	exchange.sendFault(faultMessage);
+            	} catch(Exception e) {
+            		throw new HandlerException(e);
+            	}
             	
             } catch(Exception e) {
             	e.printStackTrace();
@@ -153,24 +169,6 @@ public class RiftsawBPELExchangeHandler extends BaseBPELExchangeHandler {
         }
     }
     
-    protected String getPartName(String operationName) {
-    	String ret=null;
-    	javax.wsdl.Operation op=m_portType.getOperation(operationName, null, null);
-    	
-    	if (op != null) {
-    		java.util.Map<?,?> parts=op.getInput().getMessage().getParts();
-    		
-    		if (parts.size() != 1) {
-    			throw new SwitchYardException("Only expecting a single message part for operation '"+
-    						operationName+", on service "+m_serviceName); //+" port "+m_portName);
-    		}
-    		
-    		ret = (String)parts.keySet().iterator().next();
-    	}
-    	
-    	return(ret);
-    }
-
      /**
      * {@inheritDoc}
      */

@@ -21,6 +21,7 @@ package org.switchyard.component.bpel.riftsaw;
 import javax.xml.namespace.QName;
 
 import org.switchyard.exception.SwitchYardException;
+import org.w3c.dom.Element;
 
 /**
  * WSDL Helper.
@@ -101,4 +102,83 @@ public class WSDLHelper {
 		return(ret);
 	}
 
+	public static org.w3c.dom.Element unwrapMessagePart(org.w3c.dom.Element content) {
+		return((org.w3c.dom.Element)content.getFirstChild().getFirstChild());
+	}
+
+	public static org.w3c.dom.Element wrapRequestMessagePart(org.w3c.dom.Element content,
+						javax.wsdl.Operation operation) {
+		return(wrapMessagePart(content, operation, operation.getInput().getMessage().getParts()));
+	}
+
+	public static org.w3c.dom.Element wrapResponseMessagePart(org.w3c.dom.Element content,
+						javax.wsdl.Operation operation) {
+		return(wrapMessagePart(content, operation, operation.getOutput().getMessage().getParts()));
+	}
+
+	public static org.w3c.dom.Element wrapFaultMessagePart(org.w3c.dom.Element content,
+						javax.wsdl.Operation operation, String faultName) {
+		java.util.Map<?,?> parts=null;
+		
+		if (faultName != null) {
+			javax.wsdl.Fault fault=operation.getFault(faultName);
+			
+			if (fault == null) {
+				throw new SwitchYardException("Unable to find fault '"+faultName+"' on "+
+						"operation '"+operation.getName()+"'");
+			}
+			
+			parts = fault.getMessage().getParts();
+		} else {
+			// Need to iterate through faults to determine which has a part with the
+			// appropriate element type
+			@SuppressWarnings({ "unchecked" })
+			java.util.Iterator<javax.wsdl.Fault> iter=
+					(java.util.Iterator<javax.wsdl.Fault>)operation.getFaults().values().iterator();
+			
+			while (parts == null && iter.hasNext()) {
+				javax.wsdl.Fault fault=iter.next();
+				
+				if (fault.getMessage().getParts().size() == 1) {
+					javax.wsdl.Part part=(javax.wsdl.Part)fault.getMessage().getParts().values().iterator().next();
+					
+					if (part.getElementName() != null &&
+							content.getLocalName().equals(part.getElementName().getLocalPart()) &&
+							content.getNamespaceURI().equals(part.getElementName().getNamespaceURI())) {
+						
+						parts = fault.getMessage().getParts();
+					}
+				}
+			}
+		}
+		
+		return(wrapMessagePart(content, operation, parts));
+	}
+
+	protected static org.w3c.dom.Element wrapMessagePart(org.w3c.dom.Element content,
+					javax.wsdl.Operation operation, java.util.Map<?,?> parts) {
+		org.w3c.dom.Element ret=content.getOwnerDocument().createElement("message");
+		String partName=null;
+		
+		// Find part name from content type for the operation
+    	if (parts != null) {
+    		if (parts.size() != 1) {
+    			throw new SwitchYardException("Only expecting a single message part for operation '"+
+    						operation.getName()+"'");
+    		}
+    		
+    		partName = (String)parts.keySet().iterator().next();
+    	}
+    	
+		if (partName == null) {
+			throw new SwitchYardException("Unable to find part name for "+
+						"operation '"+operation.getName()+"'");
+		}
+		
+		Element part=ret.getOwnerDocument().createElement(partName);
+		ret.appendChild(part);
+		part.appendChild(content);		
+		
+		return(ret);
+	}
 }

@@ -21,6 +21,7 @@ import java.util.Map;
 import java.util.concurrent.Semaphore;
 
 import javax.xml.namespace.QName;
+import javax.xml.ws.soap.SOAPFaultException;
 
 import org.apache.log4j.Logger;
 import org.apache.ode.utils.DOMUtils;
@@ -39,6 +40,7 @@ import org.switchyard.exception.SwitchYardException;
 import org.switchyard.metadata.BaseExchangeContract;
 import org.switchyard.metadata.ServiceOperation;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 
 /**
  * This class implements the service locator interface to retrieve a
@@ -197,7 +199,7 @@ public class RiftsawServiceLocator implements ServiceLocator {
 			//Semaphore sem=new Semaphore(0);
 			
 			// Unwrap the first two levels, to remove the part wrapper
-			mesg = (Element)mesg.getFirstChild().getFirstChild();
+			mesg = WSDLHelper.unwrapMessagePart(mesg);
 			
 			// Need to create an exchange
 			ResponseHandler rh=new ResponseHandler();
@@ -221,6 +223,20 @@ public class RiftsawServiceLocator implements ServiceLocator {
 			if (resp == null) {
 				throw new Exception("Response not returned from operation '"+operationName+
 								"' on service: "+m_serviceReference.getName());
+				
+				/*
+			} else if (resp.getContent() instanceof SOAPFaultException) {
+				SOAPFaultException faultex=(SOAPFaultException)resp.getContent();
+				
+				Node respelem=faultex.getFault().getDetail().getFirstChild();
+				
+				Element newfault=faultex.getFault().getDetail().getFirstChild().getOwnerDocument().createElement("message");
+				Element part=respelem.getOwnerDocument().createElement("errorCode");
+				newfault.appendChild(part);
+				part.appendChild(respelem);		
+
+				throw new Fault(faultex.getFault().getFaultCodeAsQName(), newfault); //(Element)resp.getContent());
+				*/
 			} else if ((resp.getContent() instanceof Element) == false) {
 				throw new Exception("Response is not an Element for operation '"+operationName+
 						"' on service: "+m_serviceReference.getName());
@@ -233,19 +249,25 @@ public class RiftsawServiceLocator implements ServiceLocator {
         	javax.wsdl.Operation operation=m_portType.getOperation(operationName, null, null);
         	
 			if (rh.isFault()) {
+				Element newfault=WSDLHelper.wrapFaultMessagePart(respelem, operation, null);
+				/*
 				Element newfault=respelem.getOwnerDocument().createElement("message");
 				Element part=respelem.getOwnerDocument().createElement("errorCode");
 				newfault.appendChild(part);
 				part.appendChild(respelem);		
-
+*/
 				throw new Fault(null, newfault); //(Element)resp.getContent());
 			}
 			
 			// TODO Handle one-way requests, faults and headers
+			/*
 			Element newresp=respelem.getOwnerDocument().createElement("message");
 			Element part=respelem.getOwnerDocument().createElement("part");
 			newresp.appendChild(part);
-			part.appendChild(respelem);		
+			part.appendChild(respelem);
+			*/
+			
+			Element newresp=WSDLHelper.wrapResponseMessagePart(respelem, operation);
 			
 			return((Element)newresp); //resp.getContent());
 		}

@@ -60,7 +60,6 @@ public class BPELLoanApprovalTest {
     }
     
     @Test
-    @org.junit.Ignore
     public void sendLoanRequest1() throws Exception {
         _testKit.getMixIn(HTTPMixIn.class).
                 postResourceAndTestXML("http://localhost:18001/loanService",
