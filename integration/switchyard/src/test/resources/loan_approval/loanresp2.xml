@@ -1,2 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<wsdl:approveResponse xmlns:wsdl="http://example.com/loan-approval/wsdl/"><accept>Evaluated and Approved</accept></wsdl:approveResponse>

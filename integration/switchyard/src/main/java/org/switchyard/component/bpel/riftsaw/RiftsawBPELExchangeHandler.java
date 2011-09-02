@@ -112,50 +112,50 @@ public class RiftsawBPELExchangeHandler extends BaseBPELExchangeHandler {
      */
     public void handleMessage(Exchange exchange) throws HandlerException {
         
-    	if (exchange.getContract().getServiceOperation().getExchangePattern().equals(ExchangePattern.IN_OUT)) {
-            Node request = exchange.getMessage().getContent(Node.class);
-            
-            java.util.Map<String,Object> headers=new java.util.HashMap<String, Object>();
-            
-            try {
-            	// Find part name associated with operation on port type
-            	javax.wsdl.Operation operation=m_portType.getOperation(
-            			exchange.getContract().getServiceOperation().getName(), null, null);
-            	
-            	Element newreq=WSDLHelper.wrapRequestMessagePart((Element)request, operation);
-            	
-            	// Invoke the operation on the BPEL process
-            	Element response=m_engine.invoke(m_serviceName, null,
-            			exchange.getContract().getServiceOperation().getName(),
-            					newreq, headers);
+        Node request = exchange.getMessage().getContent(Node.class);
+        
+        java.util.Map<String,Object> headers=new java.util.HashMap<String, Object>();
+        
+        try {
+        	// Find part name associated with operation on port type
+        	javax.wsdl.Operation operation=m_portType.getOperation(
+        			exchange.getContract().getServiceOperation().getName(), null, null);
+        	
+        	Element newreq=WSDLHelper.wrapRequestMessagePart((Element)request, operation);
+        	
+        	// Invoke the operation on the BPEL process
+        	Element response=m_engine.invoke(m_serviceName, null,
+        			exchange.getContract().getServiceOperation().getName(),
+        					newreq, headers);
 
-                Message message = exchange.createMessage();
-                
-                // Strip off wrapper and part to just return the part contents
-                message.setContent(WSDLHelper.unwrapMessagePart(response));
-                
-                exchange.send(message);
+        	if (exchange.getContract().getServiceOperation().getExchangePattern().equals(ExchangePattern.IN_OUT)) {
 
-            } catch(Fault f) {
-            	Message faultMessage=exchange.createMessage();
+        		Message message = exchange.createMessage();
+            
+	            // Strip off wrapper and part to just return the part contents
+	            message.setContent(WSDLHelper.unwrapMessagePart(response));
+	            
+	            exchange.send(message);
+        	}
+        } catch(Fault f) {
+        	Message faultMessage=exchange.createMessage();
+        	
+        	try {
+            	SOAPFault fault=javax.xml.soap.SOAPFactory.newInstance().createFault("", f.getFaultName());
             	
-            	try {
-	            	SOAPFault fault=javax.xml.soap.SOAPFactory.newInstance().createFault("", f.getFaultName());
-	            	
-	            	Detail detail=fault.addDetail();
-	            	Node cloned=detail.getOwnerDocument().importNode(WSDLHelper.unwrapMessagePart(f.getFaultMessage()), true);	            	
-	            	detail.appendChild(cloned);
-	            	
-	            	faultMessage.setContent(fault);
- 	            	
-	            	exchange.sendFault(faultMessage);
-            	} catch(Exception e) {
-            		throw new HandlerException(e);
-            	}
+            	Detail detail=fault.addDetail();
+            	Node cloned=detail.getOwnerDocument().importNode(WSDLHelper.unwrapMessagePart(f.getFaultMessage()), true);	            	
+            	detail.appendChild(cloned);
             	
-            } catch(Exception e) {
-            	throw new HandlerException(e);
-            }
+            	faultMessage.setContent(fault);
+            	
+            	exchange.sendFault(faultMessage);
+        	} catch(Exception e) {
+        		throw new HandlerException(e);
+        	}
+        	
+        } catch(Exception e) {
+        	throw new HandlerException(e);
         }
     }
     
