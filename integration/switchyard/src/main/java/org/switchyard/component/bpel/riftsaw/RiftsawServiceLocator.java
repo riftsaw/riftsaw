@@ -26,14 +26,16 @@ import org.apache.log4j.Logger;
 import org.riftsaw.engine.Fault;
 import org.riftsaw.engine.Service;
 import org.riftsaw.engine.ServiceLocator;
-import org.switchyard.BaseHandler;
 import org.switchyard.Exchange;
+import org.switchyard.ExchangeState;
 import org.switchyard.HandlerException;
 import org.switchyard.Message;
 import org.switchyard.ServiceDomain;
 import org.switchyard.ServiceReference;
+import org.switchyard.SynchronousInOutHandler;
 import org.switchyard.component.bpel.config.model.BPELComponentImplementationModel;
 import org.switchyard.config.model.composite.ComponentReferenceModel;
+import org.switchyard.exception.DeliveryException;
 import org.switchyard.exception.SwitchYardException;
 import org.switchyard.metadata.BaseExchangeContract;
 import org.switchyard.metadata.ServiceOperation;
@@ -48,9 +50,12 @@ import org.w3c.dom.Element;
 public class RiftsawServiceLocator implements ServiceLocator {
 
     private static final Logger logger = Logger.getLogger(RiftsawServiceLocator.class);
+    
+    private static final long DEFAULT_TIMEOUT = 120000;
 
 	private ServiceDomain m_serviceDomain=null;
 	private java.util.Map<QName, RegistryEntry> m_registry=new java.util.HashMap<QName, RegistryEntry>();
+    private long m_waitTimeout = DEFAULT_TIMEOUT;
 	
 	public RiftsawServiceLocator(ServiceDomain serviceDomain) {
 		m_serviceDomain = serviceDomain;
@@ -128,7 +133,7 @@ public class RiftsawServiceLocator implements ServiceLocator {
 		
 	}
 	
-	public static class RegistryEntry {
+	public class RegistryEntry {
 		
 		private java.util.List<javax.wsdl.Definition> m_wsdls=new java.util.Vector<javax.wsdl.Definition>();
 		private java.util.List<QName> m_portTypes=new java.util.Vector<QName>();
@@ -169,7 +174,7 @@ public class RiftsawServiceLocator implements ServiceLocator {
 		}
 	}
 
-	public static class ServiceProxy implements Service {
+	public class ServiceProxy implements Service {
 		
 		private ServiceReference m_serviceReference=null;
 		private javax.wsdl.PortType m_portType=null;
@@ -186,9 +191,8 @@ public class RiftsawServiceLocator implements ServiceLocator {
 			mesg = WSDLHelper.unwrapMessagePart(mesg);
 			
 			// Need to create an exchange
-			ResponseHandler rh=new ResponseHandler();
-			rh.init();
-			
+            SynchronousInOutHandler rh = new SynchronousInOutHandler();
+
 			ServiceOperation op=m_serviceReference.getInterface().getOperation(operationName);
 			
 			BaseExchangeContract exchangeContract = new BaseExchangeContract(op);
@@ -199,7 +203,15 @@ public class RiftsawServiceLocator implements ServiceLocator {
 			req.setContent(mesg);
 			exchange.send(req);
 			
-			Message resp=rh.getMessage();
+            try {
+                exchange = rh.waitForOut(m_waitTimeout);
+            } catch (DeliveryException e) {
+                throw new HandlerException("Timed out after " + m_waitTimeout +
+                		" ms waiting on synchronous response from target service '" +
+                		m_serviceReference.getName() + "'.");
+            }
+            
+			Message resp=exchange.getMessage();
 			
 			if (resp == null) {
 				throw new Exception("Response not returned from operation '"+operationName+
@@ -214,7 +226,7 @@ public class RiftsawServiceLocator implements ServiceLocator {
         	
         	javax.wsdl.Operation operation=m_portType.getOperation(operationName, null, null);
         	
-			if (rh.isFault()) {
+			if (exchange.getState() == ExchangeState.FAULT) {
 				QName faultCode=null;
 				
 				if (respelem instanceof SOAPFault) {
@@ -233,36 +245,6 @@ public class RiftsawServiceLocator implements ServiceLocator {
 			Element newresp=WSDLHelper.wrapResponseMessagePart(respelem, operation);
 			
 			return((Element)newresp);
-		}
-		
-		public class ResponseHandler extends BaseHandler {
-			
-			private Message m_message=null;
-			private boolean m_fault=false;
-			
-			public ResponseHandler() {
-			}
-			
-			public void init() {
-			}
-			
-			public Message getMessage() {
-				return(m_message);
-			}
-			
-			public void handleFault(final Exchange exchange) {
-				m_message = exchange.getMessage();
-				m_fault = true;
-			}
-			
-			public boolean isFault() {
-				return(m_fault);
-			}
-
-			public void handleMessage(final Exchange exchange) throws HandlerException {
-				m_message = exchange.getMessage();
-			}
-
 		}
 	}
 	
