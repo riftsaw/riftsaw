@@ -23,7 +23,6 @@ import javax.xml.soap.Detail;
 import javax.xml.soap.SOAPFault;
 
 import org.apache.log4j.Logger;
-import org.apache.ode.utils.DOMUtils;
 import org.riftsaw.engine.BPELEngine;
 import org.riftsaw.engine.DeploymentUnit;
 import org.riftsaw.engine.Fault;
@@ -34,7 +33,6 @@ import org.switchyard.Message;
 import org.switchyard.ServiceReference;
 import org.switchyard.component.bpel.config.model.BPELComponentImplementationModel;
 import org.switchyard.component.bpel.exchange.BaseBPELExchangeHandler;
-import org.switchyard.exception.SwitchYardException;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
@@ -148,24 +146,15 @@ public class RiftsawBPELExchangeHandler extends BaseBPELExchangeHandler {
 	            	Node cloned=detail.getOwnerDocument().importNode(WSDLHelper.unwrapMessagePart(f.getFaultMessage()), true);	            	
 	            	detail.appendChild(cloned);
 	            	
-	            	/*
-	            	javax.xml.ws.soap.SOAPFaultException soapFault=
-	            			new javax.xml.ws.soap.SOAPFaultException(fault);
-	            	
-	            	faultMessage.setContent(soapFault);
-	            	*/
 	            	faultMessage.setContent(fault);
-            		
-	            	// TODO: What about the fault code?
-	            	//faultMessage.setContent(WSDLHelper.unwrapMessagePart(f.getFaultMessage()));
-	            	
+ 	            	
 	            	exchange.sendFault(faultMessage);
             	} catch(Exception e) {
             		throw new HandlerException(e);
             	}
             	
             } catch(Exception e) {
-            	e.printStackTrace();
+            	throw new HandlerException(e);
             }
         }
     }

@@ -70,6 +70,7 @@ public class BPELActivator extends BaseActivator {
 					java.util.Properties props=new java.util.Properties();
 		
 					// Temporary approach until can get properties from environment
+					// https://issues.jboss.org/browse/RIFTSAW-432
 					try {
 						java.io.InputStream is=BPELEngineImpl.class.getClassLoader().getResourceAsStream("bpel.properties");
 				
