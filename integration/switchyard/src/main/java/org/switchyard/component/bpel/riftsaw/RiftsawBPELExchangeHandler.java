@@ -142,21 +142,22 @@ public class RiftsawBPELExchangeHandler extends BaseBPELExchangeHandler {
             	Message faultMessage=exchange.createMessage();
             	
             	try {
-            		/*
 	            	SOAPFault fault=javax.xml.soap.SOAPFactory.newInstance().createFault("", f.getFaultName());
 	            	
 	            	Detail detail=fault.addDetail();
 	            	Node cloned=detail.getOwnerDocument().importNode(WSDLHelper.unwrapMessagePart(f.getFaultMessage()), true);	            	
 	            	detail.appendChild(cloned);
 	            	
+	            	/*
 	            	javax.xml.ws.soap.SOAPFaultException soapFault=
 	            			new javax.xml.ws.soap.SOAPFaultException(fault);
 	            	
 	            	faultMessage.setContent(soapFault);
 	            	*/
+	            	faultMessage.setContent(fault);
             		
 	            	// TODO: What about the fault code?
-	            	faultMessage.setContent(WSDLHelper.unwrapMessagePart(f.getFaultMessage()));
+	            	//faultMessage.setContent(WSDLHelper.unwrapMessagePart(f.getFaultMessage()));
 	            	
 	            	exchange.sendFault(faultMessage);
             	} catch(Exception e) {

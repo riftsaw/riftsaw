@@ -18,13 +18,11 @@
 package org.switchyard.component.bpel.riftsaw;
 
 import java.util.Map;
-import java.util.concurrent.Semaphore;
 
 import javax.xml.namespace.QName;
-import javax.xml.ws.soap.SOAPFaultException;
+import javax.xml.soap.SOAPFault;
 
 import org.apache.log4j.Logger;
-import org.apache.ode.utils.DOMUtils;
 import org.riftsaw.engine.Fault;
 import org.riftsaw.engine.Service;
 import org.riftsaw.engine.ServiceLocator;
@@ -40,7 +38,6 @@ import org.switchyard.exception.SwitchYardException;
 import org.switchyard.metadata.BaseExchangeContract;
 import org.switchyard.metadata.ServiceOperation;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 
 /**
  * This class implements the service locator interface to retrieve a
@@ -87,18 +84,6 @@ public class RiftsawServiceLocator implements ServiceLocator {
 		}
 		
 		return(ret);
-		/*
-		QName switchYardService=re.getService(serviceName, portName);
-		
-		ServiceReference sref=m_serviceDomain.getService(switchYardService);
-		
-		if (sref == null) {
-			logger.error("No service found for '"+serviceName+"' (port "+portName+")");
-			return(null);
-		}
-		
-		return(new ServiceProxy(sref));
-		*/
 	}
 	
 	public void initialiseReference(ComponentReferenceModel crm) {
@@ -196,7 +181,6 @@ public class RiftsawServiceLocator implements ServiceLocator {
 
 		public Element invoke(String operationName, Element mesg,
 				Map<String, Object> headers) throws Exception {
-			//Semaphore sem=new Semaphore(0);
 			
 			// Unwrap the first two levels, to remove the part wrapper
 			mesg = WSDLHelper.unwrapMessagePart(mesg);
@@ -215,74 +199,51 @@ public class RiftsawServiceLocator implements ServiceLocator {
 			req.setContent(mesg);
 			exchange.send(req);
 			
-			// Wait for response
-			//sem.acquire();
-			
 			Message resp=rh.getMessage();
 			
 			if (resp == null) {
 				throw new Exception("Response not returned from operation '"+operationName+
 								"' on service: "+m_serviceReference.getName());
 				
-				/*
-			} else if (resp.getContent() instanceof SOAPFaultException) {
-				SOAPFaultException faultex=(SOAPFaultException)resp.getContent();
-				
-				Node respelem=faultex.getFault().getDetail().getFirstChild();
-				
-				Element newfault=faultex.getFault().getDetail().getFirstChild().getOwnerDocument().createElement("message");
-				Element part=respelem.getOwnerDocument().createElement("errorCode");
-				newfault.appendChild(part);
-				part.appendChild(respelem);		
-
-				throw new Fault(faultex.getFault().getFaultCodeAsQName(), newfault); //(Element)resp.getContent());
-				*/
 			} else if ((resp.getContent() instanceof Element) == false) {
 				throw new Exception("Response is not an Element for operation '"+operationName+
 						"' on service: "+m_serviceReference.getName());
 			}
 
-			// TODO: GPB NEED TO ADD APPROPRIATE WRAPPER
-			// Need to add wrapper
         	Element respelem=(Element)resp.getContent();
         	
         	javax.wsdl.Operation operation=m_portType.getOperation(operationName, null, null);
         	
 			if (rh.isFault()) {
+				QName faultCode=null;
+				
+				if (respelem instanceof SOAPFault) {
+					SOAPFault fault=(SOAPFault)resp.getContent();
+					
+					respelem = (Element)fault.getDetail().getFirstChild();
+					
+					faultCode = fault.getFaultCodeAsQName();
+				}
+				
 				Element newfault=WSDLHelper.wrapFaultMessagePart(respelem, operation, null);
-				/*
-				Element newfault=respelem.getOwnerDocument().createElement("message");
-				Element part=respelem.getOwnerDocument().createElement("errorCode");
-				newfault.appendChild(part);
-				part.appendChild(respelem);		
-*/
-				throw new Fault(null, newfault); //(Element)resp.getContent());
+
+				throw new Fault(faultCode, newfault);
 			}
-			
-			// TODO Handle one-way requests, faults and headers
-			/*
-			Element newresp=respelem.getOwnerDocument().createElement("message");
-			Element part=respelem.getOwnerDocument().createElement("part");
-			newresp.appendChild(part);
-			part.appendChild(respelem);
-			*/
 			
 			Element newresp=WSDLHelper.wrapResponseMessagePart(respelem, operation);
 			
-			return((Element)newresp); //resp.getContent());
+			return((Element)newresp);
 		}
 		
 		public class ResponseHandler extends BaseHandler {
 			
-			//private Semaphore m_semaphore=null;
 			private Message m_message=null;
 			private boolean m_fault=false;
 			
 			public ResponseHandler() {
 			}
 			
-			public void init() {//Semaphore sem) {
-				//m_semaphore = sem;
+			public void init() {
 			}
 			
 			public Message getMessage() {
@@ -292,10 +253,6 @@ public class RiftsawServiceLocator implements ServiceLocator {
 			public void handleFault(final Exchange exchange) {
 				m_message = exchange.getMessage();
 				m_fault = true;
-				
-				// TODO: How to distinguish fault?
-				
-				//m_semaphore.release();
 			}
 			
 			public boolean isFault() {
@@ -304,8 +261,6 @@ public class RiftsawServiceLocator implements ServiceLocator {
 
 			public void handleMessage(final Exchange exchange) throws HandlerException {
 				m_message = exchange.getMessage();
-				
-				//m_semaphore.release();
 			}
 
 		}

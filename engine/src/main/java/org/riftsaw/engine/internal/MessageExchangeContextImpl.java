@@ -74,12 +74,6 @@ public class MessageExchangeContextImpl implements MessageExchangeContext {
         		}
         	} catch(Fault f) {
         		QName faultName=f.getFaultName();
-        		if (faultName == null) {
-        			// Find fault name from message type
-        			
-        			// TODO: GPB Temporarily set the fault name until it can be derived
-        			faultName = QName.valueOf("{http://example.com/loan-approval/riskAssessment/}loanProcessFault");
-        		}
         		javax.wsdl.Fault fault=partnerRoleMessageExchange.getOperation().getFault(faultName.getLocalPart());
      			Message faultMessage = partnerRoleMessageExchange.createMessage(
     					fault.getMessage().getQName());
