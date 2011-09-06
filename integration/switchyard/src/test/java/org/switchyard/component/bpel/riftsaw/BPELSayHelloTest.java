@@ -27,11 +27,10 @@ import org.switchyard.test.SwitchYardTestCaseConfig;
 import org.switchyard.test.mixins.CDIMixIn;
 import org.switchyard.test.mixins.HTTPMixIn;
 import org.switchyard.transform.config.model.TransformSwitchYardScanner;
-import org.switchyard.component.bean.config.model.BeanSwitchYardScanner;
 
 @SwitchYardTestCaseConfig(
         config = "/say_hello/switchyard.xml",
-        scanners = {BeanSwitchYardScanner.class, TransformSwitchYardScanner.class},
+        scanners = {TransformSwitchYardScanner.class},
         mixins = {CDIMixIn.class, HTTPMixIn.class})
 public class BPELSayHelloTest {
 

@@ -97,7 +97,7 @@
 		<picketlink.version>1.0.3.final</picketlink.version>
 		<juddi.version>3.1.0-SNAPSHOT</juddi.version>
 		<scout.version>1.2.3-SNAPSHOT</scout.version>
-		<switchyard.version>0.2.0-SNAPSHOT</switchyard.version>
+		<switchyard.version>0.3.0-SNAPSHOT</switchyard.version>
 	</properties>
 
 	<dependencyManagement>

@@ -3,7 +3,7 @@
 		xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.riftsaw</groupId>
-	<artifactId>switchyard-component-bpel</artifactId>
+	<artifactId>riftsaw-switchyard-component-bpel</artifactId>
 	<version>3.0.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
 	<name>RiftSaw::Integration::Switchyard-Component-BPEL</name>
@@ -29,11 +29,6 @@
 		<dependency>
 			<groupId>org.switchyard</groupId>
 			<artifactId>switchyard-plugin</artifactId>
-			<version>${switchyard.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.switchyard.components</groupId>
-			<artifactId>switchyard-component-bean</artifactId>
 			<version>${switchyard.version}</version>
 		</dependency>
 		<dependency>
@@ -142,10 +137,6 @@
 						<include>**/*TestCase.java</include>
 						<include>**/*Test.java</include>
 					</includes>
-					<excludes>
-						<exclude>**/RiftsawBPELTest.java</exclude>
-						<exclude>**/BPELHelloWorldTest.java</exclude>
-					</excludes>
 				</configuration>
 			</plugin>
 		</plugins>
