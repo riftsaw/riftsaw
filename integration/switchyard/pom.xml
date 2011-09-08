@@ -22,6 +22,11 @@
 			<version>${riftsaw.engine.version}</version>
 		</dependency>
 		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-entitymanager</artifactId>
+			<version>4.0.0.Beta1</version>
+		</dependency>
+		<dependency>
 			<groupId>org.switchyard</groupId>
 			<artifactId>switchyard-api</artifactId>
 			<version>${switchyard.version}</version>
