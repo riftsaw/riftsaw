@@ -188,9 +188,8 @@ public class BPELEngineImpl implements BPELEngine {
 	}
 
 	private void initTxMgr() throws Exception {
-		/*
 		String txFactoryName = _odeConfig.getTxFactoryClass();
-		logger.info("Initializing transaction manager using " + txFactoryName);
+		_log.info("Initializing transaction manager using " + txFactoryName);
 		try {
 			Class<?> txFactClass = this.getClass().getClassLoader().loadClass(txFactoryName);
 			Object txFact = txFactClass.newInstance();
@@ -201,11 +200,9 @@ public class BPELEngineImpl implements BPELEngine {
 			//	_txMgr = new DebugTxMgr(_txMgr);
 			//_axisConfig.addParameter("ode.transaction.manager", _txMgr);
 		} catch (Exception e) {
-			logger.error("Couldn't initialize a transaction manager with factory: " + txFactoryName, e);
+			_log.error("Couldn't initialize a transaction manager with factory: " + txFactoryName, e);
 			throw new Exception("Couldn't initialize a transaction manager with factory: " + txFactoryName, e);
 		}
-		*/
-		_txMgr = new org.apache.geronimo.transaction.manager.GeronimoTransactionManager();
 	}
 
 	protected void initDAO() throws Exception {

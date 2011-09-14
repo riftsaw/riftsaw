@@ -64,7 +64,6 @@
 
 	<modules>
 		<module>engine</module>
-		<module>integration/switchyard</module>
 	</modules>
   
 	<properties>
