@@ -30,6 +30,7 @@ import javax.transaction.TransactionManager;
 public class JBossTransactionFactory {
 
     public static final String JNDI_LOOKUP_PATH = "java:/TransactionManager";
+    public static final String JNDI_LOOKUP_PATH2 = "java:jboss/TransactionManager";
     
     public JBossTransactionFactory() {
     }
@@ -44,7 +45,12 @@ public class JBossTransactionFactory {
         try {
             return (TransactionManager) ctx.lookup(JNDI_LOOKUP_PATH);
         } catch (NamingException except) {
-            throw new RuntimeException( "Error while looking up TransactionManager at " + JNDI_LOOKUP_PATH, except);
+        	try {
+                return (TransactionManager) ctx.lookup(JNDI_LOOKUP_PATH2);
+        	} catch (NamingException except2) {
+        		throw new RuntimeException( "Error while looking up TransactionManager at " +
+        					JNDI_LOOKUP_PATH + " and "+JNDI_LOOKUP_PATH2, except);
+        	}
         }
     }
 
