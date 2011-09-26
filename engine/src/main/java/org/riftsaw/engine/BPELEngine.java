@@ -49,8 +49,22 @@ public interface BPELEngine {
      * This method deploys a BPEL process definition.
      * 
      * @param bdu The BPEL process definition
+     * @deprecated Use deploy(java.io.File) instead
      */
     public void deploy(DeploymentUnit bdu);
+
+    /**
+     * This method deploys a BPEL process definition. The
+     * deployment can be provided as an archive or folder.
+     * The name of the deployment will be taken from the
+     * archive or folder name. The archive or folder must
+     * contain the deployment descriptor at its root.
+     * 
+     * @param deployment The BPEL process archive or folder
+     * @return The reference for the deployment, to be used
+     *              during undeployment
+     */
+    public DeploymentRef deploy(java.io.File deployment);
 
     /**
      * This method invokes a BPEL process instance. If a process
@@ -74,8 +88,17 @@ public interface BPELEngine {
      * This method undeploys a BPEL process definition.
      * 
      * @param bdu The BPEL process definition
+     * @deprecated
      */
     public void undeploy(DeploymentUnit bdu);
+    
+    /**
+     * This method undeploys the BPEL process definitions associated
+     * with the supplied deployment reference.
+     * 
+     * @param ref The deployment reference
+     */
+    public void undeploy(DeploymentRef ref);
     
     /**
      * This method closes the BPEL engine.

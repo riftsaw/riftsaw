@@ -17,6 +17,7 @@
  */
 package org.riftsaw.engine.internal;
 
+import java.io.File;
 import java.util.StringTokenizer;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -58,6 +59,7 @@ import org.apache.ode.utils.DOMUtils;
 import org.apache.ode.utils.GUID;
 import org.apache.ode.utils.Properties;
 import org.riftsaw.engine.BPELEngine;
+import org.riftsaw.engine.DeploymentRef;
 import org.riftsaw.engine.DeploymentUnit;
 import org.riftsaw.engine.Fault;
 import org.riftsaw.engine.ServiceLocator;
@@ -84,6 +86,7 @@ public class BPELEngineImpl implements BPELEngine {
     private CronScheduler _cronScheduler;
     private CacheProvider _cacheProvider;
     private ServiceLocator _serviceLocator;
+    private DeploymentManager _deploymentManager;
 
     /**
      * {@inheritDoc}
@@ -107,6 +110,9 @@ public class BPELEngineImpl implements BPELEngine {
         
         LOG.info("Starting DAO.");
         initDAO();
+        
+        LOG.info("Initializing deployment manager");
+        initDeploymentManager();
         
         EndpointReferenceContextImpl eprContext = new EndpointReferenceContextImpl(this);
         
@@ -185,6 +191,11 @@ public class BPELEngineImpl implements BPELEngine {
             LOG.error("Error in starting cache provider", e);
             throw new RuntimeException("Error in initCacheProvider.", e);
         }
+    }
+    
+    private void initDeploymentManager() {
+        _deploymentManager = new DeploymentManager();
+        _deploymentManager.setTemporaryFolder(_odeConfig.getProperty("deployment.tmp.folder"));
     }
     
     /**
@@ -345,6 +356,52 @@ public class BPELEngineImpl implements BPELEngine {
      */
     public void undeploy(DeploymentUnit bdu) {
         _store.undeploy(bdu);
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public DeploymentRef deploy(File deployment) {
+        DeploymentRef ret=null;
+        
+        try {
+            java.util.List<DeploymentUnit> dus=
+                        _deploymentManager.getDeploymentUnits(deployment.getName(), deployment);
+            
+            for (DeploymentUnit du : dus) {
+                try {
+                    _store.deploy(du);
+                } catch(Exception e) {
+                    LOG.error("Failed to deploy '"+du.getName()+"'", e);
+                }
+            }
+            
+            ret = new DeploymentRefImpl(dus);
+            
+        } catch(Exception e) {
+            LOG.error("Failed to get deployment units from '"+deployment+"'", e);
+        }
+        
+        return(ret);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void undeploy(DeploymentRef ref) {
+        if (ref instanceof DeploymentRefImpl) {
+            // Work through list in reverse and only undeploy a named deployment
+            // unit once (i.e. the most recent version)
+            java.util.List<String> undeployed=new java.util.Vector<String>();
+            
+            for (int i=((DeploymentRefImpl)ref).getDeploymentUnits().size()-1; i >= 0; i--) {
+                DeploymentUnit du=((DeploymentRefImpl)ref).getDeploymentUnits().get(i);
+                if (!undeployed.contains(du.getName())) {
+                    _store.undeploy(du);
+                    undeployed.add(du.getName());
+                }
+            }
+        }
     }
     
     /**

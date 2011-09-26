@@ -28,6 +28,7 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.riftsaw.engine.internal.BPELEngineImpl;
+import org.riftsaw.engine.internal.DeploymentManager;
 import org.w3c.dom.Element;
 
 public class BPELEngineTest {
@@ -46,6 +47,7 @@ public class BPELEngineTest {
             props.load(is);
     
             m_engine.init(m_locator, props);
+
         } catch (Exception e) {
             fail("Failed to initialize the engine: "+e);
         }
@@ -60,30 +62,13 @@ public class BPELEngineTest {
         }
     }
     
-    public void deploy(String descriptor, String processName) throws Exception {
+    public DeploymentRef deploy(String descriptor) throws Exception {
         java.net.URL url=BPELEngineImpl.class.getResource(descriptor);
         
         java.io.File deployFile=new java.io.File(url.getFile());
         
-        DeploymentUnit bdu=new DeploymentUnit(processName, "1", deployFile.lastModified(), deployFile);
-
         // Deploy the process
-        m_engine.deploy(bdu);
-    }
-    
-    public void undeploy(String descriptor, String processName) throws Exception {
-        java.net.URL url=BPELEngineImpl.class.getResource(descriptor);
-        
-        java.io.File deployFile=new java.io.File(url.getFile());
-        
-        DeploymentUnit bdu=new DeploymentUnit(processName, "1", deployFile.lastModified(), deployFile);
-
-        // Deploy the process
-        try {
-            m_engine.undeploy(bdu);
-        } catch (Throwable t) {
-            // TODO: Ignore for now, until referential integrity issue resolved
-        }
+        return (m_engine.deploy(deployFile.getParentFile()));
     }
     
     public void invoke(QName serviceName, String portName, String operation, String reqFile, String respFile,
@@ -143,10 +128,12 @@ public class BPELEngineTest {
     public void testHelloWorldRedeploy() {
         
         try {
-            deploy("/hello_world/deploy.xml", "hello_world");
-            undeploy("/hello_world/deploy.xml", "hello_world");
-            deploy("/hello_world/deploy.xml", "hello_world");
-            undeploy("/hello_world/deploy.xml", "hello_world");
+            DeploymentRef ref1=deploy("/hello_world/deploy.xml");
+            m_engine.undeploy(ref1);
+
+            DeploymentRef ref2=deploy("/hello_world/deploy.xml");
+            m_engine.undeploy(ref2);
+
         } catch (Exception e) {
             fail("Failed: "+e);
         }
@@ -156,10 +143,76 @@ public class BPELEngineTest {
     public void testHelloWorld() {
         
         try {
-            deploy("/hello_world/deploy.xml", "hello_world");
+            DeploymentRef ref1=deploy("/hello_world/deploy.xml");
             invoke(new QName("http://www.jboss.org/bpel/examples/wsdl","HelloService"), "HelloPort",
                     "hello", "/hello_world/hello_request1.xml", "/hello_world/hello_response1.xml", null);
-            undeploy("/hello_world/deploy.xml", "hello_world");
+            m_engine.undeploy(ref1);
+
+        } catch (Exception e) {
+            fail("Failed: "+e);
+        }
+    }
+    
+    @Test
+    public void testHelloWorldVersioned() {
+        
+        try {
+            DeploymentRef ref1=deploy("/hello_world_versioned/deploy.xml");
+            invoke(new QName("http://www.jboss.org/bpel/examples/wsdl","HelloService"), "HelloPort",
+                    "hello", "/hello_world_versioned/hello_request1.xml", "/hello_world_versioned/hello_response1.xml", null);
+            m_engine.undeploy(ref1);
+
+        } catch (Exception e) {
+            fail("Failed: "+e);
+        }
+    }
+    
+    @Test
+    public void testSimpleCorrelation() {
+        
+        try {
+            DeploymentRef ref1=deploy("/simple_correlation/deploy.xml");
+            invoke(new QName("http://www.jboss.org/bpel/examples/wsdl","HelloGoodbyeService"), "HelloGoodbyePort",
+                    "hello", "/simple_correlation/hello_request1.xml", "/simple_correlation/hello_response1.xml", null);
+            invoke(new QName("http://www.jboss.org/bpel/examples/wsdl","HelloGoodbyeService"), "HelloGoodbyePort",
+                    "goodbye", "/simple_correlation/goodbye_request1.xml", "/simple_correlation/goodbye_response1.xml", null);
+            m_engine.undeploy(ref1);
+
+        } catch (Exception e) {
+            fail("Failed: "+e);
+        }
+    }
+    
+    @Test
+    public void testSimpleCorrelationVersioned() {
+        
+        try {
+            deploy("/version1/simple_correlation/deploy.xml");
+            
+            // Start process instance 1
+            invoke(new QName("http://www.jboss.org/bpel/examples/wsdl","HelloGoodbyeService"), "HelloGoodbyePort",
+                    "hello", "/version1/simple_correlation/hello_request1.xml", 
+                    "/version1/simple_correlation/hello_response1.xml", null);
+            
+            DeploymentRef ref2=deploy("/version2/simple_correlation/deploy.xml");
+            
+            // Start process instance 2
+            invoke(new QName("http://www.jboss.org/bpel/examples/wsdl","HelloGoodbyeService"), "HelloGoodbyePort",
+                    "hello", "/version2/simple_correlation/hello_request2.xml", 
+                    "/version2/simple_correlation/hello_response2.xml", null);
+            
+            // Complete process instance 2
+            invoke(new QName("http://www.jboss.org/bpel/examples/wsdl","HelloGoodbyeService"), "HelloGoodbyePort",
+                    "goodbye", "/version2/simple_correlation/goodbye_request2.xml", 
+                    "/version2/simple_correlation/goodbye_response2.xml", null);
+            
+            // Complete process instance 1
+            invoke(new QName("http://www.jboss.org/bpel/examples/wsdl","HelloGoodbyeService"), "HelloGoodbyePort",
+                    "goodbye", "/version2/simple_correlation/goodbye_request1.xml", 
+                    "/version2/simple_correlation/goodbye_response1.xml", null);
+            
+            m_engine.undeploy(ref2);
+
         } catch (Exception e) {
             fail("Failed: "+e);
         }
@@ -184,10 +237,11 @@ public class BPELEngineTest {
         });
         
         try {
-            deploy("/simple_invoke/deploy.xml", "SimpleInvoke");
+            DeploymentRef ref1=deploy("/simple_invoke/deploy.xml");
             invoke(new QName("http://www.jboss.org/bpel/examples/wsdl","SimpleInvoke_Service"), "SimpleInvoke_Port",
                     "sayHelloTo", "/simple_invoke/hello_request1.xml", "/simple_invoke/hello_response1.xml", null);
-            undeploy("/simple_invoke/deploy.xml", "SimpleInvoke");
+            m_engine.undeploy(ref1);
+
         } catch (Exception e) {
             fail("Failed: "+e);
         }
@@ -221,15 +275,16 @@ public class BPELEngineTest {
             }
         });
 
+        DeploymentRef ref1=null;
         try {
-            deploy("/loan_approval/deploy.xml", "loanApprovalProcess");
+            ref1=deploy("/loan_approval/deploy.xml");
             invoke(new QName("http://example.com/loan-approval/wsdl/","loanService"), "loanService_Port",
                     "request", "/loan_approval/loanreq1.xml", "/loan_approval/loanresp1.xml", null);
         } catch (Exception e) {
             fail("Failed: "+e);
         } finally {
             try {
-                undeploy("/loan_approval/deploy.xml", "loanApprovalProcess");
+                m_engine.undeploy(ref1);
             } catch (Exception e) {
                 fail("Failed to undeploy: "+e);
             }
@@ -267,15 +322,16 @@ public class BPELEngineTest {
             }
         });
 
+        DeploymentRef ref1=null;
         try {
-            deploy("/loan_approval/deploy.xml", "loanApprovalProcess");
+            ref1=deploy("/loan_approval/deploy.xml");
             invoke(new QName("http://example.com/loan-approval/wsdl/","loanService"), "loanService_Port",
                     "request", "/loan_approval/loanreq2.xml", "/loan_approval/loanresp2.xml", null);
         } catch (Exception e) {
             fail("Failed: "+e);
         } finally {
             try {
-                undeploy("/loan_approval/deploy.xml", "loanApprovalProcess");
+                m_engine.undeploy(ref1);
             } catch (Exception e) {
                 fail("Failed to undeploy: "+e);
             }
@@ -313,8 +369,9 @@ public class BPELEngineTest {
             }
         });
 
+        DeploymentRef ref1=null;
         try {
-            deploy("/loan_approval/deploy.xml", "loanApprovalProcess");
+            ref1=deploy("/loan_approval/deploy.xml");
             invoke(new QName("http://example.com/loan-approval/wsdl/","loanService"), "loanService_Port",
                     "request", "/loan_approval/loanreq3.xml", "/loan_approval/loanresp3.xml",
                     new QName("http://example.com/loan-approval/wsdl/","unableToHandleRequest"));
@@ -322,7 +379,7 @@ public class BPELEngineTest {
             fail("Failed: "+e);
         } finally {
             try {
-                undeploy("/loan_approval/deploy.xml", "loanApprovalProcess");
+                m_engine.undeploy(ref1);
             } catch (Exception e) {
                 fail("Failed to undeploy: "+e);
             }
@@ -355,8 +412,9 @@ public class BPELEngineTest {
             }
         });
 
+        DeploymentRef ref1=null;
         try {
-            deploy("/loan_approval/deploy.xml", "loanApprovalProcess");
+            ref1=deploy("/loan_approval/deploy.xml");
             invoke(new QName("http://example.com/loan-approval/wsdl/","loanService"), "loanService_Port",
                     "request", "/loan_approval/loanreq4.xml", "/loan_approval/loanresp4.xml",
                     new QName("http://example.com/loan-approval/wsdl/","unableToHandleRequest"));
@@ -365,7 +423,7 @@ public class BPELEngineTest {
             fail("Failed: "+e);
         } finally {
             try {
-                undeploy("/loan_approval/deploy.xml", "loanApprovalProcess");
+                m_engine.undeploy(ref1);
             } catch (Exception e) {
                 fail("Failed to undeploy: "+e);
             }

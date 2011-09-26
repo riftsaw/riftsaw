@@ -47,7 +47,11 @@ public class DeploymentManager {
      * @param tmp The temporary folder location
      */
     public void setTemporaryFolder(String tmp) {
-        _tmpFolder = tmp;
+        if (tmp == null) {
+            tmp = System.getProperty("java.io.tmpdir");
+        } else {
+            _tmpFolder = tmp;
+        }
     }
     
     /**
@@ -193,12 +197,16 @@ public class DeploymentManager {
         
         // Get version from root name
         String version="1";
-        int index=deploymentRoot.getName().lastIndexOf('-');
+        String name=deploymentRoot.getName();
+        
+        int index=name.lastIndexOf('-');
+        
         if (index != -1) {
-            version = deploymentRoot.getName().substring(index+1);
+            version = name.substring(index+1);
+            name = name.substring(0, index);
         }
         
-        ret = new DeploymentUnit(deploymentRoot.getName(), version, deployFile.lastModified(),
+        ret = new DeploymentUnit(name, version, deployFile.lastModified(),
                                 deployFile);
         
         return (ret);
