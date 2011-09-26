@@ -26,47 +26,73 @@ import org.w3c.dom.Element;
 /**
  * This class provides an implementation of the ODE PartnerRolechannel,
  * that can be used as a proxy to a BPEL engine 'partner channel'.
- * 
- * @author gbrown
  *
  */
 public class PartnerRoleChannelImpl implements PartnerRoleChannel {
 
-	private org.apache.ode.bpel.iapi.EndpointReference m_epr=null;
-	private Endpoint m_endpoint=null;
+    private org.apache.ode.bpel.iapi.EndpointReference _epr=null;
+    private Endpoint _endpoint=null;
 
-	public PartnerRoleChannelImpl(Endpoint ep) {
-		m_endpoint = ep;
-		m_epr = new EndpointReferenceProxy(ep);
-	}
-	
-	public org.apache.ode.bpel.iapi.EndpointReference getInitialEndpointReference() {
-		return(m_epr);
-	}
-	
-	public Endpoint getEndpoint() {
-		return(m_endpoint);
-	}
-	
-	public void close() {
-	}
-	
-	public static class EndpointReferenceProxy implements org.apache.ode.bpel.iapi.EndpointReference {
-		
-		private Document m_xml=null;
-		
-		public EndpointReferenceProxy(Endpoint endpoint) {
-			try {
-				Element elem=DOMUtils.stringToDOM("<epr serviceName=\""+endpoint.serviceName+
-						"\" portName=\""+endpoint.portName+"\" />");
-				m_xml = DOMUtils.toDOMDocument(elem);
-			} catch(Exception e) {
-				e.printStackTrace();
-			}
-		}
+    /**
+     * The constructor.
+     * 
+     * @param ep The endpoint
+     */
+    public PartnerRoleChannelImpl(Endpoint ep) {
+        _endpoint = ep;
+        _epr = new EndpointReferenceProxy(ep);
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public org.apache.ode.bpel.iapi.EndpointReference getInitialEndpointReference() {
+        return (_epr);
+    }
+    
+    /**
+     * This method returns the endpoint.
+     * 
+     * @return The endpoint
+     */
+    public Endpoint getEndpoint() {
+        return (_endpoint);
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public void close() {
+    }
+    
+    /**
+     * This class provides an endpoint reference proxy.
+     *
+     */
+    public static class EndpointReferenceProxy implements org.apache.ode.bpel.iapi.EndpointReference {
+        
+        private Document _xml=null;
+        
+        /**
+         * The constructor.
+         * 
+         * @param endpoint The endpoint to proxy.
+         */
+        public EndpointReferenceProxy(Endpoint endpoint) {
+            try {
+                Element elem=DOMUtils.stringToDOM("<epr serviceName=\""+endpoint.serviceName
+                        +"\" portName=\""+endpoint.portName+"\" />");
+                _xml = DOMUtils.toDOMDocument(elem);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
 
-		public Document toXML() {
-			return(m_xml);
-		}
-	}
+        /**
+         * {@inheritDoc}
+         */
+        public Document toXML() {
+            return (_xml);
+        }
+    }
 }

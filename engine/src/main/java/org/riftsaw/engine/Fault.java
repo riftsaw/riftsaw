@@ -29,37 +29,37 @@ import org.w3c.dom.Element;
  */
 public class Fault extends Exception {
 
-	private static final long serialVersionUID = 1L;
-	
-	private QName m_faultName=null;
-	private Element m_faultMessage=null;
+    private static final long serialVersionUID = 1L;
+    
+    private QName _faultName=null;
+    private Element _faultMessage=null;
 
-	/**
-	 * This is the constructor for the fault.
-	 * 
-	 * @param faultName The fault name
-	 * @param faultMessage The fault message
-	 */
-	public Fault(QName faultName, Element faultMessage) {
-		m_faultName = faultName;
-		m_faultMessage = faultMessage;
-	}
-	
-	/**
-	 * This method returns the fault name.
-	 * 
-	 * @return The fault name
-	 */
-	public QName getFaultName() {
-		return(m_faultName);
-	}
-	
-	/**
-	 * This method returns the fault message.
-	 * 
-	 * @return The fault message
-	 */
-	public Element getFaultMessage() {
-		return(m_faultMessage);
-	}
+    /**
+     * This is the constructor for the fault.
+     * 
+     * @param faultName The fault name
+     * @param faultMessage The fault message
+     */
+    public Fault(QName faultName, Element faultMessage) {
+        _faultName = faultName;
+        _faultMessage = faultMessage;
+    }
+    
+    /**
+     * This method returns the fault name.
+     * 
+     * @return The fault name
+     */
+    public QName getFaultName() {
+        return (_faultName);
+    }
+    
+    /**
+     * This method returns the fault message.
+     * 
+     * @return The fault message
+     */
+    public Element getFaultMessage() {
+        return (_faultMessage);
+    }
 }

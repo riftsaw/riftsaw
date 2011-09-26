@@ -17,47 +17,78 @@
  */
 package org.riftsaw.engine.internal;
 
-import org.apache.ode.bpel.iapi.*;
+import javax.wsdl.PortType;
+import javax.xml.namespace.QName;
+
+import org.apache.ode.bpel.iapi.BindingContext;
+import org.apache.ode.bpel.iapi.Endpoint;
+import org.apache.ode.bpel.iapi.PartnerRoleChannel;
 import org.w3c.dom.Document;
 
-import javax.xml.namespace.QName;
-import javax.wsdl.PortType;
-
+/**
+ * This class implements the BindingContext interface.
+ *
+ */
 public class RiftsawBindingContext implements BindingContext {
 
-	public org.apache.ode.bpel.iapi.EndpointReference activateMyRoleEndpoint(QName arg0, Endpoint arg1) {
-		return(new EndpointReferenceImpl(arg0, arg1));
-	}
+    /**
+     * {@inheritDoc}
+     */
+    public org.apache.ode.bpel.iapi.EndpointReference activateMyRoleEndpoint(QName arg0, Endpoint arg1) {
+        return (new EndpointReferenceImpl(arg0, arg1));
+    }
 
-	public long calculateSizeofService(org.apache.ode.bpel.iapi.EndpointReference arg0) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
+    /**
+     * {@inheritDoc}
+     */
+    public long calculateSizeofService(org.apache.ode.bpel.iapi.EndpointReference arg0) {
+        // TODO Auto-generated method stub
+        return 0;
+    }
 
-	public void deactivateMyRoleEndpoint(Endpoint arg0) {
-		// TODO Auto-generated method stub
-		
-	}
-	
-	public PartnerRoleChannel createPartnerRoleChannel(QName processId, PortType portType,
+    /**
+     * {@inheritDoc}
+     */
+    public void deactivateMyRoleEndpoint(Endpoint arg0) {
+        // TODO Auto-generated method stub
+        
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public PartnerRoleChannel createPartnerRoleChannel(QName processId, PortType portType,
               Endpoint initialPartnerEndpoint) {
-		return(new PartnerRoleChannelImpl(initialPartnerEndpoint));
-	}
-	
-	public class EndpointReferenceImpl implements org.apache.ode.bpel.iapi.EndpointReference {
+        return (new PartnerRoleChannelImpl(initialPartnerEndpoint));
+    }
 
-		private QName m_qname=null;
-		private Endpoint m_endpoint=null;
-		
-		public EndpointReferenceImpl(QName qname, Endpoint endpoint) {
-			m_qname = qname;
-			m_endpoint = endpoint;
-		}
-		
-		public Document toXML() {
-			// TODO Auto-generated method stub
-			return null;
-		}
-		
-	}
+    /**
+     * Endpoint reference implementation.
+     *
+     */
+    public class EndpointReferenceImpl implements org.apache.ode.bpel.iapi.EndpointReference {
+
+        //private QName _qname=null;
+        //private Endpoint _endpoint=null;
+        
+        /**
+         * The constructor.
+         * 
+         * @param qname The qname
+         * @param endpoint The endpoint
+         */
+        public EndpointReferenceImpl(QName qname, Endpoint endpoint) {
+            //_qname = qname;
+            //_endpoint = endpoint;
+        }
+        
+        /**
+         * {@inheritDoc}
+         */
+        public Document toXML() {
+            // TODO Auto-generated method stub
+            return null;
+        }
+        
+    }
 }

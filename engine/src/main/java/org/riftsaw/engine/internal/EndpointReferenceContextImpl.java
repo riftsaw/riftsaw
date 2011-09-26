@@ -32,47 +32,58 @@ import org.w3c.dom.Element;
 import java.util.Map;
 import java.util.HashMap;
 
+/**
+ * The EndpointReference implementation.
+ *
+ */
 public class EndpointReferenceContextImpl implements EndpointReferenceContext {
 
-  private static final Log log = LogFactory.getLog(EndpointReferenceContextImpl.class);
+    private static final Log LOG = LogFactory.getLog(EndpointReferenceContextImpl.class);
 
-  public EndpointReferenceContextImpl(BPELEngineImpl server) {
-  }
+    /**
+     * The constructor.
+     * 
+     * @param server The server
+     */
+    public EndpointReferenceContextImpl(BPELEngineImpl server) {
+    }
 
-  public EndpointReference resolveEndpointReference(Element element) {
-    if (log.isDebugEnabled())
-      log.debug("Resolving endpoint reference " + DOMUtils.domToString(element));
+    /**
+     * {@inheritDoc}
+     */
+    public EndpointReference resolveEndpointReference(Element element) {
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Resolving endpoint reference " + DOMUtils.domToString(element));
+        }
     
-    // GPB: TO INVESTIGATE
-    //if (element != null && element.getNodeName().equals(ClientEndpointReference.CLIENT_EPR_ELEMENT)) {
-    	// Returning null as ODE endpoint factory does not have an EndpointReference type for
-    	// this internal riftsaw EPR representation - so null indicates use the default EPR associated
-    	// with the WSDL
-    	//return(null);
-    //}
-    return EndpointFactory.createEndpoint(element);
-  }
-
-  public EndpointReference convertEndpoint(QName qName, Element element) {
-	if (log.isDebugEnabled())
-	   log.debug("Convert endpoint reference: qname="+qName+" element="+DOMUtils.domToString(element));
-    EndpointReference endpoint = EndpointFactory.convert(qName, element);
-    return endpoint;
-  }
-
-  public Map<?,?> getConfigLookup(EndpointReference epr) {
-    Map result = null;
-
-    if(epr instanceof MutableEndpoint)
-    {
-      result = ((MutableEndpoint)epr).toMap();
+        return EndpointFactory.createEndpoint(element);
     }
-    else
-    {
-      result = new HashMap();
-      // todo map access to xml tree
-      log.debug("Map access not implemented");
+
+    /**
+     * {@inheritDoc}
+     */
+    public EndpointReference convertEndpoint(QName qName, Element element) {
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Convert endpoint reference: qname="+qName+" element="+DOMUtils.domToString(element));
+        }
+        EndpointReference endpoint = EndpointFactory.convert(qName, element);
+        return endpoint;
     }
-    return result;
-  }
+
+    /**
+     * {@inheritDoc}
+     */
+    @SuppressWarnings("rawtypes")
+    public Map<?,?> getConfigLookup(EndpointReference epr) {
+        Map<?,?> result = null;
+
+        if (epr instanceof MutableEndpoint) {
+            result = ((MutableEndpoint)epr).toMap();
+        } else {
+            result = new HashMap();
+            // todo map access to xml tree
+            LOG.debug("Map access not implemented");
+        }
+        return result;
+    }
 }

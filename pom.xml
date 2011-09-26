@@ -63,6 +63,7 @@
 	</developers>
 
 	<modules>
+		<module>build</module>
 		<module>engine</module>
 	</modules>
   
@@ -182,6 +183,37 @@
      </plugin>
    </plugins>
    </pluginManagement>
+
+    <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-checkstyle-plugin</artifactId>
+          <version>2.6</version>
+            <configuration>
+              <configLocation>checkstyle/checkstyle.xml</configLocation>
+              <consoleOutput>false</consoleOutput>
+              <suppressionsLocation>checkstyle/suppressions.xml</suppressionsLocation>
+              <failsOnError>false</failsOnError>
+              <useFile/>
+            </configuration>
+          <dependencies>
+            <dependency>
+              <groupId>org.riftsaw</groupId>
+              <artifactId>build</artifactId>
+              <version>${project.version}</version>
+            </dependency>
+          </dependencies>
+          <executions>
+            <execution>
+              <id>check-style</id>
+              <phase>site</phase>
+              <goals>
+                <goal>checkstyle</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+     </plugins>
   </build>
 
   <reporting>

@@ -29,28 +29,43 @@ import javax.transaction.TransactionManager;
  */
 public class JBossTransactionFactory {
 
+    /**
+     * Primary jndi lookup path.
+     */
     public static final String JNDI_LOOKUP_PATH = "java:/TransactionManager";
+    
+    /**
+     * JBoss specific jndi lookup path.
+     */
     public static final String JNDI_LOOKUP_PATH2 = "java:jboss/TransactionManager";
     
+    /**
+     * The default constructor.
+     */
     public JBossTransactionFactory() {
     }
 
+    /**
+     * This method returns the transaction manager instance.
+     * 
+     * @return The transaction manager
+     */
     public TransactionManager getTransactionManager() {
         InitialContext ctx;
         try {
            ctx = new InitialContext();
         } catch (NamingException except) {
-            throw new RuntimeException( "Can't create InitialContext", except);
+            throw new RuntimeException("Can't create InitialContext", except);
         }
         try {
             return (TransactionManager) ctx.lookup(JNDI_LOOKUP_PATH);
         } catch (NamingException except) {
-        	try {
+            try {
                 return (TransactionManager) ctx.lookup(JNDI_LOOKUP_PATH2);
-        	} catch (NamingException except2) {
-        		throw new RuntimeException( "Error while looking up TransactionManager at " +
-        					JNDI_LOOKUP_PATH + " and "+JNDI_LOOKUP_PATH2, except);
-        	}
+            } catch (NamingException except2) {
+                throw new RuntimeException("Error while looking up TransactionManager at "
+                            +JNDI_LOOKUP_PATH + " and "+JNDI_LOOKUP_PATH2, except);
+            }
         }
     }
 

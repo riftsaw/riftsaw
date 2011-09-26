@@ -21,15 +21,21 @@ package org.riftsaw.engine;
  * This class provides a factory for BPELEngine instances.
  *
  */
-public class BPELEngineFactory {
+public final class BPELEngineFactory {
+    
+    /**
+     * The private constructor.
+     */
+    private BPELEngineFactory() {
+    }
 
-	/**
-	 * This method returns a new uninitialized instance of a BPEL engine.
-	 * The caller is expected to manage the lifecycle of the engine.
-	 * 
-	 * @return The BPEL engine instance
-	 */
-	public static BPELEngine getEngine() {
-		return(new org.riftsaw.engine.internal.BPELEngineImpl());
-	}
+    /**
+     * This method returns a new uninitialized instance of a BPEL engine.
+     * The caller is expected to manage the lifecycle of the engine.
+     * 
+     * @return The BPEL engine instance
+     */
+    public static BPELEngine getEngine() {
+        return (new org.riftsaw.engine.internal.BPELEngineImpl());
+    }
 }

@@ -26,16 +26,16 @@ import org.w3c.dom.Element;
  */
 public interface Service {
 
-	/**
-	 * This method invokes an operation on an external service.
-	 * 
-	 * @param operationName The operation name
-	 * @param mesg The multipart message
-	 * @param headers The optional header values
-	 * @return The response, or null if a one-way request
-	 * @throws Exception Failed to invoke operation
-	 */
-	public Element invoke(String operationName, Element mesg,
-						java.util.Map<String, Object> headers) throws Exception;
-	
+    /**
+     * This method invokes an operation on an external service.
+     * 
+     * @param operationName The operation name
+     * @param mesg The multipart message
+     * @param headers The optional header values
+     * @return The response, or null if a one-way request
+     * @throws Exception Failed to invoke operation
+     */
+    public Element invoke(String operationName, Element mesg,
+                        java.util.Map<String, Object> headers) throws Exception;
+    
 }

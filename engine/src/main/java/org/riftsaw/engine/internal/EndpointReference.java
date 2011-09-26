@@ -23,12 +23,12 @@ package org.riftsaw.engine.internal;
  */
 public interface EndpointReference {
 
-	/**
-	 * This method returns the endpoint reference as an
-	 * XML document.
-	 * 
-	 * @return The XML representation of the endpoint reference.
-	 */
-	public org.w3c.dom.Document toXML();
-	
+    /**
+     * This method returns the endpoint reference as an
+     * XML document.
+     * 
+     * @return The XML representation of the endpoint reference.
+     */
+    public org.w3c.dom.Document toXML();
+    
 }
