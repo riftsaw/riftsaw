@@ -189,52 +189,28 @@ public class BPELEngineTest {
         try {
             deploy("/version1/simple_correlation/deploy.xml");
             
-            synchronized(this) {
-                wait(2000);
-            }
-            
             // Start process instance 1
             invoke(new QName("http://www.jboss.org/bpel/examples/wsdl","HelloGoodbyeService"), "HelloGoodbyePort",
                     "hello", "/version1/simple_correlation/hello_request1.xml", 
                     "/version1/simple_correlation/hello_response1.xml", null);
             
-            synchronized(this) {
-                wait(2000);
-            }
-            
             DeploymentRef ref2=deploy("/version2/simple_correlation/deploy.xml");
             
-            synchronized(this) {
-                wait(2000);
-            }
-
             // Start process instance 2
             invoke(new QName("http://www.jboss.org/bpel/examples/wsdl","HelloGoodbyeService"), "HelloGoodbyePort",
                     "hello", "/version2/simple_correlation/hello_request2.xml", 
                     "/version2/simple_correlation/hello_response2.xml", null);
             
-            synchronized(this) {
-                wait(2000);
-            }
-
             // Complete process instance 2
             invoke(new QName("http://www.jboss.org/bpel/examples/wsdl","HelloGoodbyeService"), "HelloGoodbyePort",
                     "goodbye", "/version2/simple_correlation/goodbye_request2.xml", 
                     "/version2/simple_correlation/goodbye_response2.xml", null);
             
-            synchronized(this) {
-                wait(2000);
-            }
-
             // Complete process instance 1
             invoke(new QName("http://www.jboss.org/bpel/examples/wsdl","HelloGoodbyeService"), "HelloGoodbyePort",
                     "goodbye", "/version2/simple_correlation/goodbye_request1.xml", 
                     "/version2/simple_correlation/goodbye_response1.xml", null);
             
-            synchronized(this) {
-                wait(2000);
-            }
-
             m_engine.undeploy(ref2);
 
         } catch (Exception e) {
