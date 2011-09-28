@@ -17,6 +17,8 @@
  */
 package org.riftsaw.engine.internal;
 
+import java.io.File;
+import java.util.Collections;
 import java.util.jar.JarEntry;
 
 import org.apache.commons.logging.Log;
@@ -396,6 +398,15 @@ public class DeploymentManager {
         }
         
         findBPELProcesses(deploymentRoot, ret);
+        
+        // Sort files by name (and therefore version)
+        Collections.sort(ret, new java.util.Comparator<java.io.File>() {
+
+            public int compare(File o1, File o2) {
+                return(o1.getName().compareTo(o2.getName()));
+            }
+            
+        });
         
         return (ret);
     }

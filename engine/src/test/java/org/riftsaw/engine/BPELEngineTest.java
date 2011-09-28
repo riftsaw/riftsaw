@@ -28,7 +28,6 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.riftsaw.engine.internal.BPELEngineImpl;
-import org.riftsaw.engine.internal.DeploymentManager;
 import org.w3c.dom.Element;
 
 public class BPELEngineTest {
