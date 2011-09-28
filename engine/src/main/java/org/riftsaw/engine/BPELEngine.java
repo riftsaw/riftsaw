@@ -122,4 +122,11 @@ public interface BPELEngine {
      */
     public void close() throws Exception;
     
+    
+    /**
+     * Access the management interface of the underlying engine
+     * @return
+     */
+    public Object getManagementInterface();
+    
 }

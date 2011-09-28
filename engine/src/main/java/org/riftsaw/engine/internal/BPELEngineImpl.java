@@ -32,6 +32,7 @@ import javax.xml.namespace.QName;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ode.bpel.common.evt.DebugBpelEventListener;
+import org.apache.ode.bpel.engine.BpelManagementFacadeImpl;
 import org.apache.ode.bpel.engine.BpelServerImpl;
 import org.apache.ode.bpel.engine.CountLRUDehydrationPolicy;
 import org.apache.ode.bpel.engine.cron.CronScheduler;
@@ -907,4 +908,15 @@ public class BPELEngineImpl implements BPELEngine {
             handleEvent(event);
         }
     }
+    
+    
+	public Object getManagementInterface() {
+		return new BpelManagementFacadeImpl(_bpelServer, _store);
+	}
+	
+	public RiftSawProcessStore getStore() {
+		return _store;
+	}
+    
+    
 }
