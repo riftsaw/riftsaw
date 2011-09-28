@@ -21,6 +21,7 @@ import java.util.jar.JarEntry;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.ode.utils.DOMUtils;
 import org.riftsaw.engine.DeploymentUnit;
 
 /**
@@ -112,7 +113,8 @@ public class DeploymentManager {
                 // Log error and try to copy
                 LOG.error("Unable to rename deployment at '"+deploymentRoot+"' to '"+newDir+"'");
                 
-                copy(deploymentRoot, newDir, processes.get(0).getName());
+                copy(deploymentRoot, newDir, processes.get(0).getName(),
+                                getProcessLocalName(processes.get(0)));
                 
                 ret.add(createDeploymentUnit(newDir));
             }
@@ -127,11 +129,36 @@ public class DeploymentManager {
                     delete(newDir);
                 }
                 
-                copy(deploymentRoot, newDir, bpel.getName());
+                copy(deploymentRoot, newDir, bpel.getName(), 
+                                getProcessLocalName(bpel));
                 
                 ret.add(createDeploymentUnit(newDir));
             }
         }
+        
+        return (ret);
+    }
+    
+    /**
+     * This method returns the local name of the BPEL process contained
+     * in the supplied file.
+     * 
+     * @param bpel The BPEL process file
+     * @return The process's local name
+     * @throws Exception Failed to get local name
+     */
+    protected String getProcessLocalName(java.io.File bpel) throws Exception {
+        String ret=null;
+        java.io.InputStream is=new java.io.FileInputStream(bpel);
+
+        byte[] b=new byte[is.available()];
+        is.read(b);
+        
+        is.close();
+
+        org.w3c.dom.Element proc=DOMUtils.stringToDOM(b);
+        
+        ret = proc.getAttribute("name");
         
         return (ret);
     }
@@ -146,7 +173,7 @@ public class DeploymentManager {
      * @param bpelFileName The BPEL process filename to retain
      * @throws Exception Failed to copy
      */
-    protected void copy(java.io.File fromDir, java.io.File toDir, String bpelFileName)
+    protected void copy(java.io.File fromDir, java.io.File toDir, String bpelFileName, String processName)
                             throws Exception {
         
         // Check that destination folder exists
@@ -165,6 +192,10 @@ public class DeploymentManager {
 
                     byte[] b=new byte[is.available()];
                     is.read(b);
+                    
+                    if (f.getName().equals("deploy.xml")) {
+                        b = filterDeploymentDescriptor(b, processName);
+                    }
 
                     fos.write(b);
 
@@ -173,9 +204,45 @@ public class DeploymentManager {
                     is.close();
                 }
             } else if (f.isDirectory()) {
-                copy(f, new java.io.File(toDir, f.getName()), bpelFileName);
+                copy(f, new java.io.File(toDir, f.getName()), bpelFileName, processName);
             }
         }
+    }
+    
+    protected byte[] filterDeploymentDescriptor(byte[] b, String processName)
+                                    throws Exception {
+        byte[] ret=b;
+        org.w3c.dom.Element deploy=DOMUtils.stringToDOM(b);
+        boolean changed=false;
+        
+        org.w3c.dom.NodeList nl=deploy.getElementsByTagName("process");
+        
+        for (int i=0; i < nl.getLength(); i++) {
+            if (nl.item(i) instanceof org.w3c.dom.Element) {
+                org.w3c.dom.Element proc=(org.w3c.dom.Element)nl.item(i);
+                
+                String name=proc.getAttribute("name");
+                
+                // Check if has prefix and remove
+                int index=name.indexOf(':');
+                
+                if (index != -1) {
+                    name = name.substring(index+1);
+                }
+                
+                if (!name.equals(processName)) {
+                    // Remove element
+                    proc.getParentNode().removeChild(proc);
+                    changed = true;
+                }
+            }
+        }
+        
+        if (changed) {
+            ret = DOMUtils.domToBytes(deploy);
+        }
+        
+        return(ret);
     }
     
     /**

@@ -1,0 +1,10 @@
+<process name="MyProcess"
+    targetNamespace="http://www.jboss.org/bpel/examples" 
+    xmlns="http://docs.oasis-open.org/wsbpel/2.0/process/executable"
+    xmlns:tns="http://www.jboss.org/bpel/examples"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns:intf="http://www.jboss.org/bpel/examples/wsdl"
+    queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath2.0"
+    expressionLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath2.0">
+
+</process>

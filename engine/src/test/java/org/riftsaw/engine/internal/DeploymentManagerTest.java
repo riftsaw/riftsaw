@@ -19,6 +19,7 @@ package org.riftsaw.engine.internal;
 
 import static org.junit.Assert.*;
 
+import org.apache.ode.utils.DOMUtils;
 import org.junit.Test;
 import org.riftsaw.engine.DeploymentUnit;
 import org.riftsaw.engine.internal.DeploymentManager;
@@ -48,6 +49,8 @@ public class DeploymentManagerTest {
             if (!du.getDeploymentDescriptor().exists()) {
                 fail("Deployment descriptor does not exist");
             }
+            
+            validateDescriptor(du.getDeploymentDescriptor(), "bpl:MyProcess");
             
             if (du.getDeploymentDescriptor().getParentFile().listFiles().length != 3) {
                 fail("Deployment should contains 3 files");
@@ -94,6 +97,8 @@ public class DeploymentManagerTest {
             if (!du.getDeploymentDescriptor().exists()) {
                 fail("Deployment descriptor does not exist");
             }
+            
+            validateDescriptor(du.getDeploymentDescriptor(), "bpl:MyProcess");
             
             if (du.getDeploymentDescriptor().getParentFile().listFiles().length != 3) {
                 fail("Deployment should contains 3 files");
@@ -223,6 +228,8 @@ public class DeploymentManagerTest {
             if (!du1.getDeploymentDescriptor().exists()) {
                 fail("Deployment descriptor does not exist");
             }
+                       
+            validateDescriptor(du1.getDeploymentDescriptor(), "bpl:MyOtherProcess");
             
             if (du1.getDeploymentDescriptor().getParentFile().listFiles().length != 4) {
                 fail("Deployment should contains 4 files");
@@ -244,6 +251,8 @@ public class DeploymentManagerTest {
                 fail("Deployment descriptor does not exist");
             }
             
+            validateDescriptor(du2.getDeploymentDescriptor(), "bpl:MyProcess");
+
             if (du2.getDeploymentDescriptor().getParentFile().listFiles().length != 4) {
                 fail("Deployment should contains 4 files");
             }
@@ -295,6 +304,8 @@ public class DeploymentManagerTest {
                 fail("Deployment descriptor does not exist");
             }
             
+            validateDescriptor(du1.getDeploymentDescriptor(), "bpl:MyOtherProcess");
+
             if (du1.getDeploymentDescriptor().getParentFile().listFiles().length != 4) {
                 fail("Deployment should contains 4 files");
             }
@@ -319,6 +330,8 @@ public class DeploymentManagerTest {
                 fail("Deployment descriptor does not exist");
             }
             
+            validateDescriptor(du2.getDeploymentDescriptor(), "bpl:MyProcess");
+
             if (du2.getDeploymentDescriptor().getParentFile().listFiles().length != 4) {
                 fail("Deployment should contains 4 files");
             }
@@ -483,4 +496,31 @@ public class DeploymentManagerTest {
         }
     }
 
+    protected void validateDescriptor(java.io.File descriptor, String process) throws Exception {
+        java.io.InputStream is=new java.io.FileInputStream(descriptor);
+        
+        byte[] b=new byte[is.available()];
+        is.read(b);
+        
+        is.close();
+        
+        org.w3c.dom.Element deploy=DOMUtils.stringToDOM(b);
+        
+        // Check only 1 process child element
+        org.w3c.dom.NodeList nl=deploy.getElementsByTagName("process");
+        
+        if (nl.getLength() != 1) {
+            fail("Only 1 process element expected: "+nl.getLength());
+        }
+        
+        if (!(nl.item(0) instanceof org.w3c.dom.Element)) {
+            fail("Node is not an element");
+        }
+        
+        org.w3c.dom.Element procElem=(org.w3c.dom.Element)nl.item(0);
+        
+        if (!procElem.getAttribute("name").equals(process)) {
+            fail("Process 'name' is not '"+process+"': "+procElem.getAttribute("name"));
+        }
+    }
 }

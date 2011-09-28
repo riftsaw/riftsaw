@@ -1,0 +1,8 @@
+<deploy xmlns="http://www.apache.org/ode/schemas/dd/2007/03"
+	xmlns:bpl="http://www.jboss.org/bpel/examples" 
+	xmlns:intf="http://www.jboss.org/bpel/examples/wsdl">
+
+	<process name="bpl:MyProcess">
+	</process>
+	
+</deploy>
