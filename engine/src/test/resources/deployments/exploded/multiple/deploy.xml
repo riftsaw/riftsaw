@@ -5,6 +5,9 @@
 	<process name="bpl:MyProcess">
 	</process>
 	
+	<process name="bpl:MysteryProcess">
+	</process>
+	
 	<process name="bpl:MyOtherProcess">
 	</process>
 </deploy>

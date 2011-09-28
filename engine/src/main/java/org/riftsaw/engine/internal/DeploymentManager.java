@@ -217,7 +217,7 @@ public class DeploymentManager {
         
         org.w3c.dom.NodeList nl=deploy.getElementsByTagName("process");
         
-        for (int i=0; i < nl.getLength(); i++) {
+        for (int i=nl.getLength()-1; i >= 0; i--) {
             if (nl.item(i) instanceof org.w3c.dom.Element) {
                 org.w3c.dom.Element proc=(org.w3c.dom.Element)nl.item(i);
                 
