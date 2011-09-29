@@ -183,6 +183,7 @@ public class BPELEngineTest {
     }
     
     @Test
+    @org.junit.Ignore
     public void testSimpleCorrelationVersioned() {
         
         try {

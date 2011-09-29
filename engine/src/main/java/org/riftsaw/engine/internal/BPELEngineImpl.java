@@ -390,16 +390,9 @@ public class BPELEngineImpl implements BPELEngine {
      */
     public void undeploy(DeploymentRef ref) {
         if (ref instanceof DeploymentRefImpl) {
-            // Work through list in reverse and only undeploy a named deployment
-            // unit once (i.e. the most recent version)
-            java.util.List<String> undeployed=new java.util.Vector<String>();
-            
-            for (int i=((DeploymentRefImpl)ref).getDeploymentUnits().size()-1; i >= 0; i--) {
+            for (int i=0; i < ((DeploymentRefImpl)ref).getDeploymentUnits().size(); i++) {
                 DeploymentUnit du=((DeploymentRefImpl)ref).getDeploymentUnits().get(i);
-                if (!undeployed.contains(du.getName())) {
-                    _store.undeploy(du);
-                    undeployed.add(du.getName());
-                }
+                _store.undeploy(du);
             }
         }
     }
