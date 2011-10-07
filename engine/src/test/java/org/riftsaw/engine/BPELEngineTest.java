@@ -67,7 +67,9 @@ public class BPELEngineTest {
         java.io.File deployFile=new java.io.File(url.getFile());
         
         // Deploy the process
-        return (m_engine.deploy(deployFile.getParentFile()));
+        java.io.File deployment=deployFile.getParentFile();
+        
+        return (m_engine.deploy(deployment.getName(), deployment));
     }
     
     public void invoke(QName serviceName, String portName, String operation, String reqFile, String respFile,

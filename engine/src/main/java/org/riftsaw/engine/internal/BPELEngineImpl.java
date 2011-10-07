@@ -362,11 +362,22 @@ public class BPELEngineImpl implements BPELEngine {
      * {@inheritDoc}
      */
     public DeploymentRef deploy(File deployment) {
+        return(deploy(deployment.getName(), deployment));
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public DeploymentRef deploy(String name, File deployment) {
         DeploymentRef ret=null;
+        
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Deploying: "+name+" at: "+deployment);
+        }
         
         try {
             java.util.List<DeploymentUnit> dus=
-                        _deploymentManager.getDeploymentUnits(deployment.getName(), deployment);
+                        _deploymentManager.getDeploymentUnits(name, deployment);
             
             for (DeploymentUnit du : dus) {
                 try {
@@ -382,6 +393,10 @@ public class BPELEngineImpl implements BPELEngine {
             LOG.error("Failed to get deployment units from '"+deployment+"'", e);
         }
         
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Deployed: "+deployment+" ref="+ret);
+        }
+        
         return(ret);
     }
 
@@ -389,6 +404,11 @@ public class BPELEngineImpl implements BPELEngine {
      * {@inheritDoc}
      */
     public void undeploy(DeploymentRef ref) {
+
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Undeploying ref: "+ref);
+        }
+        
         if (ref instanceof DeploymentRefImpl) {
             for (int i=0; i < ((DeploymentRefImpl)ref).getDeploymentUnits().size(); i++) {
                 DeploymentUnit du=((DeploymentRefImpl)ref).getDeploymentUnits().get(i);

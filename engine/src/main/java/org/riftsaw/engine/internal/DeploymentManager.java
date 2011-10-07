@@ -51,9 +51,13 @@ public class DeploymentManager {
      */
     public void setTemporaryFolder(String tmp) {
         if (tmp == null) {
-            tmp = System.getProperty("java.io.tmpdir");
+            _tmpFolder = System.getProperty("java.io.tmpdir");
         } else {
             _tmpFolder = tmp;
+        }
+        
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Set temporary folder to: "+_tmpFolder);
         }
     }
     
@@ -96,6 +100,10 @@ public class DeploymentManager {
             exploded = true;
         }
         
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Deploy is exploded? "+exploded);
+        }
+        
         // Scan deployment for BPEL processes
         java.util.List<java.io.File> processes=getBPELProcesses(deploymentRoot);
         
@@ -136,6 +144,11 @@ public class DeploymentManager {
                 
                 ret.add(createDeploymentUnit(newDir));
             }
+        }
+        
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Get deployment units for name '"+deploymentName+
+                            "' and root '"+deploymentRoot+" = "+ret);
         }
         
         return (ret);
@@ -323,6 +336,10 @@ public class DeploymentManager {
                                         throws java.io.IOException {
         java.io.File ret = getTemporaryFolder(deploymentName);
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Exploring deployment name '"+deploymentName+"' at '"+deploymentRoot+"' to: "+ret);
+        }
+        
         // Recursive delete in case already exists
         delete(ret);
 
@@ -407,6 +424,10 @@ public class DeploymentManager {
             }
             
         });
+        
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Found BPEL processes under '"+deploymentRoot+"' are: "+ret);
+        }
         
         return (ret);
     }
