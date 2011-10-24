@@ -1,11 +1,32 @@
 <?xml version="1.0"?>
+<!--
+  ~ JBoss, Home of Professional Open Source.
+  ~ Copyright 2011, Red Hat, Inc., and individual contributors
+  ~ as indicated by the @author tags. See the copyright.txt file in the
+  ~ distribution for a full listing of individual contributors.
+  ~
+  ~ This is free software; you can redistribute it and/or modify it
+  ~ under the terms of the GNU Lesser General Public License as
+  ~ published by the Free Software Foundation; either version 2.1 of
+  ~ the License, or (at your option) any later version.
+  ~
+  ~ This software is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  ~ Lesser General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Lesser General Public
+  ~ License along with this software; if not, write to the Free
+  ~ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+  ~ 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+  -->
 <project xmlns="http://maven.apache.org/POM/4.0.0"
 		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 		xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.riftsaw</groupId>
 	<artifactId>riftsaw-parent</artifactId>
-	<version>3.0.0-SNAPSHOT</version>
+	<version>3.0.0.20111024-M1</version>
 	<packaging>pom</packaging>
 	<name>RiftSaw</name>
 	<url>http://www.jboss.org/riftsaw</url>
@@ -62,14 +83,22 @@
 		</developer>
 	</developers>
 
+   <licenses>
+      <license>
+         <name>GNU Lesser General Public License</name>
+         <url>http://www.gnu.org/copyleft/lesser.html</url>
+         <distribution>repo</distribution>
+      </license>
+   </licenses>
+
 	<modules>
 		<module>build</module>
 		<module>engine</module>
 	</modules>
   
 	<properties>
-		<riftsaw.ode.version>3.0.0-SNAPSHOT</riftsaw.ode.version>
-		<riftsaw.engine.version>3.0.0-SNAPSHOT</riftsaw.engine.version>
+		<riftsaw.ode.version>3.0.0.20111024-M1</riftsaw.ode.version>
+		<riftsaw.engine.version>3.0.0.20111024-M1</riftsaw.engine.version>
 		<bpel.console.version>2.2.5-SNAPSHOT</bpel.console.version>
 		<activity.monitor.model.version>1.0.0.Final</activity.monitor.model.version>
 		<dsp.version>1.0.0.Final</dsp.version>
