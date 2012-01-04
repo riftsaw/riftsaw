@@ -26,7 +26,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.riftsaw</groupId>
 	<artifactId>riftsaw-parent</artifactId>
-	<version>3.0.0.20111024-M1</version>
+	<version>3.0.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>RiftSaw</name>
 	<url>http://www.jboss.org/riftsaw</url>
@@ -97,8 +97,8 @@
 	</modules>
   
 	<properties>
-		<riftsaw.ode.version>3.0.0.20111024-M1</riftsaw.ode.version>
-		<riftsaw.engine.version>3.0.0.20111024-M1</riftsaw.engine.version>
+		<riftsaw.ode.version>3.0.0-SNAPSHOT</riftsaw.ode.version>
+		<riftsaw.engine.version>3.0.0-SNAPSHOT</riftsaw.engine.version>
 		<bpel.console.version>2.2.5-SNAPSHOT</bpel.console.version>
 		<activity.monitor.model.version>1.0.0.Final</activity.monitor.model.version>
 		<dsp.version>1.0.0.Final</dsp.version>
