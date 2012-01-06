@@ -1,0 +1,126 @@
+<process name="EventWorkflow" targetNamespace="http://www.opensoft.pt"
+	xmlns="http://docs.oasis-open.org/wsbpel/2.0/process/executable"
+	xmlns:tns="http://www.opensoft.pt" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns:intf="http://www.opensoft.pt/wsdl" queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath2.0"
+	expressionLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath2.0"
+	xmlns:bpel="http://docs.oasis-open.org/wsbpel/2.0/process/executable">
+
+	<import location="EventWorkflow.wsdl" namespace="http://www.opensoft.pt/wsdl"
+		importType="http://schemas.xmlsoap.org/wsdl/" />
+
+	<partnerLinks>
+		<partnerLink name="eventPartnerLink" partnerLinkType="intf:EventWorkflowPartnerLinkType"
+			myRole="me" />
+	</partnerLinks>
+
+	<correlationSets xmlns:cor="http://example.com/supplyCorrelation">
+		<correlationSet name="Event" properties="intf:EventID" />
+	</correlationSets>
+
+	<variables>
+		<variable name="inputVar" messageType="intf:InputMessage" />
+		<variable name="outputVar" messageType="intf:OutputMessage" />
+		<variable name="State" type="xsd:string" />
+	</variables>
+
+	<sequence name="EventWorkflow">
+
+		<!-- =================================	CREATE EVENT	================================= -->
+		
+		<sequence name="CreateEvent">
+			<receive name="rcvCreate" partnerLink="eventPartnerLink"
+				portType="intf:EventWorkflowPortType" operation="create" variable="inputVar"
+				createInstance="yes">
+				<correlations>
+					<correlation set="Event" initiate="yes" />
+				</correlations>
+			</receive>
+
+			<assign name="assignCreateMsg">
+				<copy>
+					<from>'CR'</from>
+					<to variable="State" />
+				</copy>
+				<copy>
+					<from variable="inputVar" part="ID" />
+					<to variable="outputVar" part="ID" />
+				</copy>
+				<copy>
+					<from variable="State" />
+					<to variable="outputVar" part="State" />
+				</copy>
+			</assign>
+			<reply name="rpyCreate" partnerLink="eventPartnerLink"
+				portType="intf:EventWorkflowPortType" operation="create" variable="outputVar">
+			</reply>
+        </sequence>
+        
+        
+		
+		<!-- =================================	CONFIRM/CANCEL EVENT	================================= -->
+		
+        <bpel:pick name="PickMsgConfirm">
+
+			<bpel:onMessage name="rcvConfirm" 
+					partnerLink="eventPartnerLink" portType="intf:EventWorkflowPortType" 
+					operation="confirm" variable="inputVar">
+                   <bpel:correlations>
+                       <bpel:correlation set="Event" initiate="no"></bpel:correlation>
+                </bpel:correlations>
+
+				<sequence name="ConfirmEvent">
+					<assign name="assignConfirmMsg">
+						<copy>
+							<from>'CN'</from>
+							<to variable="State" />
+						</copy>
+						<copy>
+							<from variable="inputVar" part="ID" />
+							<to variable="outputVar" part="ID" />
+						</copy>
+						<copy>
+							<from variable="State" />
+							<to variable="outputVar" part="State" />
+						</copy>
+					</assign>
+			
+					<reply name="rpyConfirm" 
+						partnerLink="eventPartnerLink" portType="intf:EventWorkflowPortType" 
+						operation="confirm" variable="outputVar"/>					
+					
+				</sequence>
+               </bpel:onMessage>
+
+
+			<bpel:onMessage name="rcvCancel" 
+					partnerLink="eventPartnerLink" portType="intf:EventWorkflowPortType" 
+					operation="cancel" variable="inputVar">
+                   <bpel:correlations>
+                       <bpel:correlation set="Event" initiate="no"></bpel:correlation>
+                </bpel:correlations>
+
+				<sequence name="CancelEvent">
+					<assign name="assignCancelMsg">
+						<copy>
+							<from>'AN'</from>
+							<to variable="State" />
+						</copy>
+						<copy>
+							<from variable="inputVar" part="ID" />
+							<to variable="outputVar" part="ID" />
+						</copy>
+						<copy>
+							<from variable="State" />
+							<to variable="outputVar" part="State" />
+						</copy>
+					</assign>
+			
+					<reply name="rpyCancel" 
+						partnerLink="eventPartnerLink" portType="intf:EventWorkflowPortType" 
+						operation="cancel" variable="outputVar"/>
+				</sequence>
+               </bpel:onMessage>
+        </bpel:pick>
+        
+	</sequence>
+</process>

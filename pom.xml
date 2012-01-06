@@ -94,12 +94,13 @@
 	<modules>
 		<module>build</module>
 		<module>engine</module>
+        <module>console</module>
 	</modules>
   
 	<properties>
 		<riftsaw.ode.version>3.0.0-SNAPSHOT</riftsaw.ode.version>
 		<riftsaw.engine.version>3.0.0-SNAPSHOT</riftsaw.engine.version>
-		<bpel.console.version>2.2.5-SNAPSHOT</bpel.console.version>
+		<bpel.console.version>2.4.0-SNAPSHOT</bpel.console.version>
 		<activity.monitor.model.version>1.0.0.Final</activity.monitor.model.version>
 		<dsp.version>1.0.0.Final</dsp.version>
 		<commons.logging.version>1.1.1</commons.logging.version>
@@ -127,6 +128,7 @@
 		<juddi.version>3.1.0-SNAPSHOT</juddi.version>
 		<scout.version>1.2.3-SNAPSHOT</scout.version>
 		<switchyard.version>0.3.0-SNAPSHOT</switchyard.version>
+		<jettison.version>1.2</jettison.version>
 	</properties>
 
 	<dependencyManagement>

@@ -25,6 +25,8 @@ import java.util.concurrent.Future;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
 import javax.transaction.Transaction;
 import javax.transaction.TransactionManager;
 import javax.xml.namespace.QName;
@@ -32,6 +34,7 @@ import javax.xml.namespace.QName;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ode.bpel.common.evt.DebugBpelEventListener;
+import org.apache.ode.bpel.engine.BpelManagementFacadeImpl;
 import org.apache.ode.bpel.engine.BpelServerImpl;
 import org.apache.ode.bpel.engine.CountLRUDehydrationPolicy;
 import org.apache.ode.bpel.engine.cron.CronScheduler;
@@ -58,6 +61,7 @@ import org.apache.ode.store.RiftSawProcessStore;
 import org.apache.ode.utils.DOMUtils;
 import org.apache.ode.utils.GUID;
 import org.apache.ode.utils.Properties;
+import org.jboss.util.naming.NonSerializableFactory;
 import org.riftsaw.engine.BPELEngine;
 import org.riftsaw.engine.DeploymentRef;
 import org.riftsaw.engine.DeploymentUnit;
@@ -72,6 +76,8 @@ import org.w3c.dom.Element;
 public class BPELEngineImpl implements BPELEngine {
     
     private static final Log LOG=LogFactory.getLog(BPELEngineImpl.class);
+    
+    private String _engineJndiName;    
 
     private BpelServerImpl _bpelServer;
     private RiftSawProcessStore _store;
@@ -100,6 +106,7 @@ public class BPELEngineImpl implements BPELEngine {
         LOG.info("ODE PROPS="+props);
 
         _odeConfig = new OdeConfigProperties(props, "bpel.");
+        _engineJndiName = _odeConfig.getProperty("engine.jndi.name");
         _serviceLocator = locator;
 
         LOG.info("Initializing transaction manager");
@@ -146,7 +153,14 @@ public class BPELEngineImpl implements BPELEngine {
 
         LOG.info("Starting scheduler");
         _scheduler.start();
+        if (jndiNameIsNotNull()) {
+        	bindJNDI();
+        }
     }
+
+	private boolean jndiNameIsNotNull() {
+		return _engineJndiName != null && !(_engineJndiName.equals(""));
+	}
     
     /**
      * This method returns the service locator
@@ -507,6 +521,9 @@ public class BPELEngineImpl implements BPELEngine {
                 if (_txMgr != null) {
                     LOG.debug("shutting down transaction manager.");
                     _txMgr = null;
+                }
+                if (jndiNameIsNotNull()) {
+                	unbindJNDI();
                 }
             }
         } finally {
@@ -907,4 +924,26 @@ public class BPELEngineImpl implements BPELEngine {
             handleEvent(event);
         }
     }
+    
+    
+	public Object getManagementInterface() {
+		return new BpelManagementFacadeImpl(_bpelServer, _store);
+	}
+	
+	public RiftSawProcessStore getStore() {
+		return _store;
+	}
+	
+	private void bindJNDI() throws NamingException {
+		InitialContext rootCtx = new InitialContext();
+		NonSerializableFactory.rebind(rootCtx, _engineJndiName, this);
+	}
+	
+	private void unbindJNDI() throws NamingException {
+		InitialContext rootCtx = new InitialContext();
+		rootCtx.unbind(_engineJndiName);
+		NonSerializableFactory.unbind(_engineJndiName);
+	}
+    
+    
 }
