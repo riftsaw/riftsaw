@@ -49,7 +49,7 @@ public class ProcessMgmtImpl implements ProcessManagement
     try
     {
       InitialContext ctx = new InitialContext();
-      engine = (BPELEngine)ctx.lookup("bpel/Engine");
+      engine = (BPELEngine)ctx.lookup("java:global/BPELEngine");
     }
     catch (NamingException e)
     {
