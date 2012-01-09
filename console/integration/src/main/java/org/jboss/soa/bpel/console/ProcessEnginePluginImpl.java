@@ -52,7 +52,7 @@ public class ProcessEnginePluginImpl implements ProcessEnginePlugin
     try
     {
       InitialContext ctx = new InitialContext();
-      engine = (BPELEngine)ctx.lookup("bpel/Engine");
+      engine = (BPELEngine)ctx.lookup(JNDINamingUtils.BPEL_ENGINE);
     }
     catch (NamingException e)
     {

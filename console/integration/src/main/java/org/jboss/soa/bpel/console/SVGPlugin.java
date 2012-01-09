@@ -75,7 +75,7 @@ public class SVGPlugin implements GraphViewerPlugin, ProcessActivityPlugin {
         try
         {
             InitialContext ctx = new InitialContext();
-            engine = (BPELEngine)ctx.lookup("bpel/Engine");
+            engine = (BPELEngine)ctx.lookup(JNDINamingUtils.BPEL_ENGINE);
         }
         catch (NamingException e)
         {
