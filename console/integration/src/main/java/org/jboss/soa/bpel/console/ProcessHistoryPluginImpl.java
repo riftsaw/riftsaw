@@ -36,7 +36,7 @@ public class ProcessHistoryPluginImpl implements ProcessHistoryPlugin {
 	    try
 	    {
 	      InitialContext ctx = new InitialContext();	      
-	      EntityManagerFactory emf  = (EntityManagerFactory)ctx.lookup("bpel/EntityManagerFactory");
+	      EntityManagerFactory emf  = (EntityManagerFactory)ctx.lookup(JNDINamingUtils.BPEL_EMF);
 	      if (null == emf) {
 	    	  throw new IllegalStateException("EntityManagerFactory is null");
 	      }

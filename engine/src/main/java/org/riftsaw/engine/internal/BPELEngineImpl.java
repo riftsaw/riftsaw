@@ -79,6 +79,7 @@ public class BPELEngineImpl implements BPELEngine {
     private static final Log LOG=LogFactory.getLog(BPELEngineImpl.class);
 
     private static final String _jndiName = "BPELEngine";
+    private static final String _emfJndiName = "BPELEMFactory";
 
     private BpelServerImpl _bpelServer;
     private RiftSawProcessStore _store;
@@ -156,6 +157,12 @@ public class BPELEngineImpl implements BPELEngine {
 
         LOG.info("Register the BPEL Engine into JNDI");
         JndiServiceActivator.registerToJndi(_jndiName, this);
+        // hack to expose the EntityManagerFactory.
+        // See org.apache.ode.dao.jpa.hibernate.BpelDAOConnectionFactoryImpl as well.
+        Object emf = _odeConfig.getProperties().get("ode.emf");
+        if (emf != null) {
+            JndiServiceActivator.registerToJndi(_emfJndiName, emf);
+        }
     }
     
     /**
