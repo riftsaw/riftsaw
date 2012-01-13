@@ -126,6 +126,74 @@ public class BPELEngineTest {
     }
     
     @Test
+    public void testLoanApprovalDocLit1() {
+        
+        m_locator.clear();
+        
+        m_locator.addService(new QName("http://example.com/loan-approval/riskAssessment/","riskAssessor"),
+                            "riskAssessor_Port", new Service() {
+
+            public Element invoke(String operationName, Element mesg,
+                        Map<String, Object> headers) throws Exception {
+                // TODO Auto-generated method stub
+                return DOMUtils.stringToDOM(
+                        "<checkResponse xmlns=\"http://example.com/loan-approval/riskAssessment/\">"+
+                        "         <level>low</level>"+
+                        "      </checkResponse>");
+            }
+        });
+
+        DeploymentRef ref1=null;
+        try {
+            ref1=deploy("/loan_approval_doclit/deploy.xml");
+            invoke(new QName("http://example.com/loan-approval/loanService/","loanService"), "loanService_Port",
+                    "request", "/loan_approval_doclit/loanreq1.xml", "/loan_approval_doclit/loanresp1.xml", null);
+        } catch (Exception e) {
+            fail("Failed: "+e);
+        } finally {
+            try {
+                m_engine.undeploy(ref1);
+            } catch (Exception e) {
+                fail("Failed to undeploy: "+e);
+            }
+        }
+    }
+    
+    @Test
+    public void testLoanApprovalDocLit2() {
+        
+        m_locator.clear();
+        
+        m_locator.addService(new QName("http://example.com/loan-approval/riskAssessment/","riskAssessor"),
+                            "riskAssessor_Port", new Service() {
+
+            public Element invoke(String operationName, Element mesg,
+                        Map<String, Object> headers) throws Exception {
+                Fault f=new Fault(new QName("http://example.com/loan-approval/riskAssessment/","loanProcessFault"),
+                            DOMUtils.stringToDOM(
+                        "<message><errorCode><ns1:integer xmlns:ns1=\"http://example.com/loan-approval/xsd/error-messages/\">21000</ns1:integer></errorCode></message>"));
+                throw f;
+            }
+        });
+
+        DeploymentRef ref1=null;
+        try {
+            ref1=deploy("/loan_approval_doclit/deploy.xml");
+            invoke(new QName("http://example.com/loan-approval/loanService/","loanService"), "loanService_Port",
+                    "request", "/loan_approval_doclit/loanreq2.xml", "/loan_approval_doclit/loanresp2.xml",
+                    new QName("http://example.com/loan-approval/loanService/","unableToHandleRequest"));
+        } catch (Exception e) {
+            fail("Failed: "+e);
+        } finally {
+            try {
+                m_engine.undeploy(ref1);
+            } catch (Exception e) {
+                fail("Failed to undeploy: "+e);
+            }
+        }
+    }
+    
+    @Test
     public void testHelloWorldRedeploy() {
         
         try {
@@ -430,7 +498,7 @@ public class BPELEngineTest {
             }
         }
     }
-    
+
     public static class TestServiceLocator implements ServiceLocator {
 
         private java.util.Map<String,Service> m_services=new java.util.HashMap<String, Service>();

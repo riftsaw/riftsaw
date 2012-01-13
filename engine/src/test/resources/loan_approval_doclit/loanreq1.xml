@@ -1,0 +1,10 @@
+<message>
+  <parameter>
+	<request xmlns="http://example.com/loan-approval/loanService/">
+	   <firstName>Fred</firstName>
+	   <name>Bloggs</name>
+	   <amount>1000</amount>
+	</request>
+  </parameter>
+</message>
+
