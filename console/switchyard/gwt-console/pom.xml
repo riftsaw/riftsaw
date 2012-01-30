@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <parent>
+	    <groupId>org.riftsaw</groupId>
+		<artifactId>riftsaw-parent</artifactId>
+		<version>3.0.0-SNAPSHOT</version>
+	</parent>
+
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>switchyard-bpel-console</artifactId>
+    <packaging>pom</packaging>
+    <name>RiftSaw: SwitchYard BPEL Console</name>
+    <description>SwitchYard BPEL Console</description>
+
+    <properties>
+        <staging.dir>${project.build.directory}/staging</staging.dir>
+        <output.dir>/</output.dir>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.jboss.bpm</groupId>
+            <artifactId>gwt-console</artifactId>
+			<version>${bpel.console.version}</version>
+            <classifier>riftsaw</classifier>
+            <type>war</type>
+        </dependency>  
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>unpack-war</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>org.jboss.bpm</groupId>
+                                    <artifactId>gwt-console</artifactId>
+									<classifier>riftsaw</classifier>
+                                    <type>war</type>
+                                    <version>${version.riftsaw.console}</version>
+                                </artifactItem>
+                            </artifactItems>
+                            <outputDirectory>${staging.dir}</outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <artifactId>maven-resources-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>copy-xml</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <resources>
+                                <resource>
+                                    <directory>${basedir}/src/main/resources</directory>
+                                    <includes>
+                                        <include>jboss-deployment-structure.xml</include>
+                                    </includes>
+                                </resource>
+                            </resources>
+                            <outputDirectory>${staging.dir}/WEB-INF</outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>assemble-war</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <appendAssemblyId>false</appendAssemblyId>
+                            <descriptors>
+                                <descriptor>${basedir}/assembly.xml</descriptor>
+                            </descriptors>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>

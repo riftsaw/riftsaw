@@ -16,9 +16,11 @@
 	</parent>
 
 	<modules>
-		<module>integration</module>
-		<module>bpel2svg</module>
-        <module>bpaf</module>
+	   <module>integration</module>
+	   <module>bpel2svg</module>
+           <module>bpaf</module>
+           <module>switchyard/gwt-console-server</module>
+           <module>switchyard/gwt-console</module>
 	</modules>
 
 </project>

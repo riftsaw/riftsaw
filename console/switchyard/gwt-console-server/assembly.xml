@@ -1,0 +1,38 @@
+<assembly xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.0"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.0 http://maven.apache.org/xsd/assembly-1.1.0.xsd">
+    <id>riftsaw-gwt-console-server</id>
+    <includeBaseDirectory>false</includeBaseDirectory>
+    <formats>
+        <format>war</format>
+    </formats>
+
+    <fileSets>
+        <fileSet>
+            <directory>${staging.dir}</directory>
+            <excludes>
+                <exclude>WEB-INF/lib/gwt-console-rpc-*.jar</exclude>
+                <exclude>WEB-INF/lib/gwt-console-server-integration-*.jar</exclude>
+                <exclude>WEB-INF/lib/jaxrs-api-*.jar</exclude>
+                <exclude>WEB-INF/lib/resteasy-jaxb-provider-*.jar</exclude>
+                <exclude>WEB-INF/lib/resteasy-jaxrs-*.jar</exclude>
+                <exclude>WEB-INF/lib/resteasy-multipart-provider-*.jar</exclude>
+            </excludes>
+            <fileMode>644</fileMode>
+            <directoryMode>755</directoryMode>
+            <outputDirectory>${output.dir}</outputDirectory>
+        </fileSet>
+    </fileSets>
+
+    <dependencySets>
+        <dependencySet>
+            <useTransitiveDependencies>false</useTransitiveDependencies>
+            <includes>
+                <include>org.riftsaw.console:riftsaw-console-integration</include>
+            </includes>
+            <outputDirectory>WEB-INF/lib</outputDirectory>
+            <outputFileNameMapping>${artifact.artifactId}-${project.version}.${artifact.extension}</outputFileNameMapping>
+        </dependencySet>
+    </dependencySets>
+
+</assembly>
