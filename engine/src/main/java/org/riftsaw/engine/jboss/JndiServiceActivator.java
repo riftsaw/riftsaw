@@ -25,6 +25,7 @@ import org.jboss.as.naming.NamingStore;
 import org.jboss.as.naming.ServiceBasedNamingStore;
 import org.jboss.as.naming.deployment.ContextNames;
 import org.jboss.as.naming.service.BinderService;
+import org.jboss.as.server.CurrentServiceContainer;
 import org.jboss.msc.inject.Injector;
 import org.jboss.msc.service.*;
 
@@ -83,4 +84,13 @@ public class JndiServiceActivator {
             builder.install();
         }
     }
+
+    public static void unregisterFromJndi(String name) {
+        final ServiceName bindingServiceName = ContextNames.GLOBAL_CONTEXT_SERVICE_NAME.append(name);
+        ServiceContainer sc =CurrentServiceContainer.getServiceContainer();
+        if (sc != null) {
+            sc.getRequiredService(bindingServiceName).setMode(ServiceController.Mode.REMOVE);
+        }
+    }
+
 }

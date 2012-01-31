@@ -155,7 +155,12 @@ public class BPELEngineImpl implements BPELEngine {
         LOG.info("Starting scheduler");
         _scheduler.start();
 
-        LOG.info("Register the BPEL Engine into JNDI");
+
+        RegisterServicesIntoJNDI();
+    }
+
+    private void RegisterServicesIntoJNDI() {
+        LOG.info("Register BPEL engine, EntityManagerFactory into JNDI.");
         JndiServiceActivator.registerToJndi(_jndiName, this);
         // hack to expose the EntityManagerFactory.
         // See org.apache.ode.dao.jpa.hibernate.BpelDAOConnectionFactoryImpl as well.
@@ -164,7 +169,13 @@ public class BPELEngineImpl implements BPELEngine {
             JndiServiceActivator.registerToJndi(_emfJndiName, emf);
         }
     }
-    
+
+    private void unregisterServicesFromJNDI() {
+        LOG.info("Unbind the services from JNDI.");
+        JndiServiceActivator.unregisterFromJndi(_jndiName);
+        JndiServiceActivator.unregisterFromJndi(_emfJndiName);
+    }
+
     /**
      * This method returns the service locator
      * associated with the BPEL engine.
@@ -525,6 +536,8 @@ public class BPELEngineImpl implements BPELEngine {
                     LOG.debug("shutting down transaction manager.");
                     _txMgr = null;
                 }
+
+                unregisterServicesFromJNDI();
             }
         } finally {
             Thread.currentThread().setContextClassLoader(old);
