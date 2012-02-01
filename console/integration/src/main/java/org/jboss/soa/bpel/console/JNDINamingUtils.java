@@ -23,7 +23,7 @@ package org.jboss.soa.bpel.console;
  */
 public class JNDINamingUtils {
 
-    public static final String BPEL_ENGINE = "java:global/BPELEngine";
+    public static final String BPEL_ENGINE = "java:jboss/BPELEngine";
 
-    public static final String BPEL_EMF = "java:global/BPELEMFactory";
+    public static final String BPEL_EMF = "java:jboss/BPELEMFactory";
 }
