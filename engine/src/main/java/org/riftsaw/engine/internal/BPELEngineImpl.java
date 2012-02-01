@@ -61,13 +61,12 @@ import org.apache.ode.store.RiftSawProcessStore;
 import org.apache.ode.utils.DOMUtils;
 import org.apache.ode.utils.GUID;
 import org.apache.ode.utils.Properties;
-import org.jboss.util.naming.NonSerializableFactory;
 import org.riftsaw.engine.BPELEngine;
 import org.riftsaw.engine.DeploymentRef;
 import org.riftsaw.engine.DeploymentUnit;
 import org.riftsaw.engine.Fault;
 import org.riftsaw.engine.ServiceLocator;
-import org.riftsaw.engine.jboss.JndiServiceActivator;
+import org.riftsaw.engine.jboss.JndiRegistry;
 import org.w3c.dom.Element;
 
 /**
@@ -78,8 +77,8 @@ public class BPELEngineImpl implements BPELEngine {
     
     private static final Log LOG=LogFactory.getLog(BPELEngineImpl.class);
 
-    private static final String _jndiName = "BPELEngine";
-    private static final String _emfJndiName = "BPELEMFactory";
+    private static final String _jndiName = "java:jboss/BPELEngine";
+    private static final String _emfJndiName = "java:jboss/BPELEMFactory";
 
     private BpelServerImpl _bpelServer;
     private RiftSawProcessStore _store;
@@ -155,25 +154,24 @@ public class BPELEngineImpl implements BPELEngine {
         LOG.info("Starting scheduler");
         _scheduler.start();
 
-
         RegisterServicesIntoJNDI();
     }
 
     private void RegisterServicesIntoJNDI() {
         LOG.info("Register BPEL engine, EntityManagerFactory into JNDI.");
-        JndiServiceActivator.registerToJndi(_jndiName, this);
+        JndiRegistry.bindToJndi(_jndiName, this);
         // hack to expose the EntityManagerFactory.
         // See org.apache.ode.dao.jpa.hibernate.BpelDAOConnectionFactoryImpl as well.
         Object emf = _odeConfig.getProperties().get("ode.emf");
         if (emf != null) {
-            JndiServiceActivator.registerToJndi(_emfJndiName, emf);
+           JndiRegistry.bindToJndi(_emfJndiName, emf);
         }
     }
 
     private void unregisterServicesFromJNDI() {
         LOG.info("Unbind the services from JNDI.");
-        JndiServiceActivator.unregisterFromJndi(_jndiName);
-        JndiServiceActivator.unregisterFromJndi(_emfJndiName);
+        JndiRegistry.unbindFromJndi(_jndiName);
+        JndiRegistry.unbindFromJndi(_emfJndiName);
     }
 
     /**
