@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="riftsaw.db.install">
+
+  <!-- DEFAULT PROPERTY VALUES -->
+  <property name="database" value="postgres" />
+
+  <property file="jdbc/${database}.properties" />
+
+  <condition property="show.table.sql" value="show tables;">
+        <equals arg1="${database}" arg2="mysql" />
+  </condition>
+
+  <condition property="show.table.sql" value="select table_name from information_schema.tables where table_schema='public' and table_type='BASE TABLE';">
+        <equals arg1="${database}" arg2="postgres" />
+  </condition>
+
+  <condition property="show.table.sql" value="select table_name from tabs;">
+        <equals arg1="${database}" arg2="oracle" />
+  </condition>
+
+  <condition property="show.table.sql" value="select name from riftsaw..sysobjects where xtype = 'U';">
+        <equals arg1="${database}" arg2="sqlserver" />
+  </condition>
+
+  <condition property="show.table.sql" value="select tabname from SYSCAT.TABLES WHERE TABSCHEMA='RIFTSAW' ">
+        <equals arg1="${database}" arg2="db2" />
+  </condition>
+
+  <!-- ### LOG PROPERTIES ################################################# -->
+  <target name="log.properties">
+    <echo message="database....... ${database}" />
+    <echo message="jdbc driver.... ${driver}" />
+    <echo message="connection url....... ${connection.url}" />
+    <echo message="username.. ${username}" />  	
+  </target>
+
+  <!-- ### CREATE RiftSaw SCHEMA ############################################# -->
+	<target name="create.riftsaw.schema"
+		      depends="log.properties"
+		      description="creates the riftsaw tables in the database">
+    <sql driver="${driver}"
+         url="${connection.url}"
+         userid="${username}"
+         password="${password}"
+         onerror="continue"
+    	   src="bpel-sql/${database}.sql">
+      <classpath>
+        <fileset dir="drivers">
+        	<include name="*.jar"/>
+        </fileset>
+      </classpath>
+    </sql>
+	</target>
+
+  <!-- ### DROP RiftSaw SCHEMA ############################################### -->
+  <target name="drop.riftsaw.schema"
+  	      depends="log.properties"
+  	      description="drops the riftsaw tables from the database">
+    <sql driver="${driver}"
+         url="${connection.url}"
+         userid="${username}"
+         password="${password}"
+         onerror="continue"
+    	   src="drop-sql/${database}.drop.sql">
+      <classpath>
+        <fileset dir="drivers">
+          <include name="*.jar"/>
+        </fileset>
+      </classpath>
+    </sql>
+  </target>
+
+
+  <!-- ### Show tables in the database ############################### -->
+  <target name="db.show.tables"
+		      depends="log.properties"
+		      description="show tables in db">
+    <sql driver="${driver}"
+         url="${connection.url}"
+         userid="${username}"
+         password="${password}"
+         onerror="continue"
+         print="true">
+      ${show.table.sql}
+      <classpath>
+        <fileset dir="drivers">
+        	<include name="*.jar"/>
+        </fileset>
+      </classpath>
+    </sql>
+	</target>
+
+</project>

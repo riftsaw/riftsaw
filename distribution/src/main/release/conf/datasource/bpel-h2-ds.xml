@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<datasources>
+    <local-tx-datasource>
+        <jndi-name>BPELDB</jndi-name>
+        <connection-url>@connection.url@</connection-url>
+        <driver-class>@driver@</driver-class>
+        <user-name>@username@</user-name>
+        <password>@password@</password>
+        <transaction-isolation>TRANSACTION_READ_COMMITTED</transaction-isolation>
+        <min-pool-size>5</min-pool-size>
+        <max-pool-size>20</max-pool-size>
+        <idle-timeout-minutes>0</idle-timeout-minutes>
+        <prepared-statement-cache-size>32</prepared-statement-cache-size>
+        <depends>jboss:service=h2,database=BPELDB</depends>
+    </local-tx-datasource>
+    <mbean code="org.jboss.soa.bpel.runtime.db.H2Database"
+           name="jboss:service=h2,database=BPELDB">
+        <attribute name="Database">BPELDB</attribute>
+        <attribute name="DataDir">${jboss.server.data.dir}</attribute>
+        <attribute name="Flags">;MVCC=true;LOCK_MODE=3;LOG=1;DB_CLOSE_ON_EXIT=FALSE</attribute>
+    </mbean>
+
+</datasources>
