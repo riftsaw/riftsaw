@@ -27,7 +27,7 @@
     </formats>
 
     <fileSets>
-        <!--Copy files like License etc -->
+        <!--Copy README.txt file -->
         <fileSet>
             <directory>src/main/release</directory>
             <outputDirectory>/</outputDirectory>
@@ -37,14 +37,14 @@
         </fileSet>
 
         <fileSet>
-            <directory>src/main/release/conf</directory>
-            <outputDirectory>/conf</outputDirectory>
+            <directory>src/main/release/</directory>
+            <outputDirectory>/</outputDirectory>
         </fileSet>
     </fileSets>
 
     <dependencySets>
         <dependencySet>
-            <outputDirectory>/conf/drivers</outputDirectory>
+            <outputDirectory>/drivers</outputDirectory>
             <includes>
                 <include>net.sourceforge.jtds:jtds</include>
                 <include>postgresql:postgresql</include>

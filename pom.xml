@@ -92,10 +92,10 @@
    </licenses>
 
 	<modules>
-		<module>build</module>
-		<module>engine</module>
-        <module>console</module>
-        <module>distribution</module>
+	   <module>build</module>
+	   <module>engine</module>
+           <module>console</module>
+           <module>db</module>
 	</modules>
   
 	<properties>
