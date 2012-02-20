@@ -71,12 +71,3 @@ Go to the $JBoss-AS7/standalone/configuration/standalone.xml, find the BPELCompo
   </module>
 
 Then you should be ready to start the SwitchYard, the BPEL component will use the database that you created.
-
-
-
-
-
-
-
-
-
