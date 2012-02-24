@@ -53,6 +53,7 @@ public class JndiRegistry {
      public static void unbindFromJndi(String name){
          ServiceTarget serviceTarget = CurrentServiceContainer.getServiceContainer();
          if (serviceTarget != null) {
+             WritableServiceBasedNamingStore.pushOwner(serviceTarget);
              try {
                  InitialContext context = new InitialContext();
                  context.unbind(name);

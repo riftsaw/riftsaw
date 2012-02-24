@@ -23,7 +23,7 @@
         <dependency>
             <groupId>org.jboss.bpm</groupId>
             <artifactId>gwt-console-server</artifactId>
-			<version>${bpel.console.version}</version>
+            <version>${bpel.console.version}</version>
             <classifier>riftsaw</classifier>
             <type>war</type>
         </dependency>
@@ -50,9 +50,9 @@
                                 <artifactItem>
                                     <groupId>org.jboss.bpm</groupId>
                                     <artifactId>gwt-console-server</artifactId>
-									<classifier>riftsaw</classifier>
+				    <classifier>riftsaw</classifier>
                                     <type>war</type>
-                                    <version>${version.riftsaw.console}</version>
+                                    <version>${bpel.console.version}</version>
                                 </artifactItem>
                             </artifactItems>
                             <outputDirectory>${staging.dir}</outputDirectory>
