@@ -33,6 +33,8 @@ import org.riftsaw.engine.DeploymentUnit;
  */
 public class DeploymentManager {
     
+    private static final int DEFAULT_VERSION = 0;
+
     private static final Log LOG=LogFactory.getLog(DeploymentManager.class);
     
     private String _tmpFolder=System.getProperty("java.io.tmpdir");
@@ -301,8 +303,28 @@ public class DeploymentManager {
      * @param process The BPEL Process file
      * @return The process's deployment folder name
      */
-    protected String getDeploymentUnitName(String deploymentName, java.io.File process) {
+    protected static String getDeploymentUnitName(String deploymentName, java.io.File process) {
         String processName=process.getName().substring(0, process.getName().length()-5);
+        
+        // Check if version has been specified, and if not, then append default version
+        boolean f_addDefaultVersion=false;
+        int index=processName.lastIndexOf('-');
+        
+        if (index == -1) {
+            f_addDefaultVersion = true;
+        } else {
+            String ver=processName.substring(index+1);
+            try {
+                Integer.parseInt(ver);
+            } catch(Exception e) {
+                // Not a valid number, so set default version
+                f_addDefaultVersion = true;
+            }
+        }
+        
+        if (f_addDefaultVersion) {
+            processName += "-"+DEFAULT_VERSION;
+        }
         
         return (deploymentName+"_"+processName);
     }

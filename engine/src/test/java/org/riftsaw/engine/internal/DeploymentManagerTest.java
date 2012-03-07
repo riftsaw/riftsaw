@@ -27,6 +27,39 @@ import org.riftsaw.engine.internal.DeploymentManager;
 public class DeploymentManagerTest {
 
     @Test
+    public void testGetDeploymentName_NoVersionSimpleNames() {
+        java.io.File f=new java.io.File("MyProcess.bpel");
+        
+        String deploymentName=DeploymentManager.getDeploymentUnitName("MyDeployment", f);
+        
+        if (!deploymentName.equals("MyDeployment_MyProcess-0")) {
+            fail("Incorrect deployment name");
+        }
+    }
+    
+    @Test
+    public void testGetDeploymentName_NoVersionHyphenNames() {
+        java.io.File f=new java.io.File("MyProcess-With-Hyphens.bpel");
+        
+        String deploymentName=DeploymentManager.getDeploymentUnitName("MyDeployment-With-Hyphens", f);
+        
+        if (!deploymentName.equals("MyDeployment-With-Hyphens_MyProcess-With-Hyphens-0")) {
+            fail("Incorrect deployment name");
+        }
+    }
+    
+    @Test
+    public void testGetDeploymentName_WithVersionHyphenNames() {
+        java.io.File f=new java.io.File("MyProcess-With-Hyphens-123.bpel");
+        
+        String deploymentName=DeploymentManager.getDeploymentUnitName("MyDeployment-With-Hyphens-5", f);
+        
+        if (!deploymentName.equals("MyDeployment-With-Hyphens-5_MyProcess-With-Hyphens-123")) {
+            fail("Incorrect deployment name");
+        }
+    }
+    
+    @Test
     public void testGetDeploymentUnitsExplodedSingle() {
         
         java.net.URL root=ClassLoader.getSystemResource("deployments/exploded/single/deploy.xml");
