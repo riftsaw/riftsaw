@@ -2,18 +2,19 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.riftsaw.console</groupId>
+    <artifactId>switchyard-bpel-console-server</artifactId>
+    <packaging>pom</packaging>
+    <version>3.0.0.20120308-M2</version>
+    <name>RiftSaw: SwitchYard BPEL Console Server</name>
+    <description>SwitchYard BPEL Console Server</description>
+
     <parent>
 	<groupId>org.riftsaw</groupId>
 	<artifactId>console</artifactId>
-	<version>3.0.0-SNAPSHOT</version>
+	<version>3.0.0.20120308-M2</version>
     </parent>
-
-    <modelVersion>4.0.0</modelVersion>
-    <groupId>org.riftsaw.console</groupId>
-    <artifactId>switchyard-bpel-console</artifactId>
-    <packaging>pom</packaging>
-    <name>RiftSaw: SwitchYard BPEL Console</name>
-    <description>SwitchYard BPEL Console</description>
 
     <properties>
         <staging.dir>${project.build.directory}/staging</staging.dir>
@@ -23,10 +24,15 @@
     <dependencies>
         <dependency>
             <groupId>org.jboss.bpm</groupId>
-            <artifactId>gwt-console</artifactId>
-	    <version>${bpel.console.version}</version>
+            <artifactId>gwt-console-server</artifactId>
+            <version>${bpel.console.version}</version>
             <classifier>riftsaw</classifier>
             <type>war</type>
+        </dependency>
+        <dependency>
+            <groupId>org.riftsaw.console</groupId>
+            <artifactId>riftsaw-console-integration</artifactId>
+            <version>${riftsaw.engine.version}</version>
         </dependency>  
     </dependencies>
 
@@ -45,8 +51,8 @@
                             <artifactItems>
                                 <artifactItem>
                                     <groupId>org.jboss.bpm</groupId>
-                                    <artifactId>gwt-console</artifactId>
-			            <classifier>riftsaw</classifier>
+                                    <artifactId>gwt-console-server</artifactId>
+				    <classifier>riftsaw</classifier>
                                     <type>war</type>
                                     <version>${bpel.console.version}</version>
                                 </artifactItem>
@@ -75,6 +81,25 @@
                                 </resource>
                             </resources>
                             <outputDirectory>${staging.dir}/WEB-INF</outputDirectory>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>copy-properties</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <resources>
+                                <resource>
+                                    <directory>${basedir}/src/main/resources</directory>
+                                    <includes>
+                                        <include>users.properties</include>
+                                        <include>roles.properties</include>
+                                    </includes>
+                                </resource>
+                            </resources>
+                            <outputDirectory>${staging.dir}/WEB-INF/classes</outputDirectory>
                         </configuration>
                     </execution>
                 </executions>
