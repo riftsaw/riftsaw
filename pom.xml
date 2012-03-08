@@ -101,8 +101,8 @@
 	<properties>
 		<riftsaw.ode.version>3.0.0-SNAPSHOT</riftsaw.ode.version>
 		<riftsaw.engine.version>3.0.0-SNAPSHOT</riftsaw.engine.version>
-		<bpel.console.version>2.4.0-SNAPSHOT</bpel.console.version>
-		<activity.monitor.model.version>1.2.0-SNAPSHOT</activity.monitor.model.version>
+		<bpel.console.version>2.4.0.Final</bpel.console.version>
+		<activity.monitor.model.version>1.2.0.Final</activity.monitor.model.version>
 		<dsp.version>1.0.0.Final</dsp.version>
 		<commons.logging.version>1.1.1</commons.logging.version>
 		<commons.lang.version>2.4</commons.lang.version>
