@@ -5,13 +5,13 @@
     <groupId>org.riftsaw.console</groupId>
     <artifactId>riftsaw-bpaf</artifactId>
     <packaging>jar</packaging>
-    <version>3.0.0.20120308-M2</version>
+    <version>3.0.0-SNAPSHOT</version>
     <name>RiftSaw::Console::BPAF</name>
 
     <parent>
         <groupId>org.riftsaw</groupId>
         <artifactId>console</artifactId>
-        <version>3.0.0.20120308-M2</version>
+        <version>3.0.0-SNAPSHOT</version>
     </parent>
 
     <!-- Properties -->
