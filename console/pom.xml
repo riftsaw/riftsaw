@@ -6,13 +6,13 @@
 	<groupId>org.riftsaw</groupId>
 	<artifactId>console</artifactId>
 	<packaging>pom</packaging>
-	<version>3.0.0-SNAPSHOT</version>
+	<version>3.0.0.20120316-M2</version>
 	<name>RiftSaw::Console</name>
 
     <parent>
 	    <groupId>org.riftsaw</groupId>
 		<artifactId>riftsaw-parent</artifactId>
-		<version>3.0.0-SNAPSHOT</version>
+		<version>3.0.0.20120316-M2</version>
 	</parent>
 
 	<modules>
