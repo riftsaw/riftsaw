@@ -17,6 +17,10 @@
  */
 package org.riftsaw.engine.internal;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
 import javax.xml.namespace.QName;
 
 import org.apache.commons.logging.Log;
@@ -32,6 +36,7 @@ import org.riftsaw.engine.Fault;
 import org.riftsaw.engine.Service;
 import org.riftsaw.engine.ServiceLocator;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 
 /**
  * Implementation of the ODE {@link org.apache.ode.bpel.iapi.MessageExchangeContext}
@@ -75,9 +80,22 @@ public class MessageExchangeContextImpl implements MessageExchangeContext {
             }
             
             try {
+                Map<String, Node> headerParts = partnerRoleMessageExchange.getRequest().getHeaderParts();
+                Map<String, Object> transferedHeaderParts = new HashMap<String, Object>();
+                Set<String> keys = headerParts.keySet();
+                for (String key : keys) {
+                    Element e = partnerRoleMessageExchange.getRequest().getHeaderPart(key);
+                    String k;
+                    if (e.getNamespaceURI() == null || e.getNamespaceURI().isEmpty()) {
+                        k = e.getLocalName();
+                    } else {
+                        k = "{"+e.getNamespaceURI()+"}" + e.getLocalName();
+                    }
+                    transferedHeaderParts.put(k, e);
+                }
                 Element resp=service.invoke(partnerRoleMessageExchange.getOperationName(),
                             partnerRoleMessageExchange.getRequest().getMessage(),
-                                    null);
+                                    transferedHeaderParts); 
                 
                 if (partnerRoleMessageExchange.getMessageExchangePattern()
                         == MessageExchange.MessageExchangePattern.REQUEST_RESPONSE) {
