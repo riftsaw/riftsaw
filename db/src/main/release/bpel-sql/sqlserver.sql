@@ -77,7 +77,7 @@ create table BPEL_FAULT (
     FAULT_ID numeric(19,0) identity not null,
     ACTIVITY_ID int null,
     DATA text null,
-    MESSAGE varchar(4000) null,
+    MESSAGE varchar(max) null,
     LINE_NUMBER int null,
     NAME varchar(255) null,
     primary key (FAULT_ID)
