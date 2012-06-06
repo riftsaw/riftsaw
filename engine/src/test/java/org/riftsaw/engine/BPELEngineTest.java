@@ -223,6 +223,18 @@ public class BPELEngineTest {
     }
     
     @Test
+    public void testHelloWorldInvalid() {
+        
+        try {
+            deploy("/hello_world_invalid/deploy.xml");
+            fail("Should have thrown an exception");
+
+        } catch (Exception e) {
+            // Ignore
+        }
+    }
+    
+    @Test
     public void testHelloWorldVersioned() {
         
         try {
@@ -233,6 +245,18 @@ public class BPELEngineTest {
 
         } catch (Exception e) {
             fail("Failed: "+e);
+        }
+    }
+    
+    @Test
+    public void testHelloWorldVersionedInvalid() {
+        
+        try {
+            deploy("/hello_world_versioned_invalid/deploy.xml");
+            fail("Should have thrown an exception");
+
+        } catch (Exception e) {
+            // Ignore
         }
     }
     

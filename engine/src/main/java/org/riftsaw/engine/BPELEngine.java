@@ -49,9 +49,10 @@ public interface BPELEngine {
      * This method deploys a BPEL process definition.
      * 
      * @param bdu The BPEL process definition
+     * @throws Failed to deploy
      * @deprecated Use deploy(String,java.io.File) instead
      */
-    public void deploy(DeploymentUnit bdu);
+    public void deploy(DeploymentUnit bdu) throws Exception;
 
     /**
      * This method deploys a BPEL process definition. The
@@ -63,9 +64,10 @@ public interface BPELEngine {
      * @param deployment The BPEL process archive or folder
      * @return The reference for the deployment, to be used
      *              during undeployment
+     * @throws Failed to deploy
      * @deprecated Use deploy(String,java.io.File) instead
      */
-    public DeploymentRef deploy(java.io.File deployment);
+    public DeploymentRef deploy(java.io.File deployment) throws Exception;
 
     /**
      * This method deploys a BPEL process definition. The
@@ -78,8 +80,9 @@ public interface BPELEngine {
      * @param deployment The BPEL process archive or folder
      * @return The reference for the deployment, to be used
      *              during undeployment
+     * @throws Failed to deploy
      */
-    public DeploymentRef deploy(String name, java.io.File deployment);
+    public DeploymentRef deploy(String name, java.io.File deployment) throws Exception;
 
     /**
      * This method invokes a BPEL process instance. If a process
@@ -103,17 +106,19 @@ public interface BPELEngine {
      * This method undeploys a BPEL process definition.
      * 
      * @param bdu The BPEL process definition
+     * @throws Failed to undeploy
      * @deprecated
      */
-    public void undeploy(DeploymentUnit bdu);
+    public void undeploy(DeploymentUnit bdu) throws Exception;
     
     /**
      * This method undeploys the BPEL process definitions associated
      * with the supplied deployment reference.
      * 
      * @param ref The deployment reference
+     * @throws Failed to undeploy
      */
-    public void undeploy(DeploymentRef ref);
+    public void undeploy(DeploymentRef ref) throws Exception;
     
     /**
      * This method closes the BPEL engine.

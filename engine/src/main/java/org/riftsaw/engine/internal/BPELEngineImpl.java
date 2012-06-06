@@ -373,51 +373,68 @@ public class BPELEngineImpl implements BPELEngine {
     /**
      * {@inheritDoc}
      */
-    public void deploy(DeploymentUnit bdu) {
+    public void deploy(DeploymentUnit bdu) throws Exception {
         _store.deploy(bdu);
     }
 
     /**
      * {@inheritDoc}
      */
-    public void undeploy(DeploymentUnit bdu) {
+    public void undeploy(DeploymentUnit bdu) throws Exception {
         _store.undeploy(bdu);
     }
     
     /**
      * {@inheritDoc}
      */
-    public DeploymentRef deploy(File deployment) {
+    public DeploymentRef deploy(File deployment) throws Exception {
         return(deploy(deployment.getName(), deployment));
     }
     
     /**
      * {@inheritDoc}
      */
-    public DeploymentRef deploy(String name, File deployment) {
+    public DeploymentRef deploy(String name, File deployment) throws Exception {
         DeploymentRef ret=null;
         
         if (LOG.isDebugEnabled()) {
             LOG.debug("Deploying: "+name+" at: "+deployment);
         }
         
+        java.util.List<DeploymentUnit> dus=null;
+        
         try {
-            java.util.List<DeploymentUnit> dus=
-                        _deploymentManager.getDeploymentUnits(name, deployment);
+            dus=_deploymentManager.getDeploymentUnits(name, deployment);
+        } catch(Exception e) {
+            LOG.error("Failed to get deployment units from '"+deployment+"'", e);
+            throw e;
+        }
             
             for (DeploymentUnit du : dus) {
                 try {
                     _store.deploy(du);
                 } catch(Exception e) {
                     LOG.error("Failed to deploy '"+du.getName()+"'", e);
+                    
+                    // Need to undeploy any successful deployments
+                    for (DeploymentUnit du2 : dus) {
+                        if (du == du2) {
+                            break;
+                        } else {
+                            if (LOG.isDebugEnabled()) {
+                                LOG.debug("Undeploying '"+du2.getName()
+                                    +"' after failure when deploying '"+du.getName()+"'");
+                            }
+                            _store.undeploy(du2);
+                        }
+                    }
+                    
+                    throw e;
                 }
             }
             
             ret = new DeploymentRefImpl(dus);
             
-        } catch(Exception e) {
-            LOG.error("Failed to get deployment units from '"+deployment+"'", e);
-        }
         
         if (LOG.isDebugEnabled()) {
             LOG.debug("Deployed: "+deployment+" ref="+ret);
@@ -429,7 +446,7 @@ public class BPELEngineImpl implements BPELEngine {
     /**
      * {@inheritDoc}
      */
-    public void undeploy(DeploymentRef ref) {
+    public void undeploy(DeploymentRef ref) throws Exception {
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Undeploying ref: "+ref);
