@@ -18,6 +18,8 @@
 package org.riftsaw.engine.internal;
 
 import java.io.File;
+import java.util.Map;
+import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -25,8 +27,6 @@ import java.util.concurrent.Future;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
 import javax.transaction.Transaction;
 import javax.transaction.TransactionManager;
 import javax.xml.namespace.QName;
@@ -68,6 +68,7 @@ import org.riftsaw.engine.Fault;
 import org.riftsaw.engine.ServiceLocator;
 import org.riftsaw.engine.jboss.JndiRegistry;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 
 /**
  * This class provides an ODE based implementation of the BPEL engine interface.
@@ -703,7 +704,7 @@ public class BPELEngineImpl implements BPELEngine {
      */
     public Element invoke(QName serviceName, String portName, String operationName, Element mesg,
                             java.util.Map<String, Object> headers) throws Exception {
-        Element ret=null;
+        Message ret=null;
         boolean success = true;
         MyRoleMessageExchange odeMex = null;
         Future<?> responseFuture = null;
@@ -733,7 +734,19 @@ public class BPELEngineImpl implements BPELEngine {
             if (odeMex.getOperation() != null) {
                 // Preparing message to send to ODE
                 Message odeRequest = odeMex.createMessage(odeMex.getOperation().getInput().getMessage().getQName());        
-                odeRequest.setMessage(mesg);               
+                odeRequest.setMessage(mesg);
+                
+                if (headers != null) {
+                    Set<String> keys = headers.keySet();
+                    for (String key : keys) {
+                        Object headerPart = headers.get(key);
+                        if (headerPart instanceof Element) {
+                            Element element = (Element)headerPart;
+                            odeRequest.setHeaderPart(null, element); // put the element to header
+                        }
+                    }
+                }
+                
                 if (LOG.isDebugEnabled()) {
                     LOG.debug("Invoking ODE using MEX " + odeMex);
                     LOG.debug("Message content:  " + DOMUtils.domToString(odeRequest.getMessage()));
@@ -812,6 +825,25 @@ public class BPELEngineImpl implements BPELEngine {
                 // Refreshing the message exchange
                 odeMex = (MyRoleMessageExchange) _bpelServer.getEngine().getMessageExchange(odeMex.getMessageExchangeId());
                 ret = onResponse(odeMex);
+                
+                // Set header parts to the headers
+                if (ret != null) {
+                    Map<String, Node> headerParts = ret.getHeaderParts();
+                    if (headers != null) {
+                        headers.clear();
+                        Set<String> keys = headerParts.keySet();
+                        for (String key : keys) {
+                            Element e = ret.getHeaderPart(key);
+                            String k;
+                            if (e.getNamespaceURI() == null || e.getNamespaceURI().isEmpty()) {
+                                k = e.getLocalName();
+                            } else {
+                                k = "{"+e.getNamespaceURI()+"}" + e.getLocalName();
+                            }
+                            headers.put(k, e);
+                        }
+                    }
+                }
 
                 LOG.debug("Returning: "+ret);
                 commit = true;
@@ -850,7 +882,7 @@ public class BPELEngineImpl implements BPELEngine {
             odeMex.release(true);
         }
         
-        return (ret);
+        return ret.getMessage();
     }
 
     /**
@@ -880,8 +912,8 @@ public class BPELEngineImpl implements BPELEngine {
      * @return The contents
      * @throws Exception Failed
      */
-    private Element onResponse(MyRoleMessageExchange mex) throws Exception {
-        Element ret=null;
+    private Message onResponse(MyRoleMessageExchange mex) throws Exception {
+        Message ret=null;
 
         switch (mex.getStatus()) {
         case FAULT:
@@ -894,7 +926,7 @@ public class BPELEngineImpl implements BPELEngine {
             //break;
         case ASYNC:
         case RESPONSE:
-            ret = mex.getResponse().getMessage();
+            ret = mex.getResponse();
             if (LOG.isDebugEnabled()) {
                 LOG.debug("Response message " + ret);
             }
