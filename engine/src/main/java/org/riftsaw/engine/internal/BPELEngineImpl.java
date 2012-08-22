@@ -368,6 +368,7 @@ public class BPELEngineImpl implements BPELEngine {
         _bpelServer.setProcessThrottledMaximumSize(_odeConfig.getProcessThrottledMaximumSize());
         _bpelServer.setHydrationLazy(_odeConfig.isHydrationLazy());
         _bpelServer.setHydrationLazyMinimumSize(_odeConfig.getHydrationLazyMinimumSize());
+        _bpelServer.setXTSEnable(_odeConfig.isXTSEnable());
     }
     
     /**
