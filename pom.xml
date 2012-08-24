@@ -103,44 +103,25 @@
            <module>console</module>
            <module>db</module>
 	</modules>
-  
+
 	<properties>
-        <jbossas.version>7.1.1.Final</jbossas.version>
-		<riftsaw.ode.version>3.0.0-SNAPSHOT</riftsaw.ode.version>
-		<riftsaw.engine.version>3.0.0-SNAPSHOT</riftsaw.engine.version>
-		<bpel.console.version>2.4.1.Final</bpel.console.version>
 		<activity.monitor.model.version>1.2.1.Final</activity.monitor.model.version>
-		<dsp.version>1.0.0.Final</dsp.version>
-		<commons.logging.version>1.1.1</commons.logging.version>
-		<commons.lang.version>2.4</commons.lang.version>
-		<junit.version>4.8.1</junit.version>
-		<jboss.version>5.1.0.GA</jboss.version>
-		<log4j.version>1.2.14</log4j.version>
-		<jbossesb.version>4.9</jbossesb.version>
-		<jbossts.version>4.6.1.GA</jbossts.version>
-		<wsdl4j.version>1.6.2</wsdl4j.version>
-		<h2.version>1.2.124</h2.version>
-		<javassist.version>3.11.0.GA</javassist.version>
-		<jaxws.version>2.1</jaxws.version>
-		<xmlbeans.version>2.2.0</xmlbeans.version>
-		<commons.codec.version>1.3</commons.codec.version>
-		<xerces.version>2.9.0</xerces.version>
-		<commons.httpclient.version>3.1</commons.httpclient.version>
-		<cxf.version>2.2.6</cxf.version>
-		<saxon.version>9.2.1.5</saxon.version>
-		<spring.version>3.0.3.RELEASE</spring.version> <!-- This version must match the version used by the ESB -->
-		<batik.version>1.7</batik.version>
 		<axiom.version>1.2.8</axiom.version>
-		<commons.codec.version>1.4</commons.codec.version>
-		<picketlink.version>1.0.3.final</picketlink.version>
-		<juddi.version>3.1.0-SNAPSHOT</juddi.version>
-		<scout.version>1.2.3-SNAPSHOT</scout.version>
+		<batik.version>1.7</batik.version>
+		<bpel.console.version>2.4.1.Final</bpel.console.version>
+		<commons.logging.version>1.1.1</commons.logging.version>
+		<javax.jaxb.version>2.1</javax.jaxb.version>
+		<jboss.javaee.version>5.0.1.GA</jboss.javaee.version>
+		<jbossas.version>7.1.1.Final</jbossas.version>
+		<jtds.version>1.2.2</jtds.version>
+		<mysql.connector.version>5.0.8</mysql.connector.version>
+		<postgresql.version>8.3-603.jdbc3</postgresql.version>
+		<riftsaw.engine.version>3.0.0-SNAPSHOT</riftsaw.engine.version>
+		<riftsaw.ode.version>3.0.0-SNAPSHOT</riftsaw.ode.version>
+		<saxon.version>9.2.1.5</saxon.version>
+		<stax.api.version>1.0.1</stax.api.version>
 		<switchyard.version>0.3.0-SNAPSHOT</switchyard.version>
-		<jettison.version>1.2</jettison.version>
-        <mysql.connector.version>5.0.8</mysql.connector.version>
-        <postgresql.version>8.3-603.jdbc3</postgresql.version>
-        <jtds.version>1.2.2</jtds.version>
-        <javax.jaxb.version>2.1</javax.jaxb.version>        
+		<xml.apis.ext.version>1.3.04</xml.apis.ext.version>
 	</properties>
 
 	<dependencyManagement>
@@ -231,51 +212,26 @@
             <dependency>
                 <groupId>org.jboss.javaee</groupId>
                 <artifactId>jboss-javaee</artifactId>
-                <version>5.0.1.GA</version>
+                <version>${jboss.javaee.version}</version>
                 <exclusions>
                     <exclusion><groupId>org.jboss.logging</groupId><artifactId>jboss-logging-spi</artifactId></exclusion>
                 </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>org.jboss</groupId>
-                <artifactId>jboss-common-core</artifactId>
-                <version>2.2.17.GA</version>
-                <exclusions>
-                    <exclusion><groupId>org.jboss.logging</groupId><artifactId>jboss-logging-spi</artifactId></exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>com.h2database</groupId>
-                <artifactId>h2</artifactId>
-                <version>1.2.124</version>
             </dependency>
             <dependency>
                 <groupId>net.sourceforge.saxon</groupId>
                 <artifactId>saxonhe</artifactId>
-                <version>9.2.1.5</version>
+                <version>${saxon.version}</version>
             </dependency>
-            <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>slf4j-api</artifactId>
-                <version>1.6.1</version>
-            </dependency>
-            <dependency>
-                <groupId>junit</groupId>
-                <artifactId>junit</artifactId>
-                <version>${junit.version}</version>
-                <scope>test</scope>
-            </dependency>
-            
             <dependency>
                 <groupId>org.jboss.as</groupId>
                 <artifactId>jboss-as-naming</artifactId>
-                <version>7.1.0.Final</version>
+                <version>${jbossas.version}</version>
                 <scope>provided</scope>
             </dependency>
             <dependency>
                 <groupId>org.jboss.as</groupId>
                 <artifactId>jboss-as-server</artifactId>
-                <version>7.1.0.Final</version>
+                <version>${jbossas.version}</version>
                 <scope>provided</scope>
             </dependency>
 
@@ -299,11 +255,6 @@
             </dependency>
         
             <!-- riftsaw-bpel2svg -->
-            <dependency>
-                <groupId>commons-codec</groupId>
-                <artifactId>commons-codec</artifactId>
-                <version>${commons.codec.version}</version>
-            </dependency>
             <dependency>
                 <groupId>batik</groupId>
                 <artifactId>batik-dom</artifactId>
@@ -392,7 +343,7 @@
             <dependency>
                 <groupId>xml-apis</groupId>
                 <artifactId>xml-apis-ext</artifactId>
-                <version>1.3.04</version>
+                <version>${xml.apis.ext.version}</version>
             </dependency>
         
             <!-- riftsaw-console-integration -->
@@ -414,20 +365,9 @@
                 <scope>provided</scope>
             </dependency>
             <dependency>
-                <groupId>org.codehaus.jettison</groupId>
-                <artifactId>jettison</artifactId>
-                <version>${jettison.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.codehaus.jettison</groupId>
-                <artifactId>jettison</artifactId>
-                <version>${jettison.version}</version>
-                <classifier>sources</classifier>
-            </dependency>
-            <dependency>
                 <groupId>stax</groupId>
                 <artifactId>stax-api</artifactId>
-                <version>1.0.1</version>
+                <version>${stax.api.version}</version>
                 <scope>provided</scope>
             </dependency>
             
