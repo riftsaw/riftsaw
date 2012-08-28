@@ -103,7 +103,12 @@ public class RiftSawProcessStore extends ProcessStoreImpl {
         boolean deploy=exec(new ProcessStoreImpl.Callable<Boolean>() {
             public Boolean call(ConfStoreDAOConnection conn) {
                 boolean ret=false;
-                DeploymentUnitDAO dudao = conn.getDeploymentUnit(bdu.getVersionedName());
+                
+                String bduVerName=bdu.getVersionedName();
+                
+                LOG.debug("Deploying versioned name: "+bduVerName);
+
+                DeploymentUnitDAO dudao = conn.getDeploymentUnit(bduVerName);
                 if (dudao == null) {
                     return true;
                 }
@@ -117,29 +122,24 @@ public class RiftSawProcessStore extends ProcessStoreImpl {
                         dudao.setDeploymentUnitDir(dir);
                     }
 
-                    // Check if process has changed, and needs to be redeployed
-                    if (bdu.getLastModified() > dudao.getDeployDate().getTime()) {
-                        ret = true;
-                    } else {
-                        LOG.debug("Re-compiling: "+bdu.getDeploymentDescriptor().getParentFile());
+                    LOG.debug("Re-compiling: "+bdu.getDeploymentDescriptor().getParentFile());
 
-                        DeploymentUnitDir du=new DeploymentUnitDir(bdu.getDeploymentDescriptor().getParentFile());
-                        
-                        du.setName(bdu.getVersionedName());
+                    DeploymentUnitDir du=new DeploymentUnitDir(bdu.getDeploymentDescriptor().getParentFile());
+                    
+                    du.setName(bdu.getVersionedName());
 
-                        // Create the DU and compile it before acquiring lock.
-                        //du.setExtensionValidators(getExtensionValidators());
-                        try {
-                            du.compile();
-                        } catch (CompilationException ce) {
-                            String errmsg = "Failed to compile deployment unit '"
-                                    +bdu.getDeploymentDescriptor().getParentFile()+"'";
-                            LOG.error(errmsg, ce);
-                            throw new ContextException(errmsg, ce);
-                        }
-
-                        loaded.addAll(load(dudao));
+                    // Create the DU and compile it before acquiring lock.
+                    //du.setExtensionValidators(getExtensionValidators());
+                    try {
+                        du.compile();
+                    } catch (CompilationException ce) {
+                        String errmsg = "Failed to compile deployment unit '"
+                                +bdu.getDeploymentDescriptor().getParentFile()+"'";
+                        LOG.error(errmsg, ce);
+                        throw new ContextException(errmsg, ce);
                     }
+
+                    loaded.addAll(load(dudao));
 
                 } catch (Throwable e) {
                     LOG.error("Failed to update deployment unit dir", e);
