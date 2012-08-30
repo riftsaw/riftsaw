@@ -34,6 +34,12 @@
 		RiftSaw - the JBoss BPEL engine.
 	</description>
 
+    <parent>
+        <groupId>org.jboss</groupId>
+        <artifactId>jboss-parent</artifactId>
+        <version>8</version>
+    </parent>
+
 	<scm>
 		<connection>scm:svn:http://anonsvn.jboss.org/repos/riftsaw/trunk</connection>
 		<developerConnection>scm:svn:https://svn.jboss.org/repos/riftsaw/trunk</developerConnection>
@@ -97,43 +103,292 @@
            <module>console</module>
            <module>db</module>
 	</modules>
-  
+
 	<properties>
-		<riftsaw.ode.version>3.0.0-SNAPSHOT</riftsaw.ode.version>
-		<riftsaw.engine.version>3.0.0-SNAPSHOT</riftsaw.engine.version>
-		<bpel.console.version>2.4.1.Final</bpel.console.version>
 		<activity.monitor.model.version>1.2.1.Final</activity.monitor.model.version>
-		<dsp.version>1.0.0.Final</dsp.version>
-		<commons.logging.version>1.1.1</commons.logging.version>
-		<commons.lang.version>2.4</commons.lang.version>
-		<junit.version>4.8.1</junit.version>
-		<jboss.version>5.1.0.GA</jboss.version>
-		<log4j.version>1.2.14</log4j.version>
-		<jbossesb.version>4.9</jbossesb.version>
-		<jbossts.version>4.6.1.GA</jbossts.version>
-		<wsdl4j.version>1.6.2</wsdl4j.version>
-		<h2.version>1.2.124</h2.version>
-		<javassist.version>3.11.0.GA</javassist.version>
-		<jaxws.version>2.1</jaxws.version>
-		<xmlbeans.version>2.2.0</xmlbeans.version>
-		<commons.codec.version>1.3</commons.codec.version>
-		<xerces.version>2.9.0</xerces.version>
-		<commons.httpclient.version>3.1</commons.httpclient.version>
-		<cxf.version>2.2.6</cxf.version>
-		<saxon.version>9.2.1.5</saxon.version>
-		<spring.version>3.0.3.RELEASE</spring.version> <!-- This version must match the version used by the ESB -->
-		<batik.version>1.7</batik.version>
 		<axiom.version>1.2.8</axiom.version>
-		<commons.codec.version>1.4</commons.codec.version>
-		<picketlink.version>1.0.3.final</picketlink.version>
-		<juddi.version>3.1.0-SNAPSHOT</juddi.version>
-		<scout.version>1.2.3-SNAPSHOT</scout.version>
+		<batik.version>1.7</batik.version>
+		<bpel.console.version>2.4.1.Final</bpel.console.version>
+		<commons.logging.version>1.1.1</commons.logging.version>
+		<javax.jaxb.version>2.1</javax.jaxb.version>
+		<jboss.javaee.version>5.0.1.GA</jboss.javaee.version>
+		<jbossas.version>7.1.1.Final</jbossas.version>
+		<jtds.version>1.2.2</jtds.version>
+		<mysql.connector.version>5.0.8</mysql.connector.version>
+		<postgresql.version>8.3-603.jdbc3</postgresql.version>
+		<riftsaw.engine.version>3.0.0-SNAPSHOT</riftsaw.engine.version>
+		<riftsaw.ode.version>3.0.0-SNAPSHOT</riftsaw.ode.version>
+		<saxon.version>9.2.1.5</saxon.version>
+		<stax.api.version>1.0.1</stax.api.version>
 		<switchyard.version>0.3.0-SNAPSHOT</switchyard.version>
-		<jettison.version>1.2</jettison.version>
+		<xml.apis.ext.version>1.3.04</xml.apis.ext.version>
 	</properties>
 
 	<dependencyManagement>
-		<dependencies> 
+		<dependencies>
+            <!-- Imported dependencies -->
+            <dependency>
+              <groupId>org.jboss.as</groupId>
+              <artifactId>jboss-as-parent</artifactId>
+              <version>${jbossas.version}</version>
+              <type>pom</type>
+              <scope>import</scope>
+            </dependency>
+
+            <!-- db -->
+            <dependency>
+                <groupId>mysql</groupId>
+                <artifactId>mysql-connector-java</artifactId>
+                <version>${mysql.connector.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>postgresql</groupId>
+                <artifactId>postgresql</artifactId>
+                <version>${postgresql.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>net.sourceforge.jtds</groupId>
+                <artifactId>jtds</artifactId>
+                <version>${jtds.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.riftsaw</groupId>
+                <artifactId>engine</artifactId>
+                <version>${riftsaw.engine.version}</version>
+            </dependency>
+
+            <!-- engine -->
+            <dependency>
+                <groupId>org.jboss.soa.bpel</groupId>
+                <artifactId>riftsaw-agents</artifactId>
+                <version>${riftsaw.ode.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jboss.soa.bpel</groupId>
+                <artifactId>riftsaw-bpel-api</artifactId>
+                <version>${riftsaw.ode.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jboss.soa.bpel</groupId>
+                <artifactId>riftsaw-bpel-compiler</artifactId>
+                <version>${riftsaw.ode.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jboss.soa.bpel</groupId>
+                <artifactId>riftsaw-bpel-dao</artifactId>
+                <version>${riftsaw.ode.version}</version>
+                <exclusions>
+                    <exclusion><groupId>org.apache.geronimo.specs</groupId><artifactId>geronimo-jta_1.1_spec</artifactId></exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.jboss.soa.bpel</groupId>
+                <artifactId>riftsaw-bpel-epr</artifactId>
+                <version>${riftsaw.ode.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jboss.soa.bpel</groupId>
+                <artifactId>riftsaw-bpel-runtime</artifactId>
+                <version>${riftsaw.ode.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jboss.soa.bpel</groupId>
+                <artifactId>riftsaw-bpel-ql</artifactId>
+                <version>${riftsaw.ode.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jboss.soa.bpel</groupId>
+                <artifactId>riftsaw-dao-jpa-hibernate</artifactId>
+                <version>${riftsaw.ode.version}</version>
+                <exclusions>
+                    <exclusion><groupId>org.slf4j</groupId><artifactId>slf4j-log4j12</artifactId></exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.jboss.soa.bpel</groupId>
+                <artifactId>riftsaw-scheduler-simple</artifactId>
+                <version>${riftsaw.ode.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jboss.javaee</groupId>
+                <artifactId>jboss-javaee</artifactId>
+                <version>${jboss.javaee.version}</version>
+                <exclusions>
+                    <exclusion><groupId>org.jboss.logging</groupId><artifactId>jboss-logging-spi</artifactId></exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>net.sourceforge.saxon</groupId>
+                <artifactId>saxonhe</artifactId>
+                <version>${saxon.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jboss.as</groupId>
+                <artifactId>jboss-as-naming</artifactId>
+                <version>${jbossas.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.jboss.as</groupId>
+                <artifactId>jboss-as-server</artifactId>
+                <version>${jbossas.version}</version>
+                <scope>provided</scope>
+            </dependency>
+
+            <!-- riftsaw-bpaf -->
+            <dependency>
+                <groupId>org.jboss.bpm</groupId>
+                <artifactId>activity-monitor-model</artifactId>
+                <version>${activity.monitor.model.version}</version>
+            </dependency>
+            
+            <dependency>
+                <groupId>org.riftsaw.console</groupId>
+                <artifactId>riftsaw-console-integration</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>commons-logging</groupId>
+                <artifactId>commons-logging</artifactId>
+                <version>${commons.logging.version}</version>
+                <scope>provided</scope>
+            </dependency>
+        
+            <!-- riftsaw-bpel2svg -->
+            <dependency>
+                <groupId>batik</groupId>
+                <artifactId>batik-dom</artifactId>
+                <version>${batik.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>batik</groupId>
+                <artifactId>batik-svg-dom</artifactId>
+                <version>${batik.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>batik</groupId>
+                <artifactId>batik-svggen</artifactId>
+                <version>${batik.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>batik</groupId>
+                <artifactId>batik-util</artifactId>
+                <version>${batik.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>batik</groupId>
+                <artifactId>batik-css</artifactId>
+                <version>${batik.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>batik</groupId>
+                <artifactId>batik-ext</artifactId>
+                <version>${batik.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>batik</groupId>
+                <artifactId>batik-xml</artifactId>
+                <version>${batik.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>batik</groupId>
+                <artifactId>batik-transcoder</artifactId>
+                <version>${batik.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>batik</groupId>
+                <artifactId>batik-bridge</artifactId>
+                <version>${batik.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>batik</groupId>
+                <artifactId>batik-gvt</artifactId>
+                <version>${batik.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>batik</groupId>
+                <artifactId>batik-script</artifactId>
+                <version>${batik.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>batik</groupId>
+                <artifactId>batik-awt-util</artifactId>
+                <version>${batik.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>batik</groupId>
+                <artifactId>batik-parser</artifactId>
+                <version>${batik.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>batik</groupId>
+                <artifactId>batik-anim</artifactId>
+                <version>${batik.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>batik</groupId>
+                <artifactId>batik-codec</artifactId>
+                <version>${batik.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.ws.commons.axiom</groupId>
+                <artifactId>axiom-impl</artifactId>
+                <version>${axiom.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.ws.commons.axiom</groupId>
+                <artifactId>axiom-api</artifactId>
+                <version>${axiom.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>xml-apis</groupId>
+                <artifactId>xml-apis-ext</artifactId>
+                <version>${xml.apis.ext.version}</version>
+            </dependency>
+        
+            <!-- riftsaw-console-integration -->
+            <dependency>
+                <groupId>org.jboss.bpm</groupId>
+                <artifactId>gwt-console-server-integration</artifactId>
+                <version>${bpel.console.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.riftsaw.console</groupId>
+                <artifactId>riftsaw-bpel2svg</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>javax.xml.bind</groupId>
+                <artifactId>jaxb-api</artifactId>
+                <version>${javax.jaxb.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>stax</groupId>
+                <artifactId>stax-api</artifactId>
+                <version>${stax.api.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            
+            <!-- switchyard-bpel-console -->
+            <dependency>
+                <groupId>org.jboss.bpm</groupId>
+                <artifactId>gwt-console</artifactId>
+                <version>${bpel.console.version}</version>
+                <classifier>riftsaw</classifier>
+                <type>war</type>
+            </dependency>
+            
+            <!-- switchyard-bpel-console-server -->
+            <dependency>
+                <groupId>org.jboss.bpm</groupId>
+                <artifactId>gwt-console-server</artifactId>
+                <version>${bpel.console.version}</version>
+                <classifier>riftsaw</classifier>
+                <type>war</type>
+            </dependency>
+
 		</dependencies>
 	</dependencyManagement>
 
@@ -154,16 +409,9 @@
     <!-- This section defines the default plugin settings inherited by child projects. -->
     <pluginManagement>
     <plugins>
-        <!-- Fixes how test resources of a project can be used in projects dependent on it  -->
-    <plugin>
-      <groupId>org.apache.maven.plugins</groupId>
-      <artifactId>maven-jar-plugin</artifactId>
-      <version>2.2</version>
-    </plugin>
     <plugin>
       <groupId>org.apache.maven.plugins</groupId>
       <artifactId>maven-javadoc-plugin</artifactId>
-      <version>2.2</version>
       <configuration>
         <aggregate>true</aggregate>
       </configuration>
@@ -172,7 +420,6 @@
     <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>2.3.2</version>
         <configuration>
           <source>1.5</source>
           <target>1.5</target>
@@ -186,7 +433,6 @@
     <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-source-plugin</artifactId>
-        <version>2.1.2</version>
         <executions>
           <execution>
             <id>attach-sources</id>
@@ -200,7 +446,6 @@
      <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
-        <version>2.7.2</version>
         <configuration>
           <includes>
             <include>**/*TestCase.java</include>
@@ -220,7 +465,6 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-checkstyle-plugin</artifactId>
-          <version>2.6</version>
             <configuration>
               <configLocation>checkstyle/checkstyle.xml</configLocation>
               <consoleOutput>false</consoleOutput>
@@ -266,7 +510,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-report-plugin</artifactId>
-        <version>2.7.2</version>
+        <version>2.10</version>
       </plugin>
 	  <!--plugin>
 	    <groupId>org.codehaus.mojo</groupId>
