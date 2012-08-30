@@ -705,7 +705,7 @@ public class BPELEngineImpl implements BPELEngine {
      */
     public Element invoke(QName serviceName, String portName, String operationName, Element mesg,
                             java.util.Map<String, Object> headers) throws Exception {
-        Message ret=null;
+        Element ret=null;
         boolean success = true;
         MyRoleMessageExchange odeMex = null;
         Future<?> responseFuture = null;
@@ -825,16 +825,17 @@ public class BPELEngineImpl implements BPELEngine {
             try {
                 // Refreshing the message exchange
                 odeMex = (MyRoleMessageExchange) _bpelServer.getEngine().getMessageExchange(odeMex.getMessageExchangeId());
-                ret = onResponse(odeMex);
+                Message msg = onResponse(odeMex);
                 
-                // Set header parts to the headers
-                if (ret != null) {
-                    Map<String, Node> headerParts = ret.getHeaderParts();
+                if (msg != null) {
+
+                    // Set header parts to the headers
+                    Map<String, Node> headerParts = msg.getHeaderParts();
                     if (headers != null) {
                         headers.clear();
                         Set<String> keys = headerParts.keySet();
                         for (String key : keys) {
-                            Element e = ret.getHeaderPart(key);
+                            Element e = msg.getHeaderPart(key);
                             String k;
                             if (e.getNamespaceURI() == null || e.getNamespaceURI().isEmpty()) {
                                 k = e.getLocalName();
@@ -844,6 +845,9 @@ public class BPELEngineImpl implements BPELEngine {
                             headers.put(k, e);
                         }
                     }
+                    
+                    ret = msg.getMessage();
+                    
                 }
 
                 LOG.debug("Returning: "+ret);
@@ -883,7 +887,7 @@ public class BPELEngineImpl implements BPELEngine {
             odeMex.release(true);
         }
         
-        return ret.getMessage();
+        return ret;
     }
 
     /**
