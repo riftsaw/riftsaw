@@ -37,7 +37,7 @@ public class DeploymentManager {
 
     private static final Log LOG=LogFactory.getLog(DeploymentManager.class);
     
-    private String _tmpFolder=System.getProperty("java.io.tmpdir");
+    private String _deploymentFolder=System.getProperty("java.io.tmpdir");
 
     /**
      * The default constructor.
@@ -46,31 +46,27 @@ public class DeploymentManager {
     }
     
     /**
-     * This method sets the location of the temporary folder used
+     * This method sets the location of the working folder used
      * to expand the BPEL deployments.
      * 
-     * @param tmp The temporary folder location
+     * @param location The working folder location
      */
-    public void setTemporaryFolder(String tmp) {
-        if (tmp == null) {
-            _tmpFolder = System.getProperty("java.io.tmpdir");
-        } else {
-            _tmpFolder = tmp;
-        }
+    public void setDeploymentFolder(String location) {
+        _deploymentFolder = location;
         
         if (LOG.isDebugEnabled()) {
-            LOG.debug("Set temporary folder to: "+_tmpFolder);
+            LOG.debug("Set folder to: "+_deploymentFolder);
         }
     }
     
     /**
-     * This method returns the location of the temporary folder used
+     * This method returns the location of the working folder used
      * to expand the BPEL deployments.
      * 
-     * @return The temporary folder location
+     * @return The folder location
      */
-    public String getTemporaryFolder() {
-        return (_tmpFolder);
+    public String getDeploymentFolder() {
+        return (_deploymentFolder);
     }
     
     /**
@@ -337,9 +333,11 @@ public class DeploymentManager {
      * @return The temporary folder
      */
     protected java.io.File getTemporaryFolder(String deploymentName) {
-        String destPath = _tmpFolder
+        String destPath = _deploymentFolder
                 + java.io.File.separatorChar
                 + "riftsaw"
+                + java.io.File.separatorChar
+                + "rs"+System.currentTimeMillis()
                 + java.io.File.separatorChar
                 + deploymentName;
         return (new java.io.File(destPath));
@@ -359,7 +357,7 @@ public class DeploymentManager {
         java.io.File ret = getTemporaryFolder(deploymentName);
 
         if (LOG.isDebugEnabled()) {
-            LOG.debug("Exploring deployment name '"+deploymentName+"' at '"+deploymentRoot+"' to: "+ret);
+            LOG.debug("Exploding deployment name '"+deploymentName+"' at '"+deploymentRoot+"' to: "+ret);
         }
         
         // Recursive delete in case already exists
