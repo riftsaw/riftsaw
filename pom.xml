@@ -116,7 +116,6 @@
 		<jtds.version>1.2.2</jtds.version>
 		<mysql.connector.version>5.0.8</mysql.connector.version>
 		<postgresql.version>8.3-603.jdbc3</postgresql.version>
-		<riftsaw.engine.version>3.0.0-SNAPSHOT</riftsaw.engine.version>
 		<riftsaw.ode.version>3.0.0-SNAPSHOT</riftsaw.ode.version>
 		<saxon.version>9.2.1.5</saxon.version>
 		<stax.api.version>1.0.1</stax.api.version>
@@ -154,7 +153,7 @@
             <dependency>
                 <groupId>org.riftsaw</groupId>
                 <artifactId>engine</artifactId>
-                <version>${riftsaw.engine.version}</version>
+                <version>${project.version}</version>
             </dependency>
 
             <!-- engine -->
