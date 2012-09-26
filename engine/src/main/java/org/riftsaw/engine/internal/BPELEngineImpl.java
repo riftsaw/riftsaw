@@ -80,6 +80,8 @@ public class BPELEngineImpl implements BPELEngine {
 
     private static final String _jndiName = "java:jboss/BPELEngine";
     private static final String _emfJndiName = "java:jboss/BPELEMFactory";
+    
+    private static final String DEPLOYMENT_FOLDER_ENV_VAR = "jboss.server.temp.dir";
 
     private BpelServerImpl _bpelServer;
     private RiftSawProcessStore _store;
@@ -222,7 +224,16 @@ public class BPELEngineImpl implements BPELEngine {
     
     private void initDeploymentManager() {
         _deploymentManager = new DeploymentManager();
-        _deploymentManager.setTemporaryFolder(_odeConfig.getProperty("deployment.tmp.folder"));
+        
+        String folder=_odeConfig.getProperty("deployment.folder");
+        
+        if (folder == null) {
+            folder = System.getProperty(DEPLOYMENT_FOLDER_ENV_VAR);
+        }
+
+        if (folder != null) {
+            _deploymentManager.setDeploymentFolder(folder);
+        }
     }
     
     /**
