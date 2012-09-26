@@ -67,7 +67,7 @@ public class DeploymentManagerTest {
         java.io.File deploymentRoot=new java.io.File(root.getFile()).getParentFile();
         
         DeploymentManager dm=new DeploymentManager();
-        dm.setTemporaryFolder(deploymentRoot.getParentFile().getParent()+
+        dm.setDeploymentFolder(deploymentRoot.getParentFile().getParent()+
                 java.io.File.separatorChar+"tmp");
         
         try {
@@ -111,7 +111,7 @@ public class DeploymentManagerTest {
         java.io.File deploymentRoot=new java.io.File(root.getFile()).getParentFile();
         
         DeploymentManager dm=new DeploymentManager();
-        dm.setTemporaryFolder(deploymentRoot.getParentFile().getParent()+
+        dm.setDeploymentFolder(deploymentRoot.getParentFile().getParent()+
                 java.io.File.separatorChar+"tmp");
         
         try {
@@ -159,7 +159,7 @@ public class DeploymentManagerTest {
         java.io.File deploymentRoot=new java.io.File(root.getFile());
         
         DeploymentManager dm=new DeploymentManager();
-        dm.setTemporaryFolder(deploymentRoot.getParentFile().getParent()+
+        dm.setDeploymentFolder(deploymentRoot.getParentFile().getParent()+
                 java.io.File.separatorChar+"tmp");
         
         try {
@@ -200,7 +200,7 @@ public class DeploymentManagerTest {
         java.io.File deploymentRoot=new java.io.File(root.getFile());
         
         DeploymentManager dm=new DeploymentManager();
-        dm.setTemporaryFolder(deploymentRoot.getParentFile().getParent()+
+        dm.setDeploymentFolder(deploymentRoot.getParentFile().getParent()+
                 java.io.File.separatorChar+"tmp");
         
         try {
@@ -245,7 +245,7 @@ public class DeploymentManagerTest {
         java.io.File deploymentRoot=new java.io.File(root.getFile()).getParentFile();
         
         DeploymentManager dm=new DeploymentManager();
-        dm.setTemporaryFolder(deploymentRoot.getParentFile().getParent()+
+        dm.setDeploymentFolder(deploymentRoot.getParentFile().getParent()+
                 java.io.File.separatorChar+"tmp");
         
         try {
@@ -316,7 +316,7 @@ public class DeploymentManagerTest {
         java.io.File deploymentRoot=new java.io.File(root.getFile()).getParentFile();
         
         DeploymentManager dm=new DeploymentManager();
-        dm.setTemporaryFolder(deploymentRoot.getParentFile().getParent()+
+        dm.setDeploymentFolder(deploymentRoot.getParentFile().getParent()+
                 java.io.File.separatorChar+"tmp");
         
         try {
@@ -395,7 +395,7 @@ public class DeploymentManagerTest {
         java.io.File deploymentRoot=new java.io.File(root.getFile());
         
         DeploymentManager dm=new DeploymentManager();
-        dm.setTemporaryFolder(deploymentRoot.getParentFile().getParent()+
+        dm.setDeploymentFolder(deploymentRoot.getParentFile().getParent()+
                 java.io.File.separatorChar+"tmp");
         
         try {
@@ -462,7 +462,7 @@ public class DeploymentManagerTest {
         java.io.File deploymentRoot=new java.io.File(root.getFile());
         
         DeploymentManager dm=new DeploymentManager();
-        dm.setTemporaryFolder(deploymentRoot.getParentFile().getParent()+
+        dm.setDeploymentFolder(deploymentRoot.getParentFile().getParent()+
                 java.io.File.separatorChar+"tmp");
         
         try {
