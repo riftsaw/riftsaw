@@ -118,6 +118,8 @@ public class BPELEngineImpl implements BPELEngine {
         LOG.info("Creating data source.");
         initDataSource();
         
+        populateDatabaseSchema();
+        
         LOG.info("Starting DAO.");
         initDAO();
         
@@ -159,6 +161,13 @@ public class BPELEngineImpl implements BPELEngine {
 
         RegisterServicesIntoJNDI();
     }
+    
+    
+	private void populateDatabaseSchema() throws Exception {
+		String dialect = _odeConfig.getProperties().getProperty("hibernate.dialect");
+		DatabaseInitialiser dbInitialiser = new DatabaseInitialiser(_db.getDataSource(), _txMgr, dialect);
+        dbInitialiser.initDatabase();
+	}
 
     private void RegisterServicesIntoJNDI() {
         LOG.info("Register BPEL engine, EntityManagerFactory into JNDI.");
