@@ -164,9 +164,12 @@ public class BPELEngineImpl implements BPELEngine {
     
     
 	private void populateDatabaseSchema() throws Exception {
-		String dialect = _odeConfig.getProperties().getProperty("hibernate.dialect");
-		DatabaseInitialiser dbInitialiser = new DatabaseInitialiser(_db.getDataSource(), _txMgr, dialect);
-        dbInitialiser.initDatabase();
+		//populate the schema only if the db.emb.create=false in the bpel.properties
+		if (!Boolean.valueOf(_odeConfig.getProperty(OdeConfigProperties.PROP_DB_EMBEDDED_CREATE, "false"))) {
+			String dialect = _odeConfig.getProperties().getProperty("hibernate.dialect");
+			DatabaseInitialiser dbInitialiser = new DatabaseInitialiser(_db.getDataSource(), _txMgr, dialect);
+	        dbInitialiser.initDatabase();			
+		}
 	}
 
     private void RegisterServicesIntoJNDI() {
