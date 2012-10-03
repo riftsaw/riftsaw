@@ -185,8 +185,13 @@ public class BPELEngineImpl implements BPELEngine {
 
     private void unregisterServicesFromJNDI() {
         LOG.info("Unbind the services from JNDI.");
-        JndiRegistry.unbindFromJndi(_jndiName);
-        JndiRegistry.unbindFromJndi(_emfJndiName);
+        
+        try {
+            JndiRegistry.unbindFromJndi(_jndiName);
+            JndiRegistry.unbindFromJndi(_emfJndiName);
+        } catch (Throwable t) {
+            LOG.debug("Failed to unbind services on engine close", t);
+        }
     }
 
     /**
