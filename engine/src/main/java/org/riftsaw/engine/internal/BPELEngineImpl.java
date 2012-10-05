@@ -485,7 +485,10 @@ public class BPELEngineImpl implements BPELEngine {
         if (ref instanceof DeploymentRefImpl) {
             for (int i=0; i < ((DeploymentRefImpl)ref).getDeploymentUnits().size(); i++) {
                 DeploymentUnit du=((DeploymentRefImpl)ref).getDeploymentUnits().get(i);
-                _store.undeploy(du);
+                
+                if (_store != null) {
+                    _store.undeploy(du);
+                }
             }
         }
     }
