@@ -21,12 +21,13 @@
  */
 package org.jboss.soa.bpel.console.json;
 
-import org.codehaus.jettison.mapped.MappedNamespaceConvention;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.ContentHandler;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.io.PrintWriter;
+import java.io.Writer;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -37,13 +38,22 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.sax.SAXResult;
-import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.ode.utils.DOMUtils;
+import org.codehaus.jettison.mapped.Configuration;
+import org.codehaus.jettison.mapped.MappedNamespaceConvention;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.ContentHandler;
 
 public class XmlToJson
 {
-
+  private static Log log = LogFactory.getLog(XmlToJson.class);
+  
   public static String parse(InputStream in)
   {
     try {
@@ -55,15 +65,20 @@ public class XmlToJson
       Element root = doc.getDocumentElement();
 
       normalize(root);
-
+      
+      log.debug("The xml message is: " + DOMUtils.domToString(root));
+      
       ByteArrayOutputStream bout = new ByteArrayOutputStream();
       Writer writer = new PrintWriter(bout);
-
-      MappedNamespaceConvention con = new MappedNamespaceConvention();
+      
+      Configuration configuration = new Configuration();
+      configuration.setIgnoreNamespaces(true);
+      MappedNamespaceConvention con = new MappedNamespaceConvention(configuration);
       XMLStreamWriter streamWriter = new ResultAdapter(con, writer);
 
       Source source = new DOMSource(root);
-      //Result output = new StAXResult(streamWriter); JDK 6 only
+      
+      //Result output = new StAXResult(streamWriter); //JDK 6 only
       Result output = new SAXResult((ContentHandler)streamWriter);
 
       Transformer transformer = TransformerFactory.newInstance().newTransformer();
@@ -113,5 +128,11 @@ public class XmlToJson
         "</message>";
 
     System.out.println( XmlToJson.parse(new ByteArrayInputStream(xml.getBytes())) );
+    
+    String xml2 = "<message><parameters>" + 
+    			  "<sim:helloMessage xmlns:sim=\"http://www.jboss.org/bpel/examples/simple_correlation/\"><sim:sessionId>" + 
+    		"<sim:id>12</sim:id></sim:sessionId><sim:parameter>Hello2</sim:parameter></sim:helloMessage></parameters></message>";
+    
+    System.out.println( XmlToJson.parse(new ByteArrayInputStream(xml2.getBytes())) );
   }
 }
