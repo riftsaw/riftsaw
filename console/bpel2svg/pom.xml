@@ -9,7 +9,7 @@
   <parent>
     <groupId>org.riftsaw</groupId>
     <artifactId>console</artifactId>
-    <version>3.0.0.20121008-M3</version>
+    <version>3.0.0-SNAPSHOT</version>
   </parent>
 
 	<dependencies>
