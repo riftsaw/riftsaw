@@ -108,9 +108,27 @@ public class MessageExchangeContextImpl implements MessageExchangeContext {
             } catch (Fault f) {
                 QName faultName=f.getFaultName();
                 javax.wsdl.Fault fault=partnerRoleMessageExchange.getOperation().getFault(faultName.getLocalPart());
-                 Message faultMessage = partnerRoleMessageExchange.createMessage(
-                        fault.getMessage().getQName());
-                 faultMessage.setMessage(f.getFaultMessage());
+                
+                QName faultType=null;
+                
+                if (fault == null) {
+                    faultType = new QName(f.getFaultMessage().getFirstChild().getNamespaceURI(),
+                            f.getFaultMessage().getFirstChild().getLocalName());
+                    
+                    if (LOG.isTraceEnabled()) {
+                        LOG.trace("Fault type from element = "+faultType);
+                    }
+                } else {
+                    faultType = fault.getMessage().getQName();
+                    
+                    if (LOG.isTraceEnabled()) {
+                        LOG.trace("Fault type from message QName = "+faultType);
+                    }
+                }
+                
+                Message faultMessage = partnerRoleMessageExchange.createMessage(
+                        faultType);
+                faultMessage.setMessage(f.getFaultMessage());
                 
                 partnerRoleMessageExchange.replyWithFault(faultName, faultMessage);
             } catch (Exception e) {
