@@ -194,6 +194,40 @@ public class BPELEngineTest {
     }
     
     @Test
+    public void testLoanApprovalUndeclaredFault() {
+        
+        m_locator.clear();
+        
+        m_locator.addService(new QName("http://example.com/loan-approval/riskAssessment/","riskAssessor"),
+                            "riskAssessor_Port", new Service() {
+
+            public Element invoke(String operationName, Element mesg,
+                        Map<String, Object> headers) throws Exception {
+                Fault f=new Fault(new QName("http://example.com/loan-approval/riskAssessment/","loanProcessFault"),
+                            DOMUtils.stringToDOM(
+                        "<ns1:integer xmlns:ns1=\"http://example.com/loan-approval/xsd/error-messages/\">21000</ns1:integer>"));
+                throw f;
+            }
+        });
+
+        DeploymentRef ref1=null;
+        try {
+            ref1=deploy("/loan_approval_undeclaredfault/deploy.xml");
+            invoke(new QName("http://example.com/loan-approval/loanService/","loanService"), "loanService_Port",
+                    "request", "/loan_approval_undeclaredfault/loanreq2.xml", "/loan_approval_undeclaredfault/loanresp2.xml",
+                    new QName("http://example.com/loan-approval/loanService/","unableToHandleRequest"));
+        } catch (Exception e) {
+            fail("Failed: "+e);
+        } finally {
+            try {
+                m_engine.undeploy(ref1);
+            } catch (Exception e) {
+                fail("Failed to undeploy: "+e);
+            }
+        }
+    }
+    
+    @Test
     public void testHelloWorldRedeploy() {
         
         try {

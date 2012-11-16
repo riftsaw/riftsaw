@@ -112,8 +112,8 @@ public class MessageExchangeContextImpl implements MessageExchangeContext {
                 QName faultType=null;
                 
                 if (fault == null) {
-                    faultType = new QName(f.getFaultMessage().getFirstChild().getNamespaceURI(),
-                            f.getFaultMessage().getFirstChild().getLocalName());
+                    faultType = new QName(f.getFaultMessage().getNamespaceURI(),
+                            f.getFaultMessage().getLocalName());
                     
                     if (LOG.isTraceEnabled()) {
                         LOG.trace("Fault type from element = "+faultType);
