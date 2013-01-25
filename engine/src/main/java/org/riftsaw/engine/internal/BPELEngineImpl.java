@@ -27,6 +27,8 @@ import java.util.concurrent.Future;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
 import javax.transaction.Transaction;
 import javax.transaction.TransactionManager;
 import javax.xml.namespace.QName;
@@ -61,6 +63,7 @@ import org.apache.ode.store.RiftSawProcessStore;
 import org.apache.ode.utils.DOMUtils;
 import org.apache.ode.utils.GUID;
 import org.apache.ode.utils.Properties;
+import org.infinispan.manager.EmbeddedCacheManager;
 import org.riftsaw.engine.BPELEngine;
 import org.riftsaw.engine.DeploymentRef;
 import org.riftsaw.engine.DeploymentUnit;
@@ -69,6 +72,7 @@ import org.riftsaw.engine.ServiceLocator;
 import org.riftsaw.engine.jboss.JndiRegistry;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+
 
 /**
  * This class provides an ODE based implementation of the BPEL engine interface.
@@ -80,6 +84,7 @@ public class BPELEngineImpl implements BPELEngine {
 
     private static final String _jndiName = "java:jboss/BPELEngine";
     private static final String _emfJndiName = "java:jboss/BPELEMFactory";
+    private static final String _cacheContainerRoot = "java:jboss/infinispan/container/";
     
     private static final String DEPLOYMENT_FOLDER_ENV_VAR = "jboss.server.temp.dir";
 
@@ -323,11 +328,23 @@ public class BPELEngineImpl implements BPELEngine {
     protected Scheduler createScheduler() {
           
         // RIFTSAW-445
-        //String clusterNodeName=JBossDSPFactory.getServerConfig().getClusterNodeName();
-        String clusterNodeName="node1";
-        
-        LOG.info("Scheduler node name: "+clusterNodeName);
-        
+    	String cacheName = "cluster";
+    	
+    	String clusterNodeName = "non-cluster-node";
+    	
+    	try {
+			EmbeddedCacheManager ecm = (EmbeddedCacheManager)
+			        new InitialContext().lookup(_cacheContainerRoot + cacheName);
+			clusterNodeName = ecm.getAddress().toString();
+			ecm.getCache().start();
+			ecm.addListener(new MemberDropListener(_schedulerDaoCF, _txMgr));
+			
+		} catch (NamingException e) {
+			LOG.error(e);
+			//Ignore for now, it means that it is not in the clustering environment.
+		}
+    	LOG.info("The schduler node name is: "  + clusterNodeName);
+    	
         SimpleScheduler scheduler = new SimpleScheduler(clusterNodeName,
                         _schedulerDaoCF, _txMgr, _odeConfig.getProperties());
         scheduler.setExecutorService(_executorService);
