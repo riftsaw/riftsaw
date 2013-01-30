@@ -790,7 +790,8 @@ public class BPELEngineImpl implements BPELEngine {
                         Object headerPart = headers.get(key);
                         if (headerPart instanceof Element) {
                             Element element = (Element)headerPart;
-                            odeRequest.setHeaderPart(null, element); // put the element to header
+                            QName name=QName.valueOf(key);
+                            odeRequest.setHeaderPart(name.getLocalPart(), element); // put the element to header
                         }
                     }
                 }
