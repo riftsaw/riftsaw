@@ -17,6 +17,8 @@
  */
 package org.riftsaw.engine.internal;
 
+import java.util.Properties;
+
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
@@ -25,6 +27,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.ode.bpel.iapi.Cache;
 import org.apache.ode.bpel.iapi.CacheProvider;
 import org.apache.ode.il.cache.HashMapCache;
+import org.apache.ode.il.config.OdeConfigProperties;
 import org.infinispan.manager.EmbeddedCacheManager;
 
 /**
@@ -32,23 +35,21 @@ import org.infinispan.manager.EmbeddedCacheManager;
  *
  */
 public class InfinispanCacheProvider implements CacheProvider{
-	
-	private static final String cacheContainerRoot = "java:jboss/infinispan/container/";
-	
+		
 	private static Log logger = LogFactory.getLog(InfinispanCacheProvider.class);
 	
 	private org.infinispan.Cache cache;
 
-	public void start() throws Exception {
+	public void start(Properties properties) throws Exception {
 		try {
 			EmbeddedCacheManager ecm = (EmbeddedCacheManager)
-			        new InitialContext().lookup(cacheContainerRoot + "cluster");
-			this.cache = ecm.getCache();
-			
+			        new InitialContext().lookup(OdeConfigProperties.CACHE_CONTAINER_ROOT + properties.getProperty(OdeConfigProperties.CACHE_NAME_PROPERTY, "cluster"));
+			cache = ecm.getCache();
+			cache.start();
 		} catch (NamingException e) {
 			logger.error(e);	 
 		}
-		cache.start();
+		
 	}
 
 	public <K, V> Cache<K, V> createCache() {

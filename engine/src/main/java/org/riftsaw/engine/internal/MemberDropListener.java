@@ -63,7 +63,7 @@ public class MemberDropListener {
         	}
         }
         
-        logger.info("dropped nodes =>  " + dropped + "; active node =>  " + event.getCacheManager().getMembers());
+        logger.debug("dropped nodes =>  " + dropped + "; active node =>  " + event.getCacheManager().getMembers());
         if (dropped.size() > 0) {
     		try {
     			txm.begin();

@@ -84,7 +84,6 @@ public class BPELEngineImpl implements BPELEngine {
 
     private static final String _jndiName = "java:jboss/BPELEngine";
     private static final String _emfJndiName = "java:jboss/BPELEMFactory";
-    private static final String _cacheContainerRoot = "java:jboss/infinispan/container/";
     
     private static final String DEPLOYMENT_FOLDER_ENV_VAR = "jboss.server.temp.dir";
 
@@ -100,6 +99,7 @@ public class BPELEngineImpl implements BPELEngine {
     private ExecutorService _executorService;
     private CronScheduler _cronScheduler;
     private CacheProvider _cacheProvider;
+    private org.infinispan.Cache<String, String> _cache;
     private ServiceLocator _serviceLocator;
     private DeploymentManager _deploymentManager;
 
@@ -237,7 +237,7 @@ public class BPELEngineImpl implements BPELEngine {
     private void initCacheProvider() {
         _cacheProvider = CacheProviderFactory.getCacheProvider(_odeConfig);
         try {
-            _cacheProvider.start();
+            _cacheProvider.start(_odeConfig.getProperties());
         } catch (Exception e) {
             LOG.error("Error in starting cache provider", e);
             throw new RuntimeException("Error in initCacheProvider.", e);
@@ -326,17 +326,15 @@ public class BPELEngineImpl implements BPELEngine {
      * @return The scheduler
      */
     protected Scheduler createScheduler() {
-          
-        // RIFTSAW-445
-    	String cacheName = "cluster";
     	
-    	String clusterNodeName = "non-cluster-node";
-    	
+    	String clusterNodeName = _odeConfig.getProperty(OdeConfigProperties.RIFTSAW_NODE_NAME, "non-cluster-node");
+    	String cacheName = _odeConfig.getProperty(OdeConfigProperties.CACHE_NAME_PROPERTY, "cluster");
     	try {
 			EmbeddedCacheManager ecm = (EmbeddedCacheManager)
-			        new InitialContext().lookup(_cacheContainerRoot + cacheName);
+			        new InitialContext().lookup(OdeConfigProperties.CACHE_CONTAINER_ROOT + cacheName);
 			clusterNodeName = ecm.getAddress().toString();
-			ecm.getCache().start();
+			_cache = ecm.getCache();
+			_cache.start();
 			ecm.addListener(new MemberDropListener(_schedulerDaoCF, _txMgr));
 			
 		} catch (NamingException e) {
@@ -525,8 +523,6 @@ public class BPELEngineImpl implements BPELEngine {
                 } catch (Throwable ex) {
                     LOG.debug("Error stopping services.", ex);
                 }
-                  
-                _cacheProvider.stop();
 
                 if (_cronScheduler != null) {
                     try {
@@ -556,6 +552,9 @@ public class BPELEngineImpl implements BPELEngine {
                         LOG.debug("Store could not be shutdown.", t);
                     }
                 }
+                
+                //Stop the cache
+                _cacheProvider.stop();
 
                 if (_daoCF != null) {
                     try {
