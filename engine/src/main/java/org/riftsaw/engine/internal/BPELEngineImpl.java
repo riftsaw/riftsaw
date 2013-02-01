@@ -883,7 +883,7 @@ public class BPELEngineImpl implements BPELEngine {
                         headers.clear();
                         Set<String> keys = headerParts.keySet();
                         for (String key : keys) {
-                            Element e = msg.getHeaderPart(key);
+                            Element e = (Element)msg.getHeaderPart(key).getFirstChild();
                             String k;
                             if (e.getNamespaceURI() == null || e.getNamespaceURI().isEmpty()) {
                                 k = e.getLocalName();

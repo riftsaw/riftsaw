@@ -84,7 +84,7 @@ public class MessageExchangeContextImpl implements MessageExchangeContext {
                 Map<String, Object> transferedHeaderParts = new HashMap<String, Object>();
                 Set<String> keys = headerParts.keySet();
                 for (String key : keys) {
-                    Element e = partnerRoleMessageExchange.getRequest().getHeaderPart(key);
+                    Element e = (Element)partnerRoleMessageExchange.getRequest().getHeaderPart(key).getFirstChild();
                     String k;
                     if (e.getNamespaceURI() == null || e.getNamespaceURI().isEmpty()) {
                         k = e.getLocalName();
