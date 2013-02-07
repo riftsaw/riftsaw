@@ -32,6 +32,7 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.xml.namespace.QName;
 import java.io.ByteArrayInputStream;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -166,5 +167,12 @@ public class ProcessMgmtImpl implements ProcessManagement
   public void signalExecution(String executionId, String signal)
   {
     throw new RuntimeException("Not implemented");  
+  }
+
+  public long deleteInstances(String filter) {
+	BpelManagementFacade mgmtFacade = getMgmtFacade();
+	Collection<Long> result = mgmtFacade.delete(filter);
+	return result.size();	
   } 
+  
 }
