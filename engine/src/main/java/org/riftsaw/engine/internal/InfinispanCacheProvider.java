@@ -47,7 +47,7 @@ public class InfinispanCacheProvider implements CacheProvider{
 			cache = ecm.getCache();
 			cache.start();
 		} catch (NamingException e) {
-			logger.error(e);	 
+			logger.debug("Error on starting the Infinispan cache Manager. detaild is: " + e);	 
 		}
 		
 	}

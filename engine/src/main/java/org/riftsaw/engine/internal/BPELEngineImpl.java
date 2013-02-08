@@ -338,8 +338,8 @@ public class BPELEngineImpl implements BPELEngine {
 			ecm.addListener(new MemberDropListener(_schedulerDaoCF, _txMgr));
 			
 		} catch (NamingException e) {
-			LOG.error(e);
 			//Ignore for now, it means that it is not in the clustering environment.
+			LOG.info("RiftSaw (BPEL Component) will be started in the non cluster environment.");
 		}
     	LOG.info("The schduler node name is: "  + clusterNodeName);
     	
