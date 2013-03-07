@@ -26,7 +26,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.riftsaw</groupId>
 	<artifactId>riftsaw-parent</artifactId>
-	<version>3.0.0-SNAPSHOT</version>
+	<version>3.0.0.20130307-M5</version>
 	<packaging>pom</packaging>
 	<name>RiftSaw</name>
 	<url>http://www.jboss.org/riftsaw</url>
@@ -108,7 +108,7 @@
 		<activity.monitor.model.version>1.2.1.Final</activity.monitor.model.version>
 		<axiom.version>1.2.8</axiom.version>
 		<batik.version>1.7</batik.version>
-		<bpel.console.version>2.4.2-SNAPSHOT</bpel.console.version>
+		<bpel.console.version>2.4.3.Final</bpel.console.version>
 		<commons.logging.version>1.1.1</commons.logging.version>
 		<javax.jaxb.version>2.1</javax.jaxb.version>
 		<jboss.javaee.version>5.0.1.GA</jboss.javaee.version>
@@ -116,7 +116,7 @@
 		<jtds.version>1.2.2</jtds.version>
 		<mysql.connector.version>5.0.8</mysql.connector.version>
 		<postgresql.version>8.3-603.jdbc3</postgresql.version>
-		<riftsaw.ode.version>3.0.0-SNAPSHOT</riftsaw.ode.version>
+		<riftsaw.ode.version>3.0.0.20130307-M5</riftsaw.ode.version>
 		<saxon.version>9.2.1.5</saxon.version>
 		<stax.api.version>1.0.1</stax.api.version>
 		<xml.apis.ext.version>1.3.04</xml.apis.ext.version>
