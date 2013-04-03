@@ -103,6 +103,18 @@ public class MessageExchangeContextImpl implements MessageExchangeContext {
                             partnerRoleMessageExchange.getOperation().getOutput().getMessage().getQName());
                     responseMessage.setMessage(resp);
                     
+                    // Associate header values with response message
+                    for (String key : transferedHeaderParts.keySet()) {
+                        QName qname=QName.valueOf(key);
+                        
+                        if (transferedHeaderParts.get(key) instanceof Element) {
+                            responseMessage.setHeaderPart(qname.getLocalPart(),
+                                        (Element)transferedHeaderParts.get(key));
+                        } else {
+                            LOG.warn("Header part for '"+key+"' was not an Element");
+                        }
+                    }
+                    
                     partnerRoleMessageExchange.reply(responseMessage);
                 }
             } catch (Fault f) {

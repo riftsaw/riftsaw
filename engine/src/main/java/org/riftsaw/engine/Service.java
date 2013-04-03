@@ -28,10 +28,12 @@ public interface Service {
 
     /**
      * This method invokes an operation on an external service.
+     * The header map is supplied to provide header values for the
+     * request, and also to receive header values from a response.
      * 
      * @param operationName The operation name
      * @param mesg The multipart message
-     * @param headers The optional header values
+     * @param headers The header values
      * @return The response, or null if a one-way request
      * @throws Exception Failed to invoke operation
      */
