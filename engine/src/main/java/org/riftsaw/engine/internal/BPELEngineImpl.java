@@ -53,6 +53,7 @@ import org.apache.ode.bpel.iapi.ProcessStoreListener;
 import org.apache.ode.bpel.iapi.Scheduler;
 import org.apache.ode.bpel.intercept.MessageExchangeInterceptor;
 import org.apache.ode.bpel.memdao.BpelDAOConnectionFactoryImpl;
+import org.apache.ode.bpel.pmapi.BpelManagementFacade;
 import org.apache.ode.dao.bpel.BpelDAOConnectionFactory;
 import org.apache.ode.dao.scheduler.SchedulerDAOConnectionFactory;
 import org.apache.ode.dao.store.ConfStoreDAOConnectionFactory;
@@ -1044,7 +1045,7 @@ public class BPELEngineImpl implements BPELEngine {
     }
     
     
-	public Object getManagementInterface() {
+	public BpelManagementFacade getManagementInterface() {
 		return new BpelManagementFacadeImpl(_bpelServer, _store);
 	}
 	

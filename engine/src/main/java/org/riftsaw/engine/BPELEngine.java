@@ -19,6 +19,7 @@ package org.riftsaw.engine;
 
 import javax.xml.namespace.QName;
 
+import org.apache.ode.bpel.pmapi.BpelManagementFacade;
 import org.w3c.dom.Element;
 
 /**
@@ -132,7 +133,7 @@ public interface BPELEngine {
      * Access the management interface of the underlying engine
      * @return
      */
-    public Object getManagementInterface();
+    public BpelManagementFacade getManagementInterface();
     
     /**
      * This method registers the supplied listener.
