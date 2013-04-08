@@ -40,6 +40,7 @@ import org.apache.ode.bpel.engine.BpelManagementFacadeImpl;
 import org.apache.ode.bpel.engine.BpelServerImpl;
 import org.apache.ode.bpel.engine.CountLRUDehydrationPolicy;
 import org.apache.ode.bpel.engine.cron.CronScheduler;
+import org.apache.ode.bpel.evt.BpelEvent;
 import org.apache.ode.bpel.extvar.jdbc.JdbcExternalVariableModule;
 import org.apache.ode.bpel.iapi.BpelEventListener;
 import org.apache.ode.bpel.iapi.CacheProvider;
@@ -65,6 +66,7 @@ import org.apache.ode.utils.GUID;
 import org.apache.ode.utils.Properties;
 import org.infinispan.manager.EmbeddedCacheManager;
 import org.riftsaw.engine.BPELEngine;
+import org.riftsaw.engine.BPELEngineListener;
 import org.riftsaw.engine.DeploymentRef;
 import org.riftsaw.engine.DeploymentUnit;
 import org.riftsaw.engine.Fault;
@@ -103,6 +105,9 @@ public class BPELEngineImpl implements BPELEngine {
     private ServiceLocator _serviceLocator;
     private DeploymentManager _deploymentManager;
 
+    private java.util.Map<BPELEngineListener,ProxyBpelEventListener> _listeners=
+                new java.util.HashMap<BPELEngineListener, BPELEngineImpl.ProxyBpelEventListener>();
+    
     /**
      * {@inheritDoc}
      */
@@ -1047,5 +1052,52 @@ public class BPELEngineImpl implements BPELEngine {
 		return _store;
 	}
     
+    /**
+     * {@inheritDoc}
+     */
+    public void register(BPELEngineListener l) {
+        
+        synchronized (_listeners) {
+            if (!_listeners.containsKey(l)) {
+                ProxyBpelEventListener bel=new ProxyBpelEventListener(l);
+            
+                _listeners.put(l, bel);
+                
+                _bpelServer.registerBpelEventListener(bel);
+            } 
+        }
+    }
     
+    /**
+     * {@inheritDoc}
+     */
+    public void unregister(BPELEngineListener l) {
+        synchronized (_listeners) {
+            if (_listeners.containsKey(l)) {
+                ProxyBpelEventListener bel=_listeners.remove(l);
+                
+                _bpelServer.unregisterBpelEventListener(bel);
+            }
+        }
+    }
+    
+    protected class ProxyBpelEventListener implements BpelEventListener {
+        
+        private BPELEngineListener _listener=null;
+        
+        public ProxyBpelEventListener(BPELEngineListener l) {
+            _listener = l;
+        }
+
+        public void onEvent(BpelEvent bpelEvent) {
+            _listener.onEvent(bpelEvent);
+        }
+
+        public void startup(java.util.Properties configProperties) {
+        }
+
+        public void shutdown() {
+        }
+        
+    }
 }

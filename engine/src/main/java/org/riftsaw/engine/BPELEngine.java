@@ -134,4 +134,18 @@ public interface BPELEngine {
      */
     public Object getManagementInterface();
     
+    /**
+     * This method registers the supplied listener.
+     * 
+     * @param l The listener
+     */
+    public void register(BPELEngineListener l);
+    
+    /**
+     * This method unregisters the supplied listener.
+     * 
+     * @param l The listener
+     */
+    public void unregister(BPELEngineListener l);
+    
 }

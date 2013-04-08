@@ -23,6 +23,7 @@ import java.util.Map;
 
 import javax.xml.namespace.QName;
 
+import org.apache.ode.bpel.evt.BpelEvent;
 import org.apache.ode.utils.DOMUtils;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -253,6 +254,53 @@ public class BPELEngineTest {
 
         } catch (Exception e) {
             fail("Failed: "+e);
+        }
+    }
+    
+    @Test
+    public void testHelloWorldWithListener() {
+        
+        TestBPELEngineListener l=new TestBPELEngineListener();
+                
+        m_engine.register(l);
+        
+        try {
+            DeploymentRef ref1=deploy("/hello_world/deploy.xml");
+            invoke(new QName("http://www.jboss.org/bpel/examples/wsdl","HelloService"), "HelloPort",
+                    "hello", "/hello_world/hello_request1.xml", "/hello_world/hello_response1.xml", null);
+            m_engine.undeploy(ref1);
+
+        } catch (Exception e) {
+            fail("Failed: "+e);
+        }
+        
+        if (l.getEvents().size() == 0) {
+            fail("Expecting events");
+        }
+    }
+    
+    @Test
+    public void testHelloWorldWithRemovedListener() {
+        
+        TestBPELEngineListener l=new TestBPELEngineListener();
+                
+        m_engine.register(l);
+        
+        // Remove, and run a process instance, to ensure listener no longer registered
+        m_engine.unregister(l);
+        
+        try {
+            DeploymentRef ref1=deploy("/hello_world/deploy.xml");
+            invoke(new QName("http://www.jboss.org/bpel/examples/wsdl","HelloService"), "HelloPort",
+                    "hello", "/hello_world/hello_request1.xml", "/hello_world/hello_response1.xml", null);
+            m_engine.undeploy(ref1);
+
+        } catch (Exception e) {
+            fail("Failed: "+e);
+        }
+        
+        if (l.getEvents().size() != 0) {
+            fail("Not expecting any events");
         }
     }
     
@@ -571,6 +619,19 @@ public class BPELEngineTest {
         
         public void clear() {
             m_services.clear();
+        }
+    }
+    
+    public class TestBPELEngineListener implements BPELEngineListener {
+        
+        private java.util.List<BpelEvent> _events=new java.util.ArrayList<BpelEvent>();
+
+        public void onEvent(BpelEvent bpelEvent) {
+            _events.add(bpelEvent);
+        }
+        
+        public java.util.List<BpelEvent> getEvents() {
+            return (_events);
         }
     }
 }
