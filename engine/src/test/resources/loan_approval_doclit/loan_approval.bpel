@@ -18,6 +18,7 @@
 
    <variables>
       <variable name="request" messageType="lns:requestMessage" />
+      <variable name="reqelem" element="lns:request" />
       <variable name="requestResponse" messageType="lns:requestResponseMessage" />
       <variable name="check" messageType="ans:checkMessage" />
       <variable name="checkResponse" messageType="ans:checkResponseMessage" />
@@ -45,6 +46,10 @@
 				operation="request" variable="request" createInstance="yes" />
 
         <assign validate="no" name="AssignName">
+            <copy>
+            	<from variable="request" part="parameter"/>
+            	<to variable="reqelem" />
+            </copy>
             <copy>
                 <from><literal>
         <check xmlns="http://example.com/loan-approval/riskAssessment/">

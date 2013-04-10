@@ -129,6 +129,10 @@ public class BPELEngineTest {
     @Test
     public void testLoanApprovalDocLit1() {
         
+        TestBPELEngineListener l=new TestBPELEngineListener();
+        
+        m_engine.register(l);
+        
         m_locator.clear();
         
         m_locator.addService(new QName("http://example.com/loan-approval/riskAssessment/","riskAssessor"),
@@ -157,6 +161,10 @@ public class BPELEngineTest {
             } catch (Exception e) {
                 fail("Failed to undeploy: "+e);
             }
+        }
+
+        if (l.getEvents().size() == 0) {
+            fail("Expecting events");
         }
     }
     
@@ -345,6 +353,10 @@ public class BPELEngineTest {
     @Test
     public void testSimpleCorrelation() {
         
+        TestBPELEngineListener l=new TestBPELEngineListener();
+        
+        m_engine.register(l);
+        
         try {
             DeploymentRef ref1=deploy("/simple_correlation/deploy.xml");
             invoke(new QName("http://www.jboss.org/bpel/examples/wsdl","HelloGoodbyeService"), "HelloGoodbyePort",
@@ -355,6 +367,10 @@ public class BPELEngineTest {
 
         } catch (Exception e) {
             fail("Failed: "+e);
+        }
+        
+        if (l.getEvents().size() == 0) {
+            fail("Expecting events");
         }
     }
     
