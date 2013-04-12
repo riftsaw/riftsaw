@@ -17,17 +17,15 @@
  */
 package org.riftsaw.engine.jboss;
 
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.jboss.as.naming.ServiceBasedNamingStore;
 import org.jboss.as.naming.WritableServiceBasedNamingStore;
-import org.jboss.as.naming.deployment.ContextNames;
 import org.jboss.as.server.CurrentServiceContainer;
 import org.jboss.msc.service.ServiceName;
 import org.jboss.msc.service.ServiceTarget;
-
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
 
 /**
  * @author: Jeff Yu
@@ -37,7 +35,8 @@ public class JndiRegistry {
 
      private static final Log LOG= LogFactory.getLog(JndiRegistry.class);
      
-     private static final ServiceName RIFTSAW_SERVICE_NAME = ServiceName.JBOSS.append("RiftSaw");
+     //This is more of hack, don't want to depend on SwitchYard
+     private static final ServiceName RIFTSAW_SERVICE_NAME = ServiceName.of("SwitchYardComponentService").append("BPELComponent");
 
      public static void bindToJndi(String name, Object object) {
     	 ServiceTarget serviceTarget = CurrentServiceContainer.getServiceContainer();
