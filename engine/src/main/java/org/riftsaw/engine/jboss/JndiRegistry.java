@@ -36,29 +36,36 @@ import javax.naming.NamingException;
 public class JndiRegistry {
 
      private static final Log LOG= LogFactory.getLog(JndiRegistry.class);
+     
+     private static final ServiceName RIFTSAW_SERVICE_NAME = ServiceName.JBOSS.append("RiftSaw");
 
      public static void bindToJndi(String name, Object object) {
-         ServiceTarget serviceTarget = CurrentServiceContainer.getServiceContainer();
-         if (serviceTarget != null) {
-            WritableServiceBasedNamingStore.pushOwner(serviceTarget);
-             try {
-                 InitialContext context = new InitialContext();
-                 context.bind(name, object);
-             } catch (NamingException e) {
-                 LOG.error("Error in binding the object in JNDI.");
-             }
-         }
+    	 ServiceTarget serviceTarget = CurrentServiceContainer.getServiceContainer();
+    	 //Only register it in AS7 container.
+    	 if (serviceTarget != null) { 
+	    	 try {
+	             WritableServiceBasedNamingStore.pushOwner(RIFTSAW_SERVICE_NAME);
+	             InitialContext context = new InitialContext();
+	             context.bind(name, object);
+	         } catch (NamingException e) {
+	             LOG.error("Error in binding the object in JNDI.", e);
+	         } finally {
+	        	 WritableServiceBasedNamingStore.popOwner();
+	         }
+    	 }
      }
 
      public static void unbindFromJndi(String name){
          ServiceTarget serviceTarget = CurrentServiceContainer.getServiceContainer();
-         if (serviceTarget != null) {
-             WritableServiceBasedNamingStore.pushOwner(serviceTarget);
+         if (serviceTarget != null) { 
              try {
+            	 WritableServiceBasedNamingStore.pushOwner(RIFTSAW_SERVICE_NAME);
                  InitialContext context = new InitialContext();
                  context.unbind(name);
              } catch (NamingException e) {
-                 LOG.error("Error in unbinding the object from JNDI.");
+                 LOG.error("Error in unbinding the object from JNDI.", e);
+             } finally {
+            	 WritableServiceBasedNamingStore.popOwner();
              }
          }
      }
