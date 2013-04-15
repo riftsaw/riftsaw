@@ -112,7 +112,7 @@
 		<commons.logging.version>1.1.1</commons.logging.version>
 		<javax.jaxb.version>2.1</javax.jaxb.version>
 		<jboss.javaee.version>5.0.1.GA</jboss.javaee.version>
-		<jbossas.version>7.2.0.Final</jbossas.version>
+		<jbossas.version>7.2.0.Alpha1-redhat-4</jbossas.version>
 		<jtds.version>1.2.2</jtds.version>
 		<mysql.connector.version>5.0.8</mysql.connector.version>
 		<postgresql.version>8.3-603.jdbc3</postgresql.version>

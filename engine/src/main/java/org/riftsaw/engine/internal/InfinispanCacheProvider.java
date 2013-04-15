@@ -47,7 +47,7 @@ public class InfinispanCacheProvider implements CacheProvider{
 			cache = ecm.getCache();
 			cache.start();
 		} catch (NamingException e) {
-			logger.debug("Error on starting the Infinispan cache Manager. detaild is: " + e);	 
+			logger.debug("Using the default HashMapCache as the cache provider", e);
 		}
 		
 	}
@@ -62,7 +62,9 @@ public class InfinispanCacheProvider implements CacheProvider{
 	}
 
 	public void stop() throws Exception {
-		cache.stop();
+		if (cache != null) {
+			cache.stop();
+		}
 	}
 
 }

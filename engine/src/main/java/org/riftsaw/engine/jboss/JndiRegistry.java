@@ -22,10 +22,17 @@ import javax.naming.NamingException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.jboss.as.naming.ServiceBasedNamingStore;
+import org.jboss.as.naming.ValueManagedReferenceFactory;
 import org.jboss.as.naming.WritableServiceBasedNamingStore;
+import org.jboss.as.naming.deployment.ContextNames;
+import org.jboss.as.naming.service.BinderService;
 import org.jboss.as.server.CurrentServiceContainer;
+import org.jboss.msc.service.ServiceContainer;
+import org.jboss.msc.service.ServiceController;
 import org.jboss.msc.service.ServiceName;
 import org.jboss.msc.service.ServiceTarget;
+import org.jboss.msc.value.ImmediateValue;
 
 /**
  * @author: Jeff Yu
@@ -35,22 +42,25 @@ public class JndiRegistry {
 
      private static final Log LOG= LogFactory.getLog(JndiRegistry.class);
      
-     //This is more of hack, don't want to depend on SwitchYard
-     private static final ServiceName RIFTSAW_SERVICE_NAME = ServiceName.of("SwitchYardComponentService").append("BPELComponent");
-
      public static void bindToJndi(String name, Object object) {
-    	 ServiceTarget serviceTarget = CurrentServiceContainer.getServiceContainer();
+    	 ServiceContainer serviceContainer = CurrentServiceContainer.getServiceContainer();
     	 //Only register it in AS7 container.
-    	 if (serviceTarget != null) { 
+    	 if (serviceContainer != null) { 
 	    	 try {
-	             WritableServiceBasedNamingStore.pushOwner(RIFTSAW_SERVICE_NAME);
-	             InitialContext context = new InitialContext();
-	             context.bind(name, object);
-	         } catch (NamingException e) {
-	             LOG.error("Error in binding the object in JNDI.", e);
-	         } finally {
-	        	 WritableServiceBasedNamingStore.popOwner();
-	         }
+	    		 // creates binder service
+	             final ContextNames.BindInfo bindInfo = ContextNames.bindInfoFor(name);
+	             final BinderService binderService = new BinderService(bindInfo.getBindName());
+	             binderService.getManagedObjectInjector().inject(new ValueManagedReferenceFactory(new ImmediateValue<Object>(object)));
+	             // creates the service builder with dep to the parent jndi context
+	             ServiceController<?> serviceController = serviceContainer.addService(bindInfo.getBinderServiceName(), binderService)
+	               .addDependency(bindInfo.getParentContextServiceName(), ServiceBasedNamingStore.class, binderService.getNamingStoreInjector())
+	               .setInitialMode(ServiceController.Mode.ACTIVE)
+	               .install();
+    
+	         }catch (Throwable e) {
+	        	 final NamingException ne = new NamingException("Failed to bind "+ object + " at location " + name);
+	             ne.setRootCause(e);
+	         } 
     	 }
      }
 
@@ -58,7 +68,6 @@ public class JndiRegistry {
          ServiceTarget serviceTarget = CurrentServiceContainer.getServiceContainer();
          if (serviceTarget != null) { 
              try {
-            	 WritableServiceBasedNamingStore.pushOwner(RIFTSAW_SERVICE_NAME);
                  InitialContext context = new InitialContext();
                  context.unbind(name);
              } catch (NamingException e) {
