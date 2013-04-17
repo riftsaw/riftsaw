@@ -170,7 +170,7 @@ public class BPELEngineImpl implements BPELEngine {
         LOG.info("Starting scheduler");
         _scheduler.start();
 
-        //RegisterServicesIntoJNDI();
+        RegisterServicesIntoJNDI();
     }
     
     
@@ -607,7 +607,7 @@ public class BPELEngineImpl implements BPELEngine {
                     _txMgr = null;
                 }
 
-                //unregisterServicesFromJNDI();
+                unregisterServicesFromJNDI();
             }
         } finally {
             Thread.currentThread().setContextClassLoader(old);
