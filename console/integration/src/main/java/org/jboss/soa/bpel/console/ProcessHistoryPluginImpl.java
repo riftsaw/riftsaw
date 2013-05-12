@@ -23,6 +23,7 @@ import org.jboss.bpm.monitor.model.json.XYDataSetJSO;
 import org.jboss.bpm.monitor.model.metric.Grouping;
 import org.jboss.bpm.monitor.model.metric.Timespan;
 import org.jboss.bpm.monitor.model.metric.TimespanFactory;
+import org.riftsaw.engine.BPELEngine;
 
 /**
  * @author Jeff Yu
@@ -31,6 +32,8 @@ import org.jboss.bpm.monitor.model.metric.TimespanFactory;
 public class ProcessHistoryPluginImpl implements ProcessHistoryPlugin {
 	
 	private BPAFDataSource ds = null;
+	
+	private BPELEngine engine = null;
 	
 	public ProcessHistoryPluginImpl() {
 	    try
@@ -41,10 +44,11 @@ public class ProcessHistoryPluginImpl implements ProcessHistoryPlugin {
 	    	  throw new IllegalStateException("EntityManagerFactory is null");
 	      }
 	      ds = new DefaultBPAFDataSource(emf);
+	      engine = (BPELEngine)ctx.lookup(JNDINamingUtils.BPEL_ENGINE);
 	    }
 	    catch (NamingException e)
 	    {
-	      throw new RuntimeException("Failed to initialize BPAF datasource");
+	      throw new RuntimeException("Failed to initialize BPAF datasource or BPEL Engine");
 	    }
 	}
 
@@ -305,5 +309,15 @@ public class ProcessHistoryPluginImpl implements ProcessHistoryPlugin {
         }
         return grouped;
     }
+
+	public boolean recoveryAction(String iid, String aid, String action) {
+		boolean result = true;
+		try {
+			engine.getManagementInterface().recoverActivity(Long.valueOf(iid), Long.valueOf(aid), action);
+		} catch (Exception e) {
+			result = false;
+		}
+		return result;
+	}
 
 }
