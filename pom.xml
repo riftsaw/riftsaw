@@ -37,7 +37,7 @@
     <parent>
         <groupId>org.jboss</groupId>
         <artifactId>jboss-parent</artifactId>
-        <version>8</version>
+        <version>10</version>
     </parent>
 
 	<scm>
@@ -106,57 +106,28 @@
 
 	<properties>
 		<activity.monitor.model.version>1.2.2-SNAPSHOT</activity.monitor.model.version>
-		<axiom.version>1.2.8</axiom.version>
-		<batik.version>1.7</batik.version>
 		<bpel.console.version>2.4.5.Final</bpel.console.version>
-		<commons.logging.version>1.1.1</commons.logging.version>
-		<javax.jaxb.version>2.1</javax.jaxb.version>
-		<jboss.javaee.version>5.0.1.GA</jboss.javaee.version>
-		<jbossas.version>7.2.0.Final</jbossas.version>
-		<jtds.version>1.2.2</jtds.version>
-		<mysql.connector.version>5.0.8</mysql.connector.version>
-		<postgresql.version>8.3-603.jdbc3</postgresql.version>
-		<riftsaw.ode.version>3.2.0-SNAPSHOT</riftsaw.ode.version>
-		<saxon.version>9.2.1.5</saxon.version>
-		<stax.api.version>1.0.1</stax.api.version>
-		<xml.apis.ext.version>1.3.04</xml.apis.ext.version>
-        <infinispan.version>5.1.2.FINAL</infinispan.version>
-	</properties>
+ 		<jboss-integration-platform.version>6.0.0-SNAPSHOT</jboss-integration-platform.version>
+		<riftsaw.ode.version>3.1.0-SNAPSHOT</riftsaw.ode.version>
+ 	</properties>
 
 	<dependencyManagement>
 		<dependencies>
             <!-- Imported dependencies -->
-            <dependency>
-              <groupId>org.jboss.as</groupId>
-              <artifactId>jboss-as-parent</artifactId>
-              <version>${jbossas.version}</version>
-              <type>pom</type>
-              <scope>import</scope>
-            </dependency>
+	    <dependency>
+		<groupId>org.jboss.integration-platform</groupId>
+		<artifactId>jboss-integration-platform-bom</artifactId>
+		<version>${jboss-integration-platform.version}</version>
+		<type>pom</type>
+		<scope>import</scope>
+	    </dependency>
 
-            <!-- db -->
-            <dependency>
-                <groupId>mysql</groupId>
-                <artifactId>mysql-connector-java</artifactId>
-                <version>${mysql.connector.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>postgresql</groupId>
-                <artifactId>postgresql</artifactId>
-                <version>${postgresql.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>net.sourceforge.jtds</groupId>
-                <artifactId>jtds</artifactId>
-                <version>${jtds.version}</version>
-            </dependency>
             <dependency>
                 <groupId>org.riftsaw</groupId>
                 <artifactId>engine</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
-            <!-- engine -->
             <dependency>
                 <groupId>org.jboss.soa.bpel</groupId>
                 <artifactId>riftsaw-agents</artifactId>
@@ -208,31 +179,6 @@
                 <artifactId>riftsaw-scheduler-simple</artifactId>
                 <version>${riftsaw.ode.version}</version>
             </dependency>
-            <dependency>
-                <groupId>org.jboss.javaee</groupId>
-                <artifactId>jboss-javaee</artifactId>
-                <version>${jboss.javaee.version}</version>
-                <exclusions>
-                    <exclusion><groupId>org.jboss.logging</groupId><artifactId>jboss-logging-spi</artifactId></exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>net.sourceforge.saxon</groupId>
-                <artifactId>saxonhe</artifactId>
-                <version>${saxon.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.jboss.as</groupId>
-                <artifactId>jboss-as-naming</artifactId>
-                <version>${jbossas.version}</version>
-                <scope>provided</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.jboss.as</groupId>
-                <artifactId>jboss-as-server</artifactId>
-                <version>${jbossas.version}</version>
-                <scope>provided</scope>
-            </dependency>
 
             <!-- riftsaw-bpaf -->
             <dependency>
@@ -246,104 +192,6 @@
                 <artifactId>riftsaw-console-integration</artifactId>
                 <version>${project.version}</version>
             </dependency>
-            <dependency>
-                <groupId>commons-logging</groupId>
-                <artifactId>commons-logging</artifactId>
-                <version>${commons.logging.version}</version>
-                <scope>provided</scope>
-            </dependency>
-        
-            <!-- riftsaw-bpel2svg -->
-            <dependency>
-                <groupId>org.apache.xmlgraphics</groupId>
-                <artifactId>batik-dom</artifactId>
-                <version>${batik.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.xmlgraphics</groupId>
-                <artifactId>batik-svg-dom</artifactId>
-                <version>${batik.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.xmlgraphics</groupId>
-                <artifactId>batik-svggen</artifactId>
-                <version>${batik.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.xmlgraphics</groupId>
-                <artifactId>batik-util</artifactId>
-                <version>${batik.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.xmlgraphics</groupId>
-                <artifactId>batik-css</artifactId>
-                <version>${batik.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.xmlgraphics</groupId>
-                <artifactId>batik-ext</artifactId>
-                <version>${batik.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.xmlgraphics</groupId>
-                <artifactId>batik-xml</artifactId>
-                <version>${batik.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.xmlgraphics</groupId>
-                <artifactId>batik-transcoder</artifactId>
-                <version>${batik.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.xmlgraphics</groupId>
-                <artifactId>batik-bridge</artifactId>
-                <version>${batik.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.xmlgraphics</groupId>
-                <artifactId>batik-gvt</artifactId>
-                <version>${batik.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.xmlgraphics</groupId>
-                <artifactId>batik-script</artifactId>
-                <version>${batik.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.xmlgraphics</groupId>
-                <artifactId>batik-awt-util</artifactId>
-                <version>${batik.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.xmlgraphics</groupId>
-                <artifactId>batik-parser</artifactId>
-                <version>${batik.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.xmlgraphics</groupId>
-                <artifactId>batik-anim</artifactId>
-                <version>${batik.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.xmlgraphics</groupId>
-                <artifactId>batik-codec</artifactId>
-                <version>${batik.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.ws.commons.axiom</groupId>
-                <artifactId>axiom-impl</artifactId>
-                <version>${axiom.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.ws.commons.axiom</groupId>
-                <artifactId>axiom-api</artifactId>
-                <version>${axiom.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>xml-apis</groupId>
-                <artifactId>xml-apis-ext</artifactId>
-                <version>${xml.apis.ext.version}</version>
-            </dependency>
         
             <!-- riftsaw-console-integration -->
             <dependency>
@@ -356,18 +204,6 @@
                 <groupId>org.riftsaw.console</groupId>
                 <artifactId>riftsaw-bpel2svg</artifactId>
                 <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>javax.xml.bind</groupId>
-                <artifactId>jaxb-api</artifactId>
-                <version>${javax.jaxb.version}</version>
-                <scope>provided</scope>
-            </dependency>
-            <dependency>
-                <groupId>stax</groupId>
-                <artifactId>stax-api</artifactId>
-                <version>${stax.api.version}</version>
-                <scope>provided</scope>
             </dependency>
             
             <!-- switchyard-bpel-console -->
@@ -386,12 +222,6 @@
                 <version>${bpel.console.version}</version>
                 <classifier>riftsaw</classifier>
                 <type>war</type>
-            </dependency>
-
-            <dependency>
-                <groupId>org.infinispan</groupId>
-                <artifactId>infinispan-core</artifactId>
-                <version>${infinispan.version}</version>
             </dependency>
 
 		</dependencies>

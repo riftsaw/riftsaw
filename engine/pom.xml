@@ -71,10 +71,6 @@
 			<artifactId>riftsaw-scheduler-simple</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.jboss.javaee</groupId>
-			<artifactId>jboss-javaee</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>org.jboss</groupId>
 			<artifactId>jboss-common-core</artifactId>
 		</dependency>
@@ -95,18 +91,20 @@
 			<artifactId>junit</artifactId>
 		</dependency>
 
-        <dependency>
-            <groupId>org.jboss.as</groupId>
-            <artifactId>jboss-as-naming</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.jboss.as</groupId>
-            <artifactId>jboss-as-server</artifactId>
-        </dependency>
-        <dependency>
-        	<groupId>org.infinispan</groupId>
-        	<artifactId>infinispan-core</artifactId>
-        </dependency>
+		<dependency>
+			<groupId>org.jboss.as</groupId>
+			<artifactId>jboss-as-naming</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.jboss.as</groupId>
+			<artifactId>jboss-as-server</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.infinispan</groupId>
+			<artifactId>infinispan-core</artifactId>
+		</dependency>
 
 	</dependencies>
 
