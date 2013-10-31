@@ -29,6 +29,7 @@ import org.jboss.bpm.console.client.model.JobRef;
 import org.jboss.bpm.console.client.model.ProcessDefinitionRef;
 import org.jboss.bpm.console.server.plugin.ProcessEnginePlugin;
 import org.riftsaw.engine.BPELEngine;
+import org.riftsaw.engine.BPELEngineFactory;
 
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
@@ -51,10 +52,9 @@ public class ProcessEnginePluginImpl implements ProcessEnginePlugin
   {
     try
     {
-      InitialContext ctx = new InitialContext();
-      engine = (BPELEngine)ctx.lookup(JNDINamingUtils.BPEL_ENGINE);
+        engine = BPELEngineFactory.getEngine();
     }
-    catch (NamingException e)
+    catch (Exception e)
     {
       throw new RuntimeException("Failed to initialize BPEL engine");
     }

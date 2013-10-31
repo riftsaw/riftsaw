@@ -28,6 +28,7 @@ import org.jboss.bpm.monitor.model.bpaf.Event;
 import org.jboss.bpm.monitor.model.bpaf.Tuple;
 import org.jboss.soa.bpel.bpel2svg.BPEL2SVGUtil;
 import org.riftsaw.engine.BPELEngine;
+import org.riftsaw.engine.BPELEngineFactory;
 import org.riftsaw.engine.internal.BPELEngineImpl;
 import org.wso2.carbon.bpel.ui.bpel2svg.ActivityInterface;
 import org.wso2.carbon.bpel.ui.bpel2svg.SVGInterface;
@@ -74,10 +75,9 @@ public class SVGPlugin implements GraphViewerPlugin, ProcessActivityPlugin {
 
         try
         {
-            InitialContext ctx = new InitialContext();
-            engine = (BPELEngine)ctx.lookup(JNDINamingUtils.BPEL_ENGINE);
+            engine = BPELEngineFactory.getEngine();
         }
-        catch (NamingException e)
+        catch (Exception e)
         {
             throw new RuntimeException("Failed to initialize BPEL engine");
         }

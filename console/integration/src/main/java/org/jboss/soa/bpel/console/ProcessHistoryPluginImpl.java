@@ -24,6 +24,7 @@ import org.jboss.bpm.monitor.model.metric.Grouping;
 import org.jboss.bpm.monitor.model.metric.Timespan;
 import org.jboss.bpm.monitor.model.metric.TimespanFactory;
 import org.riftsaw.engine.BPELEngine;
+import org.riftsaw.engine.BPELEngineFactory;
 
 /**
  * @author Jeff Yu
@@ -38,17 +39,18 @@ public class ProcessHistoryPluginImpl implements ProcessHistoryPlugin {
 	public ProcessHistoryPluginImpl() {
 	    try
 	    {
+	      engine = BPELEngineFactory.getEngine();
+
 	      InitialContext ctx = new InitialContext();	      
 	      EntityManagerFactory emf  = (EntityManagerFactory)ctx.lookup(JNDINamingUtils.BPEL_EMF);
 	      if (null == emf) {
 	    	  throw new IllegalStateException("EntityManagerFactory is null");
 	      }
 	      ds = new DefaultBPAFDataSource(emf);
-	      engine = (BPELEngine)ctx.lookup(JNDINamingUtils.BPEL_ENGINE);
 	    }
-	    catch (NamingException e)
+	    catch (Exception e)
 	    {
-	      throw new RuntimeException("Failed to initialize BPAF datasource or BPEL Engine");
+	      throw new RuntimeException("Failed to initialize BPAF datasource or BPEL Engine", e);
 	    }
 	}
 
