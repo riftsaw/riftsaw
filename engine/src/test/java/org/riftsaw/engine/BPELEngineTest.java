@@ -38,9 +38,9 @@ public class BPELEngineTest {
     
     @BeforeClass
     public static void runBeforeClass() {
-        m_engine = BPELEngineFactory.getEngine();
-        
         try {
+            m_engine = BPELEngineFactory.createEngine();
+            
             java.util.Properties props=new java.util.Properties();
 
             java.io.InputStream is=BPELEngineImpl.class.getClassLoader().getResourceAsStream("bpel.properties");    

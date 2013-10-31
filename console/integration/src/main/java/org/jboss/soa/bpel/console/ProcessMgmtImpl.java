@@ -27,6 +27,7 @@ import org.jboss.bpm.console.client.model.ProcessInstanceRef;
 import org.jboss.bpm.console.server.integration.ProcessManagement;
 import org.jboss.soa.bpel.console.json.XmlToJson;
 import org.riftsaw.engine.BPELEngine;
+import org.riftsaw.engine.BPELEngineFactory;
 
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
@@ -49,10 +50,9 @@ public class ProcessMgmtImpl implements ProcessManagement
   {
     try
     {
-      InitialContext ctx = new InitialContext();
-      engine = (BPELEngine)ctx.lookup(JNDINamingUtils.BPEL_ENGINE);
+        engine = BPELEngineFactory.getEngine();
     }
-    catch (NamingException e)
+    catch (Exception e)
     {
       throw new RuntimeException("Failed to initialize BPEL engine");
     }
