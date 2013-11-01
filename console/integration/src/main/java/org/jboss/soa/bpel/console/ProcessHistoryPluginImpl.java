@@ -57,60 +57,73 @@ public class ProcessHistoryPluginImpl implements ProcessHistoryPlugin {
 	/* (non-Javadoc)
 	 * @see org.jboss.bpm.console.server.plugin.ProcessHistoryPlugin#getHistoryProcessInstances(java.lang.String, java.lang.String, long, long, java.lang.String)
 	 */
-	public List<HistoryProcessInstanceRef> getHistoryProcessInstances(
-			String definitionkey, String status, long starttime, long endtime,
-			String correlationkey) {
-		
-		String dkey =  ModelAdaptor.decodeId(definitionkey);
-		List<Event> events = ds.getInstanceEvents(dkey, new Timespan(starttime, endtime, "Custom"), getStatus(status));
-		List<String> instanceIds = null;
-		if (correlationkey != null && !("".equals(correlationkey.trim()))) {
-			String ckey = null;
-			try {
-				ckey = URLDecoder.decode(correlationkey.replace("~", "="), "UTF-8");
-			} catch (UnsupportedEncodingException e1) {
-				throw new IllegalStateException("Decode correlation key of " + correlationkey + " failed.");
-			}	
-			instanceIds = ds.getProcessInstances(dkey, "correlation-key", ckey);
-		}
-		
-		Set<String> historyInstanceIds = new HashSet<String>();
-		
-		for(Event e : events)
-	    {
-			if(instanceIds == null || instanceIds.contains(e.getProcessInstanceID())) {
-				if (e.getEventDetails().getCurrentState().equals(getStatus(status))) {
-					historyInstanceIds.add(e.getProcessInstanceID());
-				}
-			}
-	    }
-		
-		List<HistoryProcessInstanceRef> refs = new ArrayList<HistoryProcessInstanceRef>();
+    public List<HistoryProcessInstanceRef> getHistoryProcessInstances(
+            String definitionkey, String status, long starttime, long endtime,
+            String correlationkey, int startpos, int maxnum) {
+    
+        if (correlationkey != null && !("".equals(correlationkey.trim()))) {
+            try {
+                correlationkey = URLDecoder.decode(correlationkey.replace("~", "="), "UTF-8");
+            } catch (UnsupportedEncodingException e1) {
+                    throw new IllegalStateException("Decode correlation key of " + correlationkey + " failed.");
+            }
+        }
+        
+        String dkey =  ModelAdaptor.decodeId(definitionkey);
 
-		for (String theInstanceID : historyInstanceIds) {
-			List<Event> theEvents = ds.getPastActivities(theInstanceID);
-			HistoryProcessInstanceRef ref = new HistoryProcessInstanceRef();
-			for (Event e : theEvents) {
-				ref.setProcessInstanceId(e.getProcessInstanceID());
-				ref.setState(status);
-				ref.setProcessDefinitionId(e.getProcessDefinitionID());
-				for (Tuple tuple : e.getDataElement()) {
-					if ("correlation-key".equals(tuple.getName())) {
-						ref.setKey(tuple.getValue());
-					}
-					if ("process-start-time".equals(tuple.getName())) {
-						ref.setStartTime(new Date(new Long(tuple.getValue())));
-					}
-					if ("process-end-time".equals(tuple.getName())) {
-						ref.setEndTime(new Date(new Long(tuple.getValue())));
-					}
-				}
-			}
-		   refs.add(ref);
-		}
-		
-		return refs;
-	}
+        List<String> instances=ds.getProcessInstances(dkey, new Timespan(starttime, endtime, "Custom"),
+                getStatus(status), correlationkey, startpos, maxnum);
+        
+        Map<String,HistoryProcessInstanceRef> refmap=new java.util.HashMap<String,HistoryProcessInstanceRef>();
+        
+        for (String instance : instances) {
+            List<Event> events = ds.getPastActivities(instance);
+            
+            // Build map of history process instance refs
+            for (Event e : events) {
+                HistoryProcessInstanceRef ref=refmap.get(e.getProcessInstanceID());
+                
+                if (ref == null) {
+                    ref = new HistoryProcessInstanceRef();
+                    ref.setProcessDefinitionId(e.getProcessDefinitionID());
+                    ref.setProcessInstanceId(e.getProcessInstanceID());
+                    ref.setState(status);
+                    refmap.put(e.getProcessInstanceID(), ref);
+                }
+                
+                if (ref.getStartTime() == null || e.getTimestamp() < ref.getStartTime().getTime()) {
+                    ref.setStartTime(new Date(e.getTimestamp()));
+                }
+                
+                if (ref.getEndTime() == null || e.getTimestamp() > ref.getEndTime().getTime()) {
+                    ref.setEndTime(new Date(e.getTimestamp()));
+                }
+                
+                /** Currently not relevant as only pulls initial and final events,
+                 * and rtrieving all events is less efficient, but if becomes possible
+                 * then should extract correlation key.
+                 */
+                if (ref.getKey() == null) {
+                    for (Tuple tuple : e.getDataElement()) {
+                        if ("correlation-key".equals(tuple.getName())) {
+                            ref.setKey(tuple.getValue());
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        
+        List<HistoryProcessInstanceRef> refs = new ArrayList<HistoryProcessInstanceRef>(refmap.values());
+        
+        Collections.sort(refs, new java.util.Comparator<HistoryProcessInstanceRef>() {
+            public int compare(HistoryProcessInstanceRef o1, HistoryProcessInstanceRef o2) {
+                return o1.getStartTime().compareTo(o2.getStartTime());
+            }
+        });
+        
+        return refs;
+    }
 
 
 
