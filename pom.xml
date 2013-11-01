@@ -105,7 +105,7 @@
 	</modules>
 
 	<properties>
-		<activity.monitor.model.version>1.2.1.Final</activity.monitor.model.version>
+		<activity.monitor.model.version>1.2.2-SNAPSHOT</activity.monitor.model.version>
 		<axiom.version>1.2.8</axiom.version>
 		<batik.version>1.7</batik.version>
 		<bpel.console.version>2.4.5.Final</bpel.console.version>
