@@ -35,9 +35,9 @@
 	</description>
 
     <parent>
-        <groupId>org.jboss</groupId>
-        <artifactId>jboss-parent</artifactId>
-        <version>10</version>
+        <groupId>org.jboss.integration-platform</groupId>
+        <artifactId>jboss-integration-platform-parent</artifactId>
+        <version>6.0.0.CR3</version>
     </parent>
 
 	<scm>
@@ -106,9 +106,8 @@
 
 	<properties>
 		<activity.monitor.model.version>1.2.2-SNAPSHOT</activity.monitor.model.version>
-		<bpel.console.version>2.4.5.Final</bpel.console.version>
- 		<jboss-integration-platform.version>6.0.0-SNAPSHOT</jboss-integration-platform.version>
-		<riftsaw.ode.version>3.1.0-SNAPSHOT</riftsaw.ode.version>
+		<bpel.console.version>2.4.6-SNAPSHOT</bpel.console.version>
+		<riftsaw.ode.version>3.2.0-SNAPSHOT</riftsaw.ode.version>
  	</properties>
 
 	<dependencyManagement>
@@ -117,7 +116,7 @@
 	    <dependency>
 		<groupId>org.jboss.integration-platform</groupId>
 		<artifactId>jboss-integration-platform-bom</artifactId>
-		<version>${jboss-integration-platform.version}</version>
+		<version>6.0.0.CR3</version>
 		<type>pom</type>
 		<scope>import</scope>
 	    </dependency>
