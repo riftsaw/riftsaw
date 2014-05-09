@@ -37,7 +37,7 @@
     <parent>
         <groupId>org.jboss.integration-platform</groupId>
         <artifactId>jboss-integration-platform-parent</artifactId>
-        <version>6.0.0.CR3</version>
+        <version>6.0.0.CR8</version>
     </parent>
 
 	<scm>
@@ -116,7 +116,7 @@
 	    <dependency>
 		<groupId>org.jboss.integration-platform</groupId>
 		<artifactId>jboss-integration-platform-bom</artifactId>
-		<version>6.0.0.CR3</version>
+		<version>6.0.0.CR8</version>
 		<type>pom</type>
 		<scope>import</scope>
 	    </dependency>
@@ -255,8 +255,8 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
         <configuration>
-          <source>1.5</source>
-          <target>1.5</target>
+          <source>1.6</source>
+          <target>1.6</target>
           <showDeprecation>false</showDeprecation>
           <showWarnings>false</showWarnings>
           <optimize>true</optimize>
