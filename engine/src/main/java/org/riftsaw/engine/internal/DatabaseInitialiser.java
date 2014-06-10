@@ -96,8 +96,7 @@ public class DatabaseInitialiser {
 
 			log.debug("Execute SQL from resource: " + resource);
 
-			URL url = Thread.currentThread().getContextClassLoader()
-					.getResource(resource);
+			URL url = getClass().getClassLoader().getResource(resource);
 
 			log.debug("Execute SQL from resource URL: " + url);
 

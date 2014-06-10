@@ -40,7 +40,7 @@ public class JndiRegistry {
 
      private static final Log LOG= LogFactory.getLog(JndiRegistry.class);
      
-     public static void bindToJndi(String name, Object object) {
+     public void bindToJndi(String name, Object object) {
     	 ServiceContainer serviceContainer = CurrentServiceContainer.getServiceContainer();
     	 //Only register it in AS7 container.
     	 if (serviceContainer != null) { 
@@ -68,7 +68,7 @@ public class JndiRegistry {
     	 }
      }
 
-     public static void unbindFromJndi(String name){
+     public void unbindFromJndi(String name){
     	 ServiceContainer serviceContainer = CurrentServiceContainer.getServiceContainer();
          if (serviceContainer != null) {
         	 

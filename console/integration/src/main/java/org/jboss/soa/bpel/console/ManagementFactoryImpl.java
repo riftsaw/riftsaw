@@ -25,6 +25,7 @@ import org.jboss.bpm.console.server.integration.ManagementFactory;
 import org.jboss.bpm.console.server.integration.ProcessManagement;
 import org.jboss.bpm.console.server.integration.TaskManagement;
 import org.jboss.bpm.console.server.integration.UserManagement;
+import org.riftsaw.engine.BPELEngine;
 
 
 /**
@@ -32,9 +33,21 @@ import org.jboss.bpm.console.server.integration.UserManagement;
  */
 public class ManagementFactoryImpl extends ManagementFactory
 {
+
+  private final BPELEngine engine;
+
+  public ManagementFactoryImpl() {
+      this(null);
+  }
+
+  public ManagementFactoryImpl(BPELEngine engine) {
+    super();
+    this.engine = engine;
+  }
+
   public ProcessManagement createProcessManagement()
   {
-    return new ProcessMgmtImpl();
+    return engine == null ? new ProcessMgmtImpl() : new ProcessMgmtImpl(engine);
   }
 
   public TaskManagement createTaskManagement()

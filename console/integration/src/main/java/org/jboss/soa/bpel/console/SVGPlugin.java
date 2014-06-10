@@ -85,6 +85,11 @@ public class SVGPlugin implements GraphViewerPlugin, ProcessActivityPlugin {
         this.bpafDataSource = DataSourceFactory.createDataSource();
     }
 
+    public SVGPlugin(BPELEngine engine, BPAFDataSource bpafDataSource) {
+        this.engine = engine;
+        this.bpafDataSource = bpafDataSource;
+    }
+
     protected StringBuilder getBaseUrl() {
         StringBuilder spec = new StringBuilder();
         spec.append("http://");
