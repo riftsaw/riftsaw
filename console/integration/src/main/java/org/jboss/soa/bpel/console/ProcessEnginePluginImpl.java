@@ -48,6 +48,12 @@ public class ProcessEnginePluginImpl implements ProcessEnginePlugin
 
   private ProcessMgmtImpl processManagement;
 
+  public ProcessEnginePluginImpl(BPELEngine engine) {
+    super();
+    this.engine = engine;
+    this.processManagement = new ProcessMgmtImpl(engine);
+  }
+
   public ProcessEnginePluginImpl()
   {
     try

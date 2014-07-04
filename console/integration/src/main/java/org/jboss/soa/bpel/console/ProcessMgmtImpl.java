@@ -46,6 +46,11 @@ public class ProcessMgmtImpl implements ProcessManagement
 
   private BPELEngine engine;
   
+  public ProcessMgmtImpl(BPELEngine engine) {
+    super();
+    this.engine = engine;
+  }
+
   public ProcessMgmtImpl()
   {
     try

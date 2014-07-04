@@ -32,7 +32,7 @@ import org.riftsaw.engine.BPELEngineFactory;
  */
 public class ProcessHistoryPluginImpl implements ProcessHistoryPlugin {
 	
-	private BPAFDataSource ds = null;
+    private BPAFDataSource ds = null;
 	
 	private BPELEngine engine = null;
 	
@@ -53,6 +53,12 @@ public class ProcessHistoryPluginImpl implements ProcessHistoryPlugin {
 	      throw new RuntimeException("Failed to initialize BPAF datasource or BPEL Engine", e);
 	    }
 	}
+
+    public ProcessHistoryPluginImpl(BPELEngine engine, BPAFDataSource ds) {
+        super();
+        this.engine = engine;
+        this.ds = ds;
+    }
 
 	/* (non-Javadoc)
 	 * @see org.jboss.bpm.console.server.plugin.ProcessHistoryPlugin#getHistoryProcessInstances(java.lang.String, java.lang.String, long, long, java.lang.String)

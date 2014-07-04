@@ -102,7 +102,6 @@ public class BPELEngineImpl implements BPELEngine {
     private ExecutorService _executorService;
     private CronScheduler _cronScheduler;
     private CacheProvider _cacheProvider;
-    private org.infinispan.Cache<String, String> _cache;
     private ServiceLocator _serviceLocator;
     private DeploymentManager _deploymentManager;
 
@@ -114,13 +113,16 @@ public class BPELEngineImpl implements BPELEngine {
      */
     public void init(ServiceLocator locator, java.util.Properties props) throws Exception {
 
-        if (props == null) {
-            props = new java.util.Properties();
+        if (_odeConfig == null) {
+            if (props == null) {
+                props = new java.util.Properties();
+            }
+    
+            LOG.info("ODE PROPS="+props);
+    
+            _odeConfig = new OdeConfigProperties(props, "bpel.");
         }
 
-        LOG.info("ODE PROPS="+props);
-
-        _odeConfig = new OdeConfigProperties(props, "bpel.");
         _serviceLocator = locator;
 
         LOG.info("Initializing transaction manager");
@@ -170,27 +172,104 @@ public class BPELEngineImpl implements BPELEngine {
         LOG.info("Starting scheduler");
         _scheduler.start();
 
-        RegisterServicesIntoJNDI();
+        registerServicesIntoJNDI();
     }
     
-    
-	private void populateDatabaseSchema() throws Exception {
-		//populate the schema only if the db.emb.create=false in the bpel.properties
-		if (!Boolean.valueOf(_odeConfig.getProperty(OdeConfigProperties.PROP_DB_EMBEDDED_CREATE, "false"))) {
-			String dialect = _odeConfig.getProperties().getProperty("hibernate.dialect");
-			DatabaseInitialiser dbInitialiser = new DatabaseInitialiser(_db.getDataSource(), _txMgr, dialect);
-	        dbInitialiser.initDatabase();			
-		}
-	}
+    /**
+     * Set the ode config.
+     * 
+     * @param odeConfig The ode config to set.
+     */
+    public void setOdeConfig(OdeConfigProperties odeConfig) {
+        _odeConfig = odeConfig;
+    }
 
-    private void RegisterServicesIntoJNDI() {
+    /**
+     * Set the deployment manager.
+     * 
+     * @param deploymentManager The deployment manager to set.
+     */
+    public void setDeploymentManager(DeploymentManager deploymentManager) {
+        _deploymentManager = deploymentManager;
+    }
+
+    /**
+     * Set the transaction manager.
+     * 
+     * @param transactionManager The transaction manager to set.
+     */
+    public void setTransactionManager(TransactionManager transactionManager) {
+        _txMgr = transactionManager;
+    }
+
+    /**
+     * Set the daoCF.
+     * 
+     * @param daoCF The daoCF to set.
+     */
+    public void setDaoCF(BpelDAOConnectionFactory daoCF) {
+        _daoCF = daoCF;
+    }
+
+
+    /**
+     * Set the storeCF.
+     * 
+     * @param storeCF The storeCF to set.
+     */
+    public void setStoreCF(ConfStoreDAOConnectionFactory storeCF) {
+        _storeCF = storeCF;
+    }
+
+    /**
+     * Set the schedulerDaoCF.
+     * 
+     * @param schedulerDaoCF The schedulerDaoCF to set.
+     */
+    public void setSchedulerDaoCF(SchedulerDAOConnectionFactory schedulerDaoCF) {
+        _schedulerDaoCF = schedulerDaoCF;
+    }
+
+    /**
+     * Set the executor service.
+     * 
+     * @param executorService The executor service to set.
+     */
+    public void setExecutorService(ExecutorService executorService) {
+        _executorService = executorService;
+    }
+
+    /**
+     * Set the cache provider.
+     * 
+     * @param cacheProvider The cache provider to set.
+     */
+    public void setCacheProvider(CacheProvider cacheProvider) {
+        _cacheProvider = cacheProvider;
+    }
+    
+    private void populateDatabaseSchema() throws Exception {
+        //populate the schema only if the db.emb.create=false in the bpel.properties
+        if (!Boolean.valueOf(_odeConfig.getProperty(OdeConfigProperties.PROP_DB_EMBEDDED_CREATE, "false"))) {
+            String dialect = _odeConfig.getProperties().getProperty("hibernate.dialect");
+            DatabaseInitialiser dbInitialiser = new DatabaseInitialiser(_db.getDataSource(), _txMgr, dialect);
+            dbInitialiser.initDatabase();
+        }
+    }
+
+    private void registerServicesIntoJNDI() {
         LOG.info("Register BPEL engine, EntityManagerFactory into JNDI.");
-        JndiRegistry.bindToJndi(_jndiName, this);
-        // hack to expose the EntityManagerFactory.
-        // See org.apache.ode.dao.jpa.hibernate.BpelDAOConnectionFactoryImpl as well.
-        Object emf = _odeConfig.getProperties().get("ode.emf");
-        if (emf != null) {
-           JndiRegistry.bindToJndi(_emfJndiName, emf);
+        try {
+            final JndiRegistry registry = new JndiRegistry();
+            registry.bindToJndi(_jndiName, this);
+            // hack to expose the EntityManagerFactory.
+            // See org.apache.ode.dao.jpa.hibernate.BpelDAOConnectionFactoryImpl as well.
+            Object emf = _odeConfig.getProperties().get("ode.emf");
+            if (emf != null) {
+                registry.bindToJndi(_emfJndiName, emf);
+            }
+        } catch (Throwable t) {
+            LOG.error("Failed to bind engine to JNDI registry", t);
         }
     }
 
@@ -198,8 +277,9 @@ public class BPELEngineImpl implements BPELEngine {
         LOG.info("Unbind the services from JNDI.");
         
         try {
-            JndiRegistry.unbindFromJndi(_jndiName);
-            JndiRegistry.unbindFromJndi(_emfJndiName);
+            final JndiRegistry registry = new JndiRegistry();
+            registry.unbindFromJndi(_jndiName);
+            registry.unbindFromJndi(_emfJndiName);
         } catch (Throwable t) {
             LOG.debug("Failed to unbind services on engine close", t);
         }
@@ -241,7 +321,9 @@ public class BPELEngineImpl implements BPELEngine {
      * This method initializes the cache provider.
      */
     private void initCacheProvider() {
-        _cacheProvider = CacheProviderFactory.getCacheProvider(_odeConfig);
+        if (_cacheProvider == null) {
+            _cacheProvider = CacheProviderFactory.getCacheProvider(_odeConfig);
+        }
         try {
             _cacheProvider.start(_odeConfig.getProperties());
         } catch (Exception e) {
@@ -251,16 +333,18 @@ public class BPELEngineImpl implements BPELEngine {
     }
     
     private void initDeploymentManager() {
-        _deploymentManager = new DeploymentManager();
-        
-        String folder=_odeConfig.getProperty("deployment.folder");
-        
-        if (folder == null) {
-            folder = System.getProperty(DEPLOYMENT_FOLDER_ENV_VAR);
-        }
-
-        if (folder != null) {
-            _deploymentManager.setDeploymentFolder(folder);
+        if (_deploymentManager == null) {
+            _deploymentManager = new DeploymentManager();
+            
+            String folder=_odeConfig.getProperty("deployment.folder");
+            
+            if (folder == null) {
+                folder = System.getProperty(DEPLOYMENT_FOLDER_ENV_VAR);
+            }
+    
+            if (folder != null) {
+                _deploymentManager.setDeploymentFolder(folder);
+            }
         }
     }
     
@@ -290,19 +374,21 @@ public class BPELEngineImpl implements BPELEngine {
      * @throws Exception Failed to initialize
      */
     private void initTxMgr() throws Exception {
-        String txFactoryName = _odeConfig.getTxFactoryClass();
-        LOG.info("Initializing transaction manager using " + txFactoryName);
-        try {
-            Class<?> txFactClass = this.getClass().getClassLoader().loadClass(txFactoryName);
-            Object txFact = txFactClass.newInstance();
-            _txMgr = (TransactionManager) txFactClass.getMethod("getTransactionManager", (Class[]) null).invoke(txFact);
-            
-            //if (__logTx.isDebugEnabled() && System.getProperty("ode.debug.tx") != null)
-            //    _txMgr = new DebugTxMgr(_txMgr);
-            //_axisConfig.addParameter("ode.transaction.manager", _txMgr);
-        } catch (Exception e) {
-            LOG.error("Couldn't initialize a transaction manager with factory: " + txFactoryName, e);
-            throw new Exception("Couldn't initialize a transaction manager with factory: " + txFactoryName, e);
+        if (_txMgr == null) {
+            String txFactoryName = _odeConfig.getTxFactoryClass();
+            LOG.info("Initializing transaction manager using " + txFactoryName);
+            try {
+                Class<?> txFactClass = this.getClass().getClassLoader().loadClass(txFactoryName);
+                Object txFact = txFactClass.newInstance();
+                _txMgr = (TransactionManager) txFactClass.getMethod("getTransactionManager", (Class[]) null).invoke(txFact);
+                
+                //if (__logTx.isDebugEnabled() && System.getProperty("ode.debug.tx") != null)
+                //    _txMgr = new DebugTxMgr(_txMgr);
+                //_axisConfig.addParameter("ode.transaction.manager", _txMgr);
+            } catch (Exception e) {
+                LOG.error("Couldn't initialize a transaction manager with factory: " + txFactoryName, e);
+                throw new Exception("Couldn't initialize a transaction manager with factory: " + txFactoryName, e);
+            }
         }
     }
 
@@ -312,17 +398,27 @@ public class BPELEngineImpl implements BPELEngine {
      * @throws Exception Failed to initialize
      */
     protected void initDAO() throws Exception {
-        LOG.info("USING DAO: "+_odeConfig.getDAOConnectionFactory() + ", " + _odeConfig.getDAOConfStoreConnectionFactory()
-                        + ", " + _odeConfig.getDAOConfScheduleConnectionFactory());
-        try {
-            _daoCF = _db.createDaoCF();
-            _storeCF = _db.createDaoStoreCF();
-            _schedulerDaoCF = _db.createDaoSchedulerCF();
-        } catch (Exception ex) {
-            String errmsg = "DAO INSTANTIATION FAILED: "+_odeConfig.getDAOConnectionFactory() + " , " + _odeConfig.getDAOConfStoreConnectionFactory()
-                            + " and " + _odeConfig.getDAOConfScheduleConnectionFactory();
-            LOG.error(errmsg, ex);
-            throw new Exception(errmsg, ex);
+        if (_daoCF == null) {
+            LOG.info("USING DAO: "+_odeConfig.getDAOConnectionFactory() + ", " + _odeConfig.getDAOConfStoreConnectionFactory()
+                            + ", " + _odeConfig.getDAOConfScheduleConnectionFactory());
+            try {
+                _daoCF = _db.createDaoCF();
+                _storeCF = _db.createDaoStoreCF();
+                _schedulerDaoCF = _db.createDaoSchedulerCF();
+            } catch (Exception ex) {
+                String errmsg = "DAO INSTANTIATION FAILED: "+_odeConfig.getDAOConnectionFactory() + " , " + _odeConfig.getDAOConfStoreConnectionFactory()
+                                + " and " + _odeConfig.getDAOConfScheduleConnectionFactory();
+                LOG.error(errmsg, ex);
+                throw new Exception(errmsg, ex);
+            }
+        } else if (_storeCF == null) {
+            String errmsg = "DAO INSTANTIATION FAILED: DAO initialized using setters, but ConfStoreDAOConnectionFactory was not set.";
+            LOG.error(errmsg);
+            throw new Exception(errmsg);
+        } else if (_schedulerDaoCF == null) {
+            String errmsg = "DAO INSTANTIATION FAILED: DAO initialized using setters, but SchedulerDAOConnectionFactory was not set.";
+            LOG.error(errmsg);
+            throw new Exception(errmsg);
         }
     }
     
@@ -339,8 +435,8 @@ public class BPELEngineImpl implements BPELEngine {
 			EmbeddedCacheManager ecm = (EmbeddedCacheManager)
 			        new InitialContext().lookup(OdeConfigProperties.CACHE_CONTAINER_ROOT + cacheName);
 			clusterNodeName = ecm.getAddress().toString();
-			_cache = ecm.getCache();
-			_cache.start();
+			org.infinispan.Cache<String, String> cache = ecm.getCache();
+			cache.start();
 			ecm.addListener(new MemberDropListener(_schedulerDaoCF, _txMgr));
 			
 		} catch (NamingException e) {
@@ -377,10 +473,12 @@ public class BPELEngineImpl implements BPELEngine {
             }
         };
 
-        if (_odeConfig.getThreadPoolMaxSize() == 0) {
-            _executorService = Executors.newCachedThreadPool(threadFactory);
-        } else {
-            _executorService = Executors.newFixedThreadPool(_odeConfig.getThreadPoolMaxSize(), threadFactory);
+        if (_executorService == null) {
+            if (_odeConfig.getThreadPoolMaxSize() == 0) {
+                _executorService = Executors.newCachedThreadPool(threadFactory);
+            } else {
+                _executorService = Executors.newFixedThreadPool(_odeConfig.getThreadPoolMaxSize(), threadFactory);
+            }
         }
 
         _bpelServer = new BpelServerImpl();
