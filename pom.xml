@@ -37,7 +37,7 @@
     <parent>
         <groupId>org.jboss.integration-platform</groupId>
         <artifactId>jboss-integration-platform-parent</artifactId>
-        <version>6.0.0.CR8</version>
+        <version>6.0.0.CR9</version>
     </parent>
 
 	<scm>
@@ -116,7 +116,7 @@
 	    <dependency>
 		<groupId>org.jboss.integration-platform</groupId>
 		<artifactId>jboss-integration-platform-bom</artifactId>
-		<version>6.0.0.CR8</version>
+		<version>6.0.0.CR9</version>
 		<type>pom</type>
 		<scope>import</scope>
 	    </dependency>
