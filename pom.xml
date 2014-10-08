@@ -37,7 +37,7 @@
     <parent>
         <groupId>org.jboss.integration-platform</groupId>
         <artifactId>jboss-integration-platform-parent</artifactId>
-        <version>6.0.0.CR9</version>
+        <version>6.0.0.CR12</version>
     </parent>
 
 	<scm>
@@ -108,6 +108,9 @@
 		<activity.monitor.model.version>1.2.2.Final</activity.monitor.model.version>
 		<bpel.console.version>2.4.6.Final</bpel.console.version>
 		<riftsaw.ode.version>3.2.1-SNAPSHOT</riftsaw.ode.version>
+
+		<version.org.jboss.as>7.4.0.Final-redhat-19</version.org.jboss.as>
+
  	</properties>
 
 	<dependencyManagement>
@@ -116,7 +119,7 @@
 	    <dependency>
 		<groupId>org.jboss.integration-platform</groupId>
 		<artifactId>jboss-integration-platform-bom</artifactId>
-		<version>6.0.0.CR9</version>
+		<version>6.0.0.CR12</version>
 		<type>pom</type>
 		<scope>import</scope>
 	    </dependency>
@@ -222,6 +225,17 @@
                 <classifier>riftsaw</classifier>
                 <type>war</type>
             </dependency>
+
+		    <dependency>
+				<groupId>org.jboss.as</groupId>
+				<artifactId>jboss-as-naming</artifactId>
+				<version>${version.org.jboss.as}</version>
+		    </dependency>            
+		    <dependency>
+				<groupId>org.jboss.as</groupId>
+				<artifactId>jboss-as-server</artifactId>
+				<version>${version.org.jboss.as}</version>
+		    </dependency>            
 
 		</dependencies>
 	</dependencyManagement>
@@ -374,6 +388,19 @@
 		  <updatePolicy>never</updatePolicy>
 		</snapshots>
     </repository>
+	    <repository>
+	        <id>redhat-techpreview-repository-group</id>
+	        <name>RedHat Tech Preview Maven Repository Group</name>
+	        <url>http://maven.repository.redhat.com/techpreview/all</url>
+	        <releases>
+	            <enabled>true</enabled>
+	            <updatePolicy>never</updatePolicy>
+	        </releases>
+	        <snapshots>
+	            <enabled>true</enabled>
+	            <updatePolicy>never</updatePolicy>
+	        </snapshots>
+	    </repository>
 
   </repositories>
 
