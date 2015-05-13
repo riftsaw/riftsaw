@@ -26,7 +26,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.riftsaw</groupId>
 	<artifactId>riftsaw-parent</artifactId>
-	<version>3.2.1.Final</version>
+	<version>3.2.2.Final</version>
 	<packaging>pom</packaging>
 	<name>RiftSaw</name>
 	<url>http://www.jboss.org/riftsaw</url>
@@ -105,9 +105,9 @@
 	</modules>
 
 	<properties>
-		<activity.monitor.model.version>1.2.3.Final</activity.monitor.model.version>
-		<bpel.console.version>2.4.7.Final</bpel.console.version>
-		<riftsaw.ode.version>3.2.1.Final</riftsaw.ode.version>
+		<activity.monitor.model.version>1.2.3.Final-redhat-4</activity.monitor.model.version>
+		<bpel.console.version>2.4.8.Final</bpel.console.version>
+		<riftsaw.ode.version>3.2.1.Final-redhat-4</riftsaw.ode.version>
 
 		<version.org.jboss.as>7.4.0.Final-redhat-19</version.org.jboss.as>
 
