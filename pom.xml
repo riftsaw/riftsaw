@@ -26,7 +26,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.riftsaw</groupId>
 	<artifactId>riftsaw-parent</artifactId>
-	<version>3.2.2.Final</version>
+	<version>3.2.3.Final</version>
 	<packaging>pom</packaging>
 	<name>RiftSaw</name>
 	<url>http://www.jboss.org/riftsaw</url>
@@ -106,15 +106,41 @@
 
 	<properties>
 		<activity.monitor.model.version>1.2.3.Final-redhat-4</activity.monitor.model.version>
-		<bpel.console.version>2.4.8.Final</bpel.console.version>
-		<riftsaw.ode.version>3.2.1.Final-redhat-4</riftsaw.ode.version>
-
+		<bpel.console.version>2.4.7.Final-redhat-4</bpel.console.version>
+		<riftsaw.ode.version>3.2.2.Final</riftsaw.ode.version>
 		<version.org.jboss.as>7.4.0.Final-redhat-19</version.org.jboss.as>
-
  	</properties>
 
 	<dependencyManagement>
 		<dependencies>
+	    <!-- Hibernate 4.3 for Fuse -->
+                    <dependency>
+                        <groupId>org.hibernate.javax.persistence</groupId>
+                        <artifactId>hibernate-jpa-2.1-api</artifactId>
+                        <version>1.0.0.Final</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.hibernate.common</groupId>
+                        <artifactId>hibernate-commons-annotations</artifactId>
+                        <version>4.0.5.Final</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.hibernate</groupId>
+                        <artifactId>hibernate-core</artifactId>
+                        <version>4.3.6.Final</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.hibernate</groupId>
+                        <artifactId>hibernate-entitymanager</artifactId>
+                        <version>4.3.6.Final</version>
+                    </dependency>
+		    <dependency>
+                        <groupId>org.jboss</groupId>
+                        <artifactId>jandex</artifactId>
+                        <version>1.1.0.Final</version>
+                        <scope>test</scope>
+                    </dependency>
+
             <!-- Imported dependencies -->
 	    <dependency>
 		<groupId>org.jboss.integration-platform</groupId>
