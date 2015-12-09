@@ -7,10 +7,10 @@
 	<packaging>pom</packaging>
 	<name>RiftSaw::Console</name>
 
-    <parent>
+        <parent>
 	    <groupId>org.riftsaw</groupId>
-		<artifactId>riftsaw-parent</artifactId>
-		<version>3.2.0.Final</version>
+	    <artifactId>riftsaw-parent</artifactId>
+	    <version>3.2.4-SNAPSHOT</version>
 	</parent>
 
 	<modules>

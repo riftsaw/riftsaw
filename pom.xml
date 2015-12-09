@@ -26,7 +26,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.riftsaw</groupId>
 	<artifactId>riftsaw-parent</artifactId>
-	<version>3.2.0.Final</version>
+	<version>3.2.4-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>RiftSaw</name>
 	<url>http://www.jboss.org/riftsaw</url>
@@ -105,13 +105,25 @@
 	</modules>
 
 	<properties>
-		<activity.monitor.model.version>1.2.2.Final</activity.monitor.model.version>
-		<bpel.console.version>2.4.6.Final</bpel.console.version>
-		<riftsaw.ode.version>3.2.0.Final</riftsaw.ode.version>
+                <activity.monitor.model.version>1.2.2.Final</activity.monitor.model.version>
+                <bpel.console.version>2.4.6.Final</bpel.console.version>
+                <riftsaw.ode.version>3.2.4-SNAPSHOT</riftsaw.ode.version>
+                <version.net.sf.saxon>9.5.1-5</version.net.sf.saxon>
  	</properties>
 
 	<dependencyManagement>
-		<dependencies>
+          <dependencies>
+            <dependency>
+                <groupId>net.sf.saxon</groupId>
+                <artifactId>Saxon-HE</artifactId>
+                <version>${version.net.sf.saxon}</version>
+            </dependency>
+	    <dependency>
+                <groupId>org.jboss.soa.bpel</groupId>
+                <artifactId>riftsaw-saxon-xqj</artifactId>
+                <version>${riftsaw.ode.version}</version>
+            </dependency>
+
             <!-- Imported dependencies -->
 	    <dependency>
 		<groupId>org.jboss.integration-platform</groupId>
