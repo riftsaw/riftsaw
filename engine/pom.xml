@@ -30,10 +30,18 @@
 	<parent>
 		<groupId>org.riftsaw</groupId>
 		<artifactId>riftsaw-parent</artifactId>
-		<version>3.2.3.Final</version>
+		<version>3.2.4-SNAPSHOT</version>
 	</parent>
 
 	<dependencies>
+                <dependency>
+                        <groupId>net.sf.saxon</groupId>
+                        <artifactId>Saxon-HE</artifactId>
+                </dependency>
+                <dependency>
+                        <groupId>org.jboss.soa.bpel</groupId>
+                        <artifactId>riftsaw-saxon-xqj</artifactId>
+                </dependency>
 		<dependency>
 			<groupId>org.jboss.soa.bpel</groupId>
 			<artifactId>riftsaw-agents</artifactId>
@@ -77,10 +85,6 @@
 		<dependency>
 			<groupId>com.h2database</groupId>
 			<artifactId>h2</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>net.sourceforge.saxon</groupId>
-			<artifactId>saxonhe</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>
