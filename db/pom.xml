@@ -30,7 +30,7 @@
 	<parent>
 		<groupId>org.riftsaw</groupId>
 		<artifactId>riftsaw-parent</artifactId>
-		<version>3.2.3.Final</version>
+		<version>3.2.4-SNAPSHOT</version>
 	</parent>
 
 	<dependencies>
@@ -78,9 +78,6 @@
                     </execution>
                 </executions>
             </plugin>
-
         </plugins>
     </build>
-
-
 </project>
